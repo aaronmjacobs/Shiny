@@ -3,9 +3,11 @@ set(HEADER_NAMES
    Log.h
    Pointers.h
    ShinyAssert.h
+   Graphics/Framebuffer.h
    Graphics/Mesh.h
    Graphics/Model.h
    Graphics/Shader.h
    Graphics/ShaderProgram.h
    Graphics/Texture.h
+   Graphics/Viewport.h
 )
