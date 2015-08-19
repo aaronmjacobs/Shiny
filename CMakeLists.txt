@@ -114,11 +114,38 @@ function(set_import_locations target lib_release lib_debug imp_release imp_debug
    endif(imp_debug)
 endfunction(set_import_locations)
 
+macro(list_subdirs result curdir)
+   file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+   set(dirlist "")
+   foreach(child ${children})
+      if(IS_DIRECTORY ${curdir}/${child})
+         list(APPEND dirlist ${child})
+      endif(IS_DIRECTORY ${curdir}/${child})
+   endforeach(child)
+   set(${result} ${dirlist})
+endmacro(list_subdirs)
+
+function(copy_headers source dest)
+   file(MAKE_DIRECTORY "${dest}")
+
+   file(GLOB HEADERS "${source}/*.h" "${source}/*.hpp" "${source}/*.inl")
+   file(COPY ${HEADERS} DESTINATION "${dest}")
+
+   list_subdirs(SUBDIRS ${source})
+   foreach(subdir ${SUBDIRS})
+      copy_headers("${source}/${subdir}" "${dest}/${subdir}")
+   endforeach()
+endfunction(copy_headers)
+
 ## Integrated ##
 
 # glad
 set(GLAD_DIR "${DEP_DIR}/glad")
 attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
+
+# GLM
+set(GLM_DIR "${DEP_DIR}/glm")
+copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm)
 
 # Pempek Assert
 set(PEMPEK_DIR "${DEP_DIR}/PempekAssert")
