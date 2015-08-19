@@ -116,6 +116,10 @@ endfunction(set_import_locations)
 
 ## Integrated ##
 
+# Pempek Assert
+set(PEMPEK_DIR "${DEP_DIR}/PempekAssert")
+attach_lib("${PEMPEK_DIR}/include" "${PEMPEK_DIR}/lib/pempek_assert.cpp" "")
+
 # templog
 set(TEMPLOG_DIR "${DEP_DIR}/templog")
 attach_lib("${TEMPLOG_DIR}/include" "${TEMPLOG_DIR}/imp/logging.cpp" "")
