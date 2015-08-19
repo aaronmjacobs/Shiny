@@ -137,6 +137,16 @@ attach_lib("${BOXER_DIR}/include" "" "Boxer")
 
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
+# GLFW
+set(GLFW_DIR "${DEP_DIR}/glfw")
+set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
+set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
+set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
+set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
+set(GLFW_USE_CHDIR OFF CACHE INTERNAL "Make glfwInit chdir to Contents/Resources")
+add_subdirectory(${GLFW_DIR})
+attach_lib("${GLFW_DIR}/include" "" "glfw")
+
 ### Building ###
 
 # Includes

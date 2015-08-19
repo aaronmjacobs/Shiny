@@ -1,3 +1,6 @@
 [submodule "dependencies/Boxer"]
 	path = dependencies/Boxer
 	url = https://github.com/aaronmjacobs/Boxer.git
+[submodule "dependencies/glfw"]
+	path = dependencies/glfw
+	url = https://github.com/glfw/glfw.git
