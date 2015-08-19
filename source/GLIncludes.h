@@ -1,5 +1,5 @@
-#ifndef SHINY_GL_H
-#define SHINY_GL_H
+#ifndef SHINY_GLINCLUDES_H
+#define SHINY_GLINCLUDES_H
 
 #include <glad/glad.h>
 

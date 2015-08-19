@@ -10,6 +10,7 @@
 #define VERSION_BUILD @VERSION_BUILD@
 
 #cmakedefine SHINY_LOG_TO_FILE
+#cmakedefine SHINY_USE_GLM
 
 #define DATA_DIR "@DATA_DIR_NAME@"
 

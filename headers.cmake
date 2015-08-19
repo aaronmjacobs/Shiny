@@ -1,5 +1,11 @@
 set(HEADER_NAMES
-   GL.h
+   GLIncludes.h
    Log.h
+   Pointers.h
    ShinyAssert.h
+   Graphics/Mesh.h
+   Graphics/Model.h
+   Graphics/Shader.h
+   Graphics/ShaderProgram.h
+   Graphics/Texture.h
 )
