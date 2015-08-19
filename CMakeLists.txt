@@ -116,6 +116,10 @@ endfunction(set_import_locations)
 
 ## Integrated ##
 
+# glad
+set(GLAD_DIR "${DEP_DIR}/glad")
+attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
+
 # Pempek Assert
 set(PEMPEK_DIR "${DEP_DIR}/PempekAssert")
 attach_lib("${PEMPEK_DIR}/include" "${PEMPEK_DIR}/lib/pempek_assert.cpp" "")
