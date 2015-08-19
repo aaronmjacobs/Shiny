@@ -120,6 +120,11 @@ endfunction(set_import_locations)
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 
+# Boxer
+set(BOXER_DIR "${DEP_DIR}/Boxer")
+add_subdirectory(${BOXER_DIR})
+attach_lib("${BOXER_DIR}/include" "" "Boxer")
+
 ## Shared ##
 
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")

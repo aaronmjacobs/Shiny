@@ -1,0 +1,3 @@
+[submodule "dependencies/Boxer"]
+	path = dependencies/Boxer
+	url = https://github.com/aaronmjacobs/Boxer.git
