@@ -116,6 +116,10 @@ endfunction(set_import_locations)
 
 ## Integrated ##
 
+# templog
+set(TEMPLOG_DIR "${DEP_DIR}/templog")
+attach_lib("${TEMPLOG_DIR}/include" "${TEMPLOG_DIR}/imp/logging.cpp" "")
+
 ## Static ##
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
