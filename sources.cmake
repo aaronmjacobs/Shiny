@@ -1,5 +1,6 @@
 set(SOURCE_NAMES
    main.cpp
+   Assets/MeshLoader.cpp
    Assets/ShaderLoader.cpp
    Graphics/Framebuffer.cpp
    Graphics/Mesh.cpp
