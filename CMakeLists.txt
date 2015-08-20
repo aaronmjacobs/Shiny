@@ -158,6 +158,10 @@ attach_lib("${PEMPEK_DIR}/include" "${PEMPEK_DIR}/lib/pempek_assert.cpp" "")
 set(TEMPLOG_DIR "${DEP_DIR}/templog")
 attach_lib("${TEMPLOG_DIR}/include" "${TEMPLOG_DIR}/imp/logging.cpp" "")
 
+# tinyobj
+set(TINYOBJ_DIR "${DEP_DIR}/tinyobj")
+attach_lib("${TINYOBJ_DIR}/include" "${TINYOBJ_DIR}/src/tiny_obj_loader.cc" "")
+
 ## Static ##
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
