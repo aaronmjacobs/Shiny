@@ -3,6 +3,7 @@ set(HEADER_NAMES
    Log.h
    Pointers.h
    ShinyAssert.h
+   Assets/ShaderLoader.h
    Graphics/Framebuffer.h
    Graphics/Mesh.h
    Graphics/Model.h

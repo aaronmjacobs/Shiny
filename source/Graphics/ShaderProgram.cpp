@@ -172,7 +172,7 @@ bool ShaderProgram::link() {
       } else {
          std::string name(nameBuf);
          GLint location = glGetUniformLocation(id, name.c_str());
-         uniforms.insert({name, Uniform(location, type, name)});
+         uniforms.insert({ name, Uniform(location, type, name) });
       }
    }
 
