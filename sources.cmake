@@ -6,4 +6,6 @@ set(SOURCE_NAMES
    Graphics/Shader.cpp
    Graphics/ShaderProgram.cpp
    Graphics/Texture.cpp
+   Platform/IOUtils.cpp
+   Platform/OSUtils.cpp
 )

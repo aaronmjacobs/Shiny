@@ -10,4 +10,6 @@ set(HEADER_NAMES
    Graphics/ShaderProgram.h
    Graphics/Texture.h
    Graphics/Viewport.h
+   Platform/IOUtils.h
+   Platform/OSUtils.h
 )
