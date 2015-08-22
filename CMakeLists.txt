@@ -78,6 +78,8 @@ list(APPEND INCLUDES
    ${BIN_INCLUDE_DIR}
 )
 
+source_group("Dependencies" "dependencies/*")
+
 ### Libraries ###
 
 function(attach_lib include source lib)
