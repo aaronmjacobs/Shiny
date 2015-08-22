@@ -38,6 +38,11 @@ if(LINUX)
    set(CMAKE_INSTALL_RPATH "$ORIGIN/")
 endif(LINUX)
 
+# Windows quirks
+if(WIN32)
+   add_definitions(-DNOMINMAX)
+endif(WIN32)
+
 # Directories
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/source")
 set(DEP_DIR "${PROJECT_SOURCE_DIR}/dependencies")
