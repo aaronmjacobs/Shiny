@@ -1,7 +1,9 @@
 set(HEADER_NAMES
+   Engine.h
    GLIncludes.h
    Log.h
    Pointers.h
+   Shiny.h
    ShinyAssert.h
    Assets/MeshLoader.h
    Assets/ShaderLoader.h
