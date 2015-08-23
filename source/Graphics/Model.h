@@ -10,7 +10,6 @@ namespace Shiny {
 
 class Model {
 private:
-   GLuint vao;
    SPtr<Mesh> mesh;
    SPtr<ShaderProgram> program;
 
@@ -25,10 +24,6 @@ public:
 
    ShaderProgram& getProgram() {
       return *program;
-   }
-
-   GLuint getVAO() const {
-      return vao;
    }
 };
 

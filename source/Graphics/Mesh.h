@@ -12,6 +12,7 @@ protected:
    GLuint nbo;
    GLuint ibo;
    GLuint tbo;
+   GLuint vao;
 
    UPtr<float[]> vertices;
    UPtr<unsigned int[]> indices;
@@ -43,6 +44,10 @@ public:
 
    GLuint getTBO() const {
       return tbo;
+   }
+
+   GLuint getVAO() const {
+      return vao;
    }
 
    float* getVertices() const {
