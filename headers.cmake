@@ -16,4 +16,6 @@ set(HEADER_NAMES
    Graphics/Viewport.h
    Platform/IOUtils.h
    Platform/OSUtils.h
+   Scene/Camera.h
+   Scene/Transform.h
 )

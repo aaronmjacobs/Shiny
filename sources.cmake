@@ -12,8 +12,10 @@ set(SOURCE_NAMES
    Graphics/Texture.cpp
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
+   Scene/Camera.cpp
 )
 source_group("Source" "source/*")
 source_group("Source\\Assets" "source/Assets/*")
 source_group("Source\\Graphics" "source/Graphics/*")
 source_group("Source\\Platform" "source/Platform/*")
+source_group("Source\\Scene" "source/Scene/*")
