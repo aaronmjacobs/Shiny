@@ -6,32 +6,14 @@
 #include "Log.h"
 #include "Pointers.h"
 
+#include <glm/glm.hpp>
+
 #include <array>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace Shiny {
-
-#ifdef SHINY_USE_GLM
-
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-typedef glm::vec2 vec2;
-typedef glm::vec3 vec3;
-typedef glm::vec4 vec4;
-typedef glm::mat4 mat4;
-#define SHINY_RAW_VALUE(x) glm::value_ptr(x)
-
-#else // SHINY_USE_GLM
-
-typedef std::array<float, 2> vec2;
-typedef std::array<float, 3> vec3;
-typedef std::array<float, 4> vec4;
-typedef std::array<float, 16> mat4;
-#define SHINY_RAW_VALUE(x) (x).data()
-
-#endif // SHINY_USE_GLM
 
 namespace ShaderAttributes {
 
@@ -57,10 +39,10 @@ union UniformData {
    bool boolVal;
    int intVal;
    float floatVal;
-   vec2 vec2Val;
-   vec3 vec3Val;
-   vec4 vec4Val;
-   mat4 mat4Val;
+   glm::vec2 vec2Val;
+   glm::vec3 vec3Val;
+   glm::vec4 vec4Val;
+   glm::mat4 mat4Val;
 };
 
 class Uniform {
@@ -92,13 +74,13 @@ public:
 
    void setValue(float value);
 
-   void setValue(const vec2 &value);
+   void setValue(const glm::vec2 &value);
 
-   void setValue(const vec3 &value);
+   void setValue(const glm::vec3 &value);
 
-   void setValue(const vec4 &value);
+   void setValue(const glm::vec4 &value);
 
-   void setValue(const mat4 &value);
+   void setValue(const glm::mat4 &value);
 };
 
 class Shader;

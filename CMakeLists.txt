@@ -54,7 +54,6 @@ set(BIN_RES_DIR "${PROJECT_BINARY_DIR}/resources")
 
 # Options
 option(SHINY_LOG_TO_FILE "Enable file logging" OFF)
-option(SHINY_USE_GLM "Use GLM for math" ON)
 
 # Generated content
 configure_file (
@@ -152,10 +151,8 @@ set(GLAD_DIR "${DEP_DIR}/glad")
 attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
 
 # GLM
-if(SHINY_USE_GLM)
-   set(GLM_DIR "${DEP_DIR}/glm")
-   copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm)
-endif(SHINY_USE_GLM)
+set(GLM_DIR "${DEP_DIR}/glm")
+copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm)
 
 # Pempek Assert
 set(PEMPEK_DIR "${DEP_DIR}/PempekAssert")

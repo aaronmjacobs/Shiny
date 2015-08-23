@@ -4,6 +4,8 @@
 #include "Shader.h"
 #include "ShinyAssert.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <cstring>
 
 namespace Shiny {
@@ -45,16 +47,16 @@ void Uniform::commit() {
          glUniform1f(location, data.floatVal);
          break;
       case GL_FLOAT_VEC2:
-         glUniform2fv(location, 1, SHINY_RAW_VALUE(data.vec2Val));
+         glUniform2fv(location, 1, glm::value_ptr(data.vec2Val));
          break;
       case GL_FLOAT_VEC3:
-         glUniform3fv(location, 1, SHINY_RAW_VALUE(data.vec3Val));
+         glUniform3fv(location, 1, glm::value_ptr(data.vec3Val));
          break;
       case GL_FLOAT_VEC4:
-         glUniform4fv(location, 1, SHINY_RAW_VALUE(data.vec4Val));
+         glUniform4fv(location, 1, glm::value_ptr(data.vec4Val));
          break;
       case GL_FLOAT_MAT4:
-         glUniformMatrix4fv(location, 1, GL_FALSE, SHINY_RAW_VALUE(data.mat4Val));
+         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(data.mat4Val));
          break;
       default:
          ASSERT(false, "Invalid uniform type: %d", type);
@@ -93,25 +95,25 @@ void Uniform::setValue(float value) {
    data.floatVal = value;
 }
 
-void Uniform::setValue(const vec2 &value) {
+void Uniform::setValue(const glm::vec2 &value) {
    ASSERT(type == GL_FLOAT_VEC2);
    dirty = dirty || data.vec2Val != value;
    data.vec2Val = value;
 }
 
-void Uniform::setValue(const vec3 &value) {
+void Uniform::setValue(const glm::vec3 &value) {
    ASSERT(type == GL_FLOAT_VEC3);
    dirty = dirty || data.vec3Val != value;
    data.vec3Val = value;
 }
 
-void Uniform::setValue(const vec4 &value) {
+void Uniform::setValue(const glm::vec4 &value) {
    ASSERT(type == GL_FLOAT_VEC4);
    dirty = dirty || data.vec4Val != value;
    data.vec4Val = value;
 }
 
-void Uniform::setValue(const mat4 &value) {
+void Uniform::setValue(const glm::mat4 &value) {
    ASSERT(type == GL_FLOAT_MAT4);
    dirty = dirty || data.mat4Val != value;
    data.mat4Val = value;
