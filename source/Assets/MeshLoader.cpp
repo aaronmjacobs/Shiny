@@ -84,13 +84,13 @@ SPtr<Mesh> getMeshFromMemory(const char *data) {
 
 } // namespace
 
-MeshAssetManager::MeshAssetManager() {
+MeshLoader::MeshLoader() {
 }
 
-MeshAssetManager::~MeshAssetManager() {
+MeshLoader::~MeshLoader() {
 }
 
-SPtr<Mesh> MeshAssetManager::loadMesh(const std::string &fileName) {
+SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName) {
    MeshMap::iterator location(meshMap.find(fileName));
    if (location != meshMap.end()) {
       return location->second;
@@ -113,7 +113,7 @@ SPtr<Mesh> MeshAssetManager::loadMesh(const std::string &fileName) {
    return mesh;
 }
 
-SPtr<Mesh> MeshAssetManager::getMeshForShape(MeshShape shape) {
+SPtr<Mesh> MeshLoader::getMeshForShape(MeshShape shape) {
    static SPtr<Mesh> cubeMesh = nullptr;
    static SPtr<Mesh> xyPlaneMesh = nullptr;
 

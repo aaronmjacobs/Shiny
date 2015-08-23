@@ -16,14 +16,14 @@ enum class MeshShape {
    Cube, XYPlane
 };
 
-class MeshAssetManager {
+class MeshLoader {
 protected:
    MeshMap meshMap;
 
 public:
-   MeshAssetManager();
+   MeshLoader();
 
-   virtual ~MeshAssetManager();
+   virtual ~MeshLoader();
 
    /**
     * Loads the mesh with the given file name, using a cached version if possible
