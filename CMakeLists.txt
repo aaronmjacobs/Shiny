@@ -132,16 +132,18 @@ macro(list_subdirs result curdir)
    set(${result} ${dirlist})
 endmacro(list_subdirs)
 
-function(copy_headers source dest)
+function(copy_headers source dest recurse)
    file(MAKE_DIRECTORY "${dest}")
 
    file(GLOB HEADERS "${source}/*.h" "${source}/*.hpp" "${source}/*.inl")
    file(COPY ${HEADERS} DESTINATION "${dest}")
 
-   list_subdirs(SUBDIRS ${source})
-   foreach(subdir ${SUBDIRS})
-      copy_headers("${source}/${subdir}" "${dest}/${subdir}")
-   endforeach()
+   if(recurse)
+      list_subdirs(SUBDIRS ${source})
+      foreach(subdir ${SUBDIRS})
+         copy_headers("${source}/${subdir}" "${dest}/${subdir}")
+      endforeach()
+   endif(recurse)
 endfunction(copy_headers)
 
 ## Integrated ##
@@ -152,11 +154,15 @@ attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
 
 # GLM
 set(GLM_DIR "${DEP_DIR}/glm")
-copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm)
+copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm true)
 
 # Pempek Assert
 set(PEMPEK_DIR "${DEP_DIR}/PempekAssert")
 attach_lib("${PEMPEK_DIR}/include" "${PEMPEK_DIR}/lib/pempek_assert.cpp" "")
+
+# stb
+set(STB_DIR "${DEP_DIR}/stb")
+copy_headers(${STB_DIR} ${BIN_INCLUDE_DIR}/stb false)
 
 # templog
 set(TEMPLOG_DIR "${DEP_DIR}/templog")
