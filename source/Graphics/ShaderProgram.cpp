@@ -1,5 +1,6 @@
 #include "ShaderProgram.h"
 
+#include "Context.h"
 #include "Log.h"
 #include "Shader.h"
 #include "ShinyAssert.h"
@@ -182,7 +183,10 @@ bool ShaderProgram::link() {
 }
 
 void ShaderProgram::use() const {
-   glUseProgram(id);
+   Context *context = Context::current();
+   if (context) {
+      context->useProgram(id);
+   }
 }
 
 bool ShaderProgram::hasUniform(const std::string &name) const {

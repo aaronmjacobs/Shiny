@@ -34,6 +34,7 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
    }
 
    glfwMakeContextCurrent(newWindow.get());
+   context.makeCurrent();
    glfwSwapInterval(1); // VSYNC
 
    Result glResult = loadGL();

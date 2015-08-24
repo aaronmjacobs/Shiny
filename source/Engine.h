@@ -3,6 +3,7 @@
 
 #include "Pointers.h"
 #include "Shiny.h"
+#include "Graphics/Context.h"
 
 #include <functional>
 
@@ -16,6 +17,7 @@ typedef UPtr<GLFWwindow, std::function<void(GLFWwindow*)>> WindowPtr;
 class Engine {
 protected:
    WindowPtr window;
+   Context context;
 
 public:
    Engine();

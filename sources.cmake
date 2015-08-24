@@ -4,6 +4,7 @@ set(SOURCE_NAMES
    Shiny.cpp
    Assets/MeshLoader.cpp
    Assets/ShaderLoader.cpp
+   Graphics/Context.cpp
    Graphics/Framebuffer.cpp
    Graphics/Mesh.cpp
    Graphics/Model.cpp

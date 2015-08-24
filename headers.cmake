@@ -7,6 +7,7 @@ set(HEADER_NAMES
    ShinyAssert.h
    Assets/MeshLoader.h
    Assets/ShaderLoader.h
+   Graphics/Context.h
    Graphics/Framebuffer.h
    Graphics/Mesh.h
    Graphics/Model.h
