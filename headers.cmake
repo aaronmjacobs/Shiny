@@ -17,5 +17,7 @@ set(HEADER_NAMES
    Platform/IOUtils.h
    Platform/OSUtils.h
    Scene/Camera.h
+   Scene/Scene.h
+   Scene/SceneObject.h
    Scene/Transform.h
 )

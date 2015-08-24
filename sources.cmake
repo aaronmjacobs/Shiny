@@ -13,6 +13,8 @@ set(SOURCE_NAMES
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
    Scene/Camera.cpp
+   Scene/Scene.cpp
+   Scene/SceneObject.cpp
 )
 source_group("Source" "source/*")
 source_group("Source\\Assets" "source/Assets/*")
