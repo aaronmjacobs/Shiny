@@ -1,6 +1,7 @@
 #include "Model.h"
 
 #include "GLIncludes.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "ShaderProgram.h"
 #include "ShinyAssert.h"
@@ -27,6 +28,10 @@ void Model::draw(RenderData renderData) {
    if (mesh && program) {
       glBindVertexArray(mesh->getVAO());
 
+      for (const SPtr<Material> &material : materials) {
+         material->apply(program, renderData);
+      }
+
       program->commit();
       glDrawElements(GL_TRIANGLES, mesh->getNumIndices(), GL_UNSIGNED_INT, 0);
    }
@@ -38,6 +43,16 @@ void Model::setMesh(const SPtr<Mesh> &mesh) {
 
 void Model::setShaderProgram(const SPtr<ShaderProgram> &program) {
    this->program = program;
+}
+
+void Model::attachMaterial(const SPtr<Material> &material) {
+   materials.push_back(material);
+}
+
+void Model::removeMaterial(const SPtr<Material> &material) {
+   MaterialVector::iterator loc(std::find(materials.begin(), materials.end(), material));
+   ASSERT(loc != materials.end(), "Material does not exist in vector");
+   materials.erase(loc);
 }
 
 } // namespace Shiny

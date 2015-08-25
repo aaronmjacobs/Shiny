@@ -11,6 +11,7 @@ set(HEADER_NAMES
    Assets/TextureLoader.h
    Graphics/Context.h
    Graphics/Framebuffer.h
+   Graphics/Material.h
    Graphics/Mesh.h
    Graphics/Model.h
    Graphics/RenderData.h

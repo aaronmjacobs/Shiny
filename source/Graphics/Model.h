@@ -8,13 +8,17 @@
 
 namespace Shiny {
 
+class Material;
 class Mesh;
 class ShaderProgram;
+
+typedef std::vector<SPtr<Material>> MaterialVector;
 
 class Model {
 private:
    SPtr<Mesh> mesh;
    SPtr<ShaderProgram> program;
+   MaterialVector materials;
 
 public:
    Model();
@@ -38,6 +42,10 @@ public:
    void setMesh(const SPtr<Mesh> &mesh);
 
    void setShaderProgram(const SPtr<ShaderProgram> &program);
+
+   void attachMaterial(const SPtr<Material> &material);
+
+   void removeMaterial(const SPtr<Material> &material);
 };
 
 } // namespace Shiny

@@ -49,6 +49,14 @@ void SceneObject::setShaderProgram(const SPtr<ShaderProgram> &program) {
    }
 }
 
+void SceneObject::attachMaterial(const SPtr<Material> &material) {
+   model.attachMaterial(material);
+}
+
+void SceneObject::removeMaterial(const SPtr<Material> &material) {
+   model.removeMaterial(material);
+}
+
 const glm::vec3& SceneObject::getPosition() const {
    return transform.position;
 }

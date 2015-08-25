@@ -34,6 +34,10 @@ public:
 
    void setShaderProgram(const SPtr<ShaderProgram> &program);
 
+   void attachMaterial(const SPtr<Material> &material);
+
+   void removeMaterial(const SPtr<Material> &material);
+
    const glm::vec3& getPosition() const;
 
    const glm::quat& getOrientation() const;
