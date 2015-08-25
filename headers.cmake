@@ -5,8 +5,10 @@ set(HEADER_NAMES
    Pointers.h
    Shiny.h
    ShinyAssert.h
+   Assets/DefaultImageSource.h
    Assets/MeshLoader.h
    Assets/ShaderLoader.h
+   Assets/TextureLoader.h
    Graphics/Context.h
    Graphics/Framebuffer.h
    Graphics/Mesh.h
