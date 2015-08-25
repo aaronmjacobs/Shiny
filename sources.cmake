@@ -13,6 +13,7 @@ set(SOURCE_NAMES
    Graphics/Shader.cpp
    Graphics/ShaderProgram.cpp
    Graphics/Texture.cpp
+   Graphics/TextureMaterial.cpp
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
    Scene/Camera.cpp

@@ -18,6 +18,7 @@ set(HEADER_NAMES
    Graphics/Shader.h
    Graphics/ShaderProgram.h
    Graphics/Texture.h
+   Graphics/TextureMaterial.h
    Graphics/Viewport.h
    Platform/IOUtils.h
    Platform/OSUtils.h
