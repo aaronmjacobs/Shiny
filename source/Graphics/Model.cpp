@@ -3,6 +3,7 @@
 #include "GLIncludes.h"
 #include "Mesh.h"
 #include "ShaderProgram.h"
+#include "ShinyAssert.h"
 
 namespace Shiny {
 
@@ -22,7 +23,7 @@ Model::Model(Model &&other)
 Model::~Model() {
 }
 
-void Model::draw() {
+void Model::draw(RenderData renderData) {
    if (mesh && program) {
       glBindVertexArray(mesh->getVAO());
 

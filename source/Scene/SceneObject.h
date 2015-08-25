@@ -24,7 +24,7 @@ private:
 public:
    virtual ~SceneObject();
 
-   void draw();
+   void draw(RenderData renderData);
 
    const Model& getModel() const {
       return model;

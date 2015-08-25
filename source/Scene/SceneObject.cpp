@@ -14,7 +14,7 @@ SceneObject::SceneObject(const SPtr<Scene> &scene)
 SceneObject::~SceneObject() {
 }
 
-void SceneObject::draw() {
+void SceneObject::draw(RenderData renderData) {
    const SPtr<ShaderProgram> &program(model.getProgram());
    const char *uModelMatrix = "uModelMatrix";
 
@@ -32,7 +32,7 @@ void SceneObject::draw() {
       }
    }
 
-   model.draw();
+   model.draw(renderData);
 }
 
 void SceneObject::setMesh(const SPtr<Mesh> &mesh) {

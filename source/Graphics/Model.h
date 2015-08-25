@@ -2,6 +2,9 @@
 #define SHINY_MODEL_H
 
 #include "Pointers.h"
+#include "RenderData.h"
+
+#include <vector>
 
 namespace Shiny {
 
@@ -22,7 +25,7 @@ public:
 
    virtual ~Model();
 
-   void draw();
+   void draw(RenderData renderData);
 
    const SPtr<Mesh>& getMesh() const {
       return mesh;

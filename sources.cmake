@@ -9,6 +9,7 @@ set(SOURCE_NAMES
    Graphics/Framebuffer.cpp
    Graphics/Mesh.cpp
    Graphics/Model.cpp
+   Graphics/RenderData.cpp
    Graphics/Shader.cpp
    Graphics/ShaderProgram.cpp
    Graphics/Texture.cpp
