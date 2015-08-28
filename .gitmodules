@@ -13,3 +13,6 @@
 [submodule "dependencies/Assert"]
 	path = dependencies/Assert
 	url = https://github.com/gpakosz/Assert.git
+[submodule "dependencies/tinyobjloader"]
+	path = dependencies/tinyobjloader
+	url = https://github.com/syoyo/tinyobjloader.git

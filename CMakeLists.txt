@@ -170,8 +170,9 @@ set(TEMPLOG_DIR "${DEP_DIR}/templog")
 attach_lib("${TEMPLOG_DIR}/include" "${TEMPLOG_DIR}/imp/logging.cpp" "")
 
 # tinyobj
-set(TINYOBJ_DIR "${DEP_DIR}/tinyobj")
-attach_lib("${TINYOBJ_DIR}/include" "${TINYOBJ_DIR}/src/tiny_obj_loader.cc" "")
+set(TINYOBJ_DIR "${DEP_DIR}/tinyobjloader")
+copy_headers(${TINYOBJ_DIR} ${BIN_INCLUDE_DIR}/tinyobj false)
+attach_lib("${TINYOBJ_DIR}" "${TINYOBJ_DIR}/tiny_obj_loader.cc" "")
 
 ## Static ##
 
