@@ -157,8 +157,9 @@ set(GLM_DIR "${DEP_DIR}/glm")
 copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm true)
 
 # Pempek Assert
-set(PEMPEK_DIR "${DEP_DIR}/PempekAssert")
-attach_lib("${PEMPEK_DIR}/include" "${PEMPEK_DIR}/lib/pempek_assert.cpp" "")
+set(PEMPEK_DIR "${DEP_DIR}/Assert")
+copy_headers(${PEMPEK_DIR}/src ${BIN_INCLUDE_DIR}/pempek false)
+attach_lib("${PEMPEK_DIR}/src" "${PEMPEK_DIR}/src/pempek_assert.cpp" "")
 
 # stb
 set(STB_DIR "${DEP_DIR}/stb")
