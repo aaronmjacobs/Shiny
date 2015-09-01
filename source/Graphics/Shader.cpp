@@ -1,6 +1,6 @@
-#include "Shader.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "ShinyAssert.h"
+#include "Shiny/Graphics/Shader.h"
 
 namespace Shiny {
 

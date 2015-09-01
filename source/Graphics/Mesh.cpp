@@ -1,7 +1,7 @@
-#include "Mesh.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "ShaderProgram.h"
-#include "ShinyAssert.h"
+#include "Shiny/Graphics/Mesh.h"
+#include "Shiny/Graphics/ShaderProgram.h"
 
 namespace Shiny {
 

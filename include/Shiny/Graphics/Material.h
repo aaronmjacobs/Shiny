@@ -1,7 +1,7 @@
 #ifndef SHINY_MATERIAL_H
 #define SHINY_MATERIAL_H
 
-#include "Pointers.h"
+#include "Shiny/Pointers.h"
 
 namespace Shiny {
 

@@ -1,8 +1,7 @@
-#include "Engine.h"
-
-#include "GLIncludes.h"
-#include "Shiny.h"
-#include "ShinyAssert.h"
+#include "Shiny/Engine.h"
+#include "Shiny/GLIncludes.h"
+#include "Shiny/Shiny.h"
+#include "Shiny/ShinyAssert.h"
 
 #include <algorithm>
 

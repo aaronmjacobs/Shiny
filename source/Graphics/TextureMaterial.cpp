@@ -1,9 +1,9 @@
-#include "TextureMaterial.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "RenderData.h"
-#include "ShaderProgram.h"
-#include "ShinyAssert.h"
-#include "Texture.h"
+#include "Shiny/Graphics/RenderData.h"
+#include "Shiny/Graphics/ShaderProgram.h"
+#include "Shiny/Graphics/Texture.h"
+#include "Shiny/Graphics/TextureMaterial.h"
 
 namespace Shiny {
 

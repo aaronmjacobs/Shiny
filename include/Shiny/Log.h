@@ -1,7 +1,7 @@
 #ifndef SHINY_LOG_H
 #define SHINY_LOG_H
 
-#include "Defines.h"
+#include "Shiny/Defines.h"
 
 #include <boxer/boxer.h>
 #include <templog/logging.h>

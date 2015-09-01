@@ -1,8 +1,8 @@
 #ifndef SHINY_SHADER_LOADER_H
 #define SHINY_SHADER_LOADER_H
 
-#include "GLIncludes.h"
-#include "Pointers.h"
+#include "Shiny/GLIncludes.h"
+#include "Shiny/Pointers.h"
 
 #include <string>
 #include <unordered_map>

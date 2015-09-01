@@ -1,7 +1,7 @@
 #ifndef SHINY_TEXTURE_H
 #define SHINY_TEXTURE_H
 
-#include "GLIncludes.h"
+#include "Shiny/GLIncludes.h"
 
 namespace Shiny {
 

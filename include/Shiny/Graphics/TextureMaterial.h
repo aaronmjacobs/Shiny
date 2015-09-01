@@ -1,8 +1,9 @@
 #ifndef SHINY_TEXTURE_MATERIAL_H
 #define SHINY_TEXTURE_MATERIAL_H
 
-#include "Material.h"
-#include "Pointers.h"
+#include "Shiny/Pointers.h"
+
+#include "Shiny/Graphics/Material.h"
 
 #include <string>
 

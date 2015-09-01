@@ -1,9 +1,9 @@
-#include "ShaderProgram.h"
+#include "Shiny/Log.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "Context.h"
-#include "Log.h"
-#include "Shader.h"
-#include "ShinyAssert.h"
+#include "Shiny/Graphics/Context.h"
+#include "Shiny/Graphics/Shader.h"
+#include "Shiny/Graphics/ShaderProgram.h"
 
 #include <glm/gtc/type_ptr.hpp>
 

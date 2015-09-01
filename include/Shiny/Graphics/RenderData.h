@@ -1,7 +1,7 @@
 #ifndef SHINY_RENDER_DATA_H
 #define SHINY_RENDER_DATA_H
 
-#include "GLIncludes.h"
+#include "Shiny/GLIncludes.h"
 
 namespace Shiny {
 

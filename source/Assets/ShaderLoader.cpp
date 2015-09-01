@@ -1,10 +1,12 @@
-#include "ShaderLoader.h"
+#include "Shiny/Log.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "Log.h"
-#include "ShinyAssert.h"
-#include "Graphics/Shader.h"
-#include "Graphics/ShaderProgram.h"
-#include "Platform/IOUtils.h"
+#include "Shiny/Assets/ShaderLoader.h"
+
+#include "Shiny/Graphics/Shader.h"
+#include "Shiny/Graphics/ShaderProgram.h"
+
+#include "Shiny/Platform/IOUtils.h"
 
 #define GLSL(source) "#version 150 core\n" #source
 

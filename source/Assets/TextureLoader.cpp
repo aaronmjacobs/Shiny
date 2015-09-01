@@ -1,9 +1,10 @@
-#include "TextureLoader.h"
+#include "Shiny/Log.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "DefaultImageSource.h"
-#include "Log.h"
-#include "ShinyAssert.h"
-#include "Graphics/Texture.h"
+#include "Shiny/Assets/DefaultImageSource.h"
+#include "Shiny/Assets/TextureLoader.h"
+
+#include "Shiny/Graphics/Texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ASSERT ASSERT

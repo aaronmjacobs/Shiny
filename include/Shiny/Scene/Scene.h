@@ -1,7 +1,7 @@
 #ifndef SHINY_SCENE_H
 #define SHINY_SCENE_H
 
-#include "Pointers.h"
+#include "Shiny/Pointers.h"
 
 #include <map>
 #include <vector>

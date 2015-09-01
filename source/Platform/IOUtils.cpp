@@ -1,7 +1,7 @@
-#include "IOUtils.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "OSUtils.h"
-#include "ShinyAssert.h"
+#include "Shiny/Platform/IOUtils.h"
+#include "Shiny/Platform/OSUtils.h"
 
 #include <fstream>
 

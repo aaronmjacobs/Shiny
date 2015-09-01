@@ -1,7 +1,7 @@
-#include "Framebuffer.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "ShinyAssert.h"
-#include "Texture.h"
+#include "Shiny/Graphics/Framebuffer.h"
+#include "Shiny/Graphics/Texture.h"
 
 namespace Shiny {
 

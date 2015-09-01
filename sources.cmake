@@ -19,8 +19,8 @@ set(SOURCE_NAMES
    Scene/Scene.cpp
    Scene/SceneObject.cpp
 )
-source_group("Source" "source/*")
-source_group("Source\\Assets" "source/Assets/*")
-source_group("Source\\Graphics" "source/Graphics/*")
-source_group("Source\\Platform" "source/Platform/*")
-source_group("Source\\Scene" "source/Scene/*")
+source_group("Sources" "source/*")
+source_group("Sources\\Assets" "source/Assets/*")
+source_group("Sources\\Graphics" "source/Graphics/*")
+source_group("Sources\\Platform" "source/Platform/*")
+source_group("Sources\\Scene" "source/Scene/*")

@@ -1,9 +1,10 @@
 #ifndef SHINY_ENGINE_H
 #define SHINY_ENGINE_H
 
-#include "Pointers.h"
-#include "Shiny.h"
-#include "Graphics/Context.h"
+#include "Shiny/Pointers.h"
+#include "Shiny/Shiny.h"
+
+#include "Shiny/Graphics/Context.h"
 
 #include <functional>
 

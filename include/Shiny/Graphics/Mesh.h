@@ -1,8 +1,8 @@
 #ifndef SHINY_MESH_H
 #define SHINY_MESH_H
 
-#include "GLIncludes.h"
-#include "Pointers.h"
+#include "Shiny/GLIncludes.h"
+#include "Shiny/Pointers.h"
 
 namespace Shiny {
 

@@ -1,6 +1,6 @@
-#include "Texture.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "ShinyAssert.h"
+#include "Shiny/Graphics/Texture.h"
 
 namespace Shiny {
 

@@ -1,7 +1,7 @@
 #ifndef SHINY_IOUTILS_H
 #define SHINY_IOUTILS_H
 
-#include "Pointers.h"
+#include "Shiny/Pointers.h"
 
 #include <string>
 

@@ -1,7 +1,7 @@
 #ifndef SHINY_CAMERA_H
 #define SHINY_CAMERA_H
 
-#include "Transform.h"
+#include "Shiny/Scene/Transform.h"
 
 #include <glm/glm.hpp>
 

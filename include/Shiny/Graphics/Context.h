@@ -1,7 +1,7 @@
 #ifndef SHINY_CONTEXT_H
 #define SHINY_CONTEXT_H
 
-#include "GLIncludes.h"
+#include "Shiny/GLIncludes.h"
 
 namespace Shiny {
 

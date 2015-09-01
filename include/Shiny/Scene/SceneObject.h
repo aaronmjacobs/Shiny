@@ -1,10 +1,12 @@
 #ifndef SHINY_SCENE_OBJECT_H
 #define SHINY_SCENE_OBJECT_H
 
-#include "Pointers.h"
-#include "Scene.h"
-#include "Transform.h"
-#include "Graphics/Model.h"
+#include "Shiny/Pointers.h"
+
+#include "Shiny/Graphics/Model.h"
+
+#include "Shiny/Scene/Scene.h"
+#include "Shiny/Scene/Transform.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>

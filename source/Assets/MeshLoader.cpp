@@ -1,9 +1,11 @@
-#include "MeshLoader.h"
+#include "Shiny/Log.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "Log.h"
-#include "ShinyAssert.h"
-#include "Graphics/Mesh.h"
-#include "Platform/IOUtils.h"
+#include "Shiny/Assets/MeshLoader.h"
+
+#include "Shiny/Graphics/Mesh.h"
+
+#include "Shiny/Platform/IOUtils.h"
 
 #include <tinyobj/tiny_obj_loader.h>
 

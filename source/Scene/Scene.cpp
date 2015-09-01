@@ -1,8 +1,8 @@
-#include "Scene.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "Camera.h"
-#include "SceneObject.h"
-#include "ShinyAssert.h"
+#include "Shiny/Scene/Camera.h"
+#include "Shiny/Scene/Scene.h"
+#include "Shiny/Scene/SceneObject.h"
 
 #include <algorithm>
 

@@ -1,6 +1,6 @@
-#include "RenderData.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "ShinyAssert.h"
+#include "Shiny/Graphics/RenderData.h"
 
 namespace Shiny {
 

@@ -1,6 +1,6 @@
-#include "SceneObject.h"
+#include "Shiny/Graphics/ShaderProgram.h"
 
-#include "Graphics/ShaderProgram.h"
+#include "Shiny/Scene/SceneObject.h"
 
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>

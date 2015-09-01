@@ -1,8 +1,9 @@
 #ifndef SHINY_MODEL_H
 #define SHINY_MODEL_H
 
-#include "Pointers.h"
-#include "RenderData.h"
+#include "Shiny/Pointers.h"
+
+#include "Shiny/Graphics/RenderData.h"
 
 #include <vector>
 

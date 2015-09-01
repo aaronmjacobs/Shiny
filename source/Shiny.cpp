@@ -1,8 +1,8 @@
-#include "Shiny.h"
+#include "Shiny/GLIncludes.h"
+#include "Shiny/Log.h"
+#include "Shiny/Shiny.h"
 
-#include "GLIncludes.h"
-#include "Log.h"
-#include "Platform/OSUtils.h"
+#include "Shiny/Platform/OSUtils.h"
 
 namespace Shiny {
 

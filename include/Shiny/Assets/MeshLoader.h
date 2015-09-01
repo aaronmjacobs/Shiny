@@ -1,7 +1,7 @@
 #ifndef SHINY_MESH_LOADER_H
 #define SHINY_MESH_LOADER_H
 
-#include "Pointers.h"
+#include "Shiny/Pointers.h"
 
 #include <string>
 #include <unordered_map>

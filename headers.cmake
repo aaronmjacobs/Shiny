@@ -27,3 +27,8 @@ set(HEADER_NAMES
    Scene/SceneObject.h
    Scene/Transform.h
 )
+source_group("Includes" "include/Shiny/*")
+source_group("Includes\\Assets" "include/Shiny/Assets/*")
+source_group("Includes\\Graphics" "include/Shiny/Graphics/*")
+source_group("Includes\\Platform" "include/Shiny/Platform/*")
+source_group("Includes\\Scene" "include/Shiny/Scene/*")

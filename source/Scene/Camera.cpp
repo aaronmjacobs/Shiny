@@ -1,6 +1,6 @@
-#include "Camera.h"
+#include "Shiny/ShinyAssert.h"
 
-#include "ShinyAssert.h"
+#include "Shiny/Scene/Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>

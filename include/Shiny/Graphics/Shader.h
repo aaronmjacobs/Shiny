@@ -1,7 +1,7 @@
 #ifndef SHINY_SHADER_H
 #define SHINY_SHADER_H
 
-#include "GLIncludes.h"
+#include "Shiny/GLIncludes.h"
 
 namespace Shiny {
 

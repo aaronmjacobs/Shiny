@@ -25,21 +25,21 @@ endif(WIN32)
 
 # Directories
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
+set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(DEP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
 set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
-set(SHINY_BIN_INCLUDE_DIR "${BIN_INCLUDE_DIR}/${PROJECT_NAME}")
 
 # Options
 option(SHINY_LOG_TO_FILE "Enable file logging" OFF)
 
 # Generated content
 configure_file (
-   "${SRC_DIR}/Defines.h.in"
-   "${SHINY_BIN_INCLUDE_DIR}/Defines.h"
+   "${INCLUDE_DIR}/${PROJECT_NAME}/Defines.h.in"
+   "${BIN_INCLUDE_DIR}/${PROJECT_NAME}/Defines.h"
 )
 configure_file (
-   "${SRC_DIR}/Shiny.h.in"
-   "${SHINY_BIN_INCLUDE_DIR}/Shiny.h"
+   "${INCLUDE_DIR}/${PROJECT_NAME}/Shiny.h.in"
+   "${BIN_INCLUDE_DIR}/${PROJECT_NAME}/Shiny.h"
 )
 
 # Source content
@@ -52,14 +52,13 @@ endforeach(SOURCE_NAME)
 include(headers.cmake)
 set(HEADERS)
 foreach(HEADER_NAME ${HEADER_NAMES})
-   list(APPEND HEADERS "${SRC_DIR}/${HEADER_NAME}")
+   list(APPEND HEADERS "${INCLUDE_DIR}/${PROJECT_NAME}/${HEADER_NAME}")
 endforeach(HEADER_NAME)
 
 set(INCLUDES)
 list(APPEND INCLUDES
-   ${SRC_DIR}
+   ${INCLUDE_DIR}
    ${BIN_INCLUDE_DIR}
-   ${SHINY_BIN_INCLUDE_DIR}
 )
 
 set(LIBS)
@@ -204,16 +203,8 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
 ### Export ###
 
-# Include directory
-#copy_headers(${SRC_DIR} ${SHINY_BIN_INCLUDE_DIR} true)
-#copy_headers(${SRC_DIR} ${BIN_INCLUDE_DIR} true) # TODO
-
-foreach(INCLUDE ${INCLUDES})
-   copy_headers(${INCLUDE} ${BIN_INCLUDE_DIR} true)
-endforeach(INCLUDE)
-copy_headers(${SRC_DIR} ${SHINY_BIN_INCLUDE_DIR} true)
-
-set(SHINY_INCLUDE_DIR "${BIN_INCLUDE_DIR}" PARENT_SCOPE)
+# Include directories
+set(SHINY_INCLUDE_DIRS "${INCLUDES}" PARENT_SCOPE)
 
 # Shared libraries
 if(BUILD_SHARED_LIBS)

@@ -1,9 +1,10 @@
 #ifndef SHINY_FRAMEBUFFER_H
 #define SHINY_FRAMEBUFFER_H
 
-#include "GLIncludes.h"
-#include "Pointers.h"
-#include "Viewport.h"
+#include "Shiny/GLIncludes.h"
+#include "Shiny/Pointers.h"
+
+#include "Shiny/Graphics/Viewport.h"
 
 namespace Shiny {
 
