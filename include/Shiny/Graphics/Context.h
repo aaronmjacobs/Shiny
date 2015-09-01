@@ -1,11 +1,12 @@
 #ifndef SHINY_CONTEXT_H
 #define SHINY_CONTEXT_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/GLIncludes.h"
 
 namespace Shiny {
 
-class Context {
+class SHINYAPI Context {
 protected:
    static Context* currentContext;
 

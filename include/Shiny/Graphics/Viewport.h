@@ -1,7 +1,9 @@
 #ifndef SHINY_VIEWPORT_H
 #define SHINY_VIEWPORT_H
 
-struct Viewport {
+#include "Shiny/Defines.h"
+
+struct SHINYAPI Viewport {
    int x;
    int y;
    int width;

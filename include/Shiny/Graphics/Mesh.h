@@ -1,12 +1,13 @@
 #ifndef SHINY_MESH_H
 #define SHINY_MESH_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/GLIncludes.h"
 #include "Shiny/Pointers.h"
 
 namespace Shiny {
 
-class Mesh {
+class SHINYAPI Mesh {
 protected:
    GLuint vbo;
    GLuint nbo;

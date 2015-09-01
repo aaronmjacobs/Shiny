@@ -1,6 +1,7 @@
 #ifndef SHINY_ENGINE_H
 #define SHINY_ENGINE_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 #include "Shiny/Shiny.h"
 
@@ -15,7 +16,7 @@ namespace Shiny {
 
 typedef UPtr<GLFWwindow, std::function<void(GLFWwindow*)>> WindowPtr;
 
-class Engine {
+class SHINYAPI Engine {
 protected:
    WindowPtr window;
    Context context;

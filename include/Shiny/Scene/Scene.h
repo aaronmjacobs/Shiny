@@ -1,6 +1,7 @@
 #ifndef SHINY_SCENE_H
 #define SHINY_SCENE_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include <map>
@@ -16,7 +17,7 @@ typedef std::vector<SPtr<SceneObject>> SceneObjectVector;
 typedef std::map<SPtr<ShaderProgram>, SceneObjectVector> SceneObjectProgramMap;
 typedef std::vector<SPtr<Camera>> CameraVector;
 
-class Scene : public std::enable_shared_from_this<Scene> {
+class SHINYAPI Scene : public std::enable_shared_from_this<Scene> {
 public:
    static SPtr<Scene> create();
 

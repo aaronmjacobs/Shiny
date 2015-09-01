@@ -1,6 +1,7 @@
 #ifndef SHINY_SHADER_LOADER_H
 #define SHINY_SHADER_LOADER_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/GLIncludes.h"
 #include "Shiny/Pointers.h"
 
@@ -15,7 +16,7 @@ class ShaderProgram;
 typedef std::unordered_map<std::string, SPtr<Shader>> ShaderMap;
 typedef std::unordered_map<std::string, SPtr<ShaderProgram>> ShaderProgramMap;
 
-class ShaderLoader {
+class SHINYAPI ShaderLoader {
 protected:
    ShaderMap shaderMap;
    ShaderProgramMap shaderProgramMap;

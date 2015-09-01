@@ -1,12 +1,14 @@
 #ifndef SHINY_TRANSFORM_H
 #define SHINY_TRANSFORM_H
 
+#include "Shiny/Defines.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace Shiny {
 
-struct Transform {
+struct SHINYAPI Transform {
    glm::quat orientation;
    glm::vec3 position;
    glm::vec3 scale;

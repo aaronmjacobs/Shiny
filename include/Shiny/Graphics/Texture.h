@@ -1,11 +1,12 @@
 #ifndef SHINY_TEXTURE_H
 #define SHINY_TEXTURE_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/GLIncludes.h"
 
 namespace Shiny {
 
-class Texture {
+class SHINYAPI Texture {
 protected:
    GLuint textureID;
    GLenum target;

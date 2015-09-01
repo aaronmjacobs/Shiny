@@ -1,6 +1,7 @@
 #ifndef SHINY_SHADER_PROGRAM_H
 #define SHINY_SHADER_PROGRAM_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/GLIncludes.h"
 #include "Shiny/Log.h"
 #include "Shiny/Pointers.h"
@@ -16,7 +17,7 @@ namespace Shiny {
 
 namespace ShaderAttributes {
 
-enum Attributes : GLint {
+enum SHINYAPI Attributes : GLint {
    POSITION = 0,
    NORMAL = 1,
    TEX_COORD = 2
@@ -24,7 +25,7 @@ enum Attributes : GLint {
 
 namespace {
 
-const std::array<const char*, 3> NAMES = {{
+SHINYAPI const std::array<const char*, 3> NAMES = {{
    "aPosition",
    "aNormal",
    "aTexCoord"
@@ -34,7 +35,7 @@ const std::array<const char*, 3> NAMES = {{
 
 } // namespace ShaderAttributes
 
-union UniformData {
+union SHINYAPI UniformData {
    bool boolVal;
    int intVal;
    float floatVal;
@@ -44,7 +45,7 @@ union UniformData {
    glm::mat4 mat4Val;
 };
 
-class Uniform {
+class SHINYAPI Uniform {
 protected:
    UniformData data;
    const std::string name;
@@ -85,7 +86,7 @@ public:
 class Shader;
 typedef std::unordered_map<std::string, Uniform> UniformMap;
 
-class ShaderProgram {
+class SHINYAPI ShaderProgram {
 protected:
    GLuint id;
    std::vector<SPtr<Shader>> shaders;

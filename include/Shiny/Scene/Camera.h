@@ -1,13 +1,15 @@
 #ifndef SHINY_CAMERA_H
 #define SHINY_CAMERA_H
 
+#include "Shiny/Defines.h"
+
 #include "Shiny/Scene/Transform.h"
 
 #include <glm/glm.hpp>
 
 namespace Shiny {
 
-class Camera {
+class SHINYAPI Camera {
 private:
    Transform transform;
 

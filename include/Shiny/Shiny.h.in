@@ -1,20 +1,22 @@
 #ifndef SHINY_H
 #define SHINY_H
 
+#include "Shiny/Defines.h"
+
 namespace Shiny {
 
 /**
  * Version information
  */
-constexpr int kVersionMajor = @SHINY_VERSION_MAJOR@;
-constexpr int kVersionMinor = @SHINY_VERSION_MINOR@;
-constexpr int kVersionMicro = @SHINY_VERSION_MICRO@;
-constexpr int kVersionBuild = @SHINY_VERSION_BUILD@;
+SHINYAPI constexpr int kVersionMajor = @SHINY_VERSION_MAJOR@;
+SHINYAPI constexpr int kVersionMinor = @SHINY_VERSION_MINOR@;
+SHINYAPI constexpr int kVersionMicro = @SHINY_VERSION_MICRO@;
+SHINYAPI constexpr int kVersionBuild = @SHINY_VERSION_BUILD@;
 
 /**
  * Possible results of Shiny functions
  */
-enum class Result {
+enum class SHINYAPI Result {
    kOK,
    kWorkingDirectory,
    kGlfwInit,
@@ -26,22 +28,22 @@ enum class Result {
 /**
  * Returns a string description of an error result
  */
-const char* errorString(Result result);
+SHINYAPI const char* errorString(Result result);
 
 /**
  * Initializes Shiny
  */
-Result init();
+SHINYAPI Result init();
 
 /**
  * Terminates Shiny
  */
-void terminate();
+SHINYAPI void terminate();
 
 /**
  * Loads OpenGL - must be called after an OpenGL context is created
  */
-Result loadGL();
+SHINYAPI Result loadGL();
 
 } // namespace Shiny
 

@@ -1,6 +1,7 @@
 #ifndef SHINY_TEXTURE_MATERIAL_H
 #define SHINY_TEXTURE_MATERIAL_H
 
+#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/Material.h"
@@ -11,7 +12,7 @@ namespace Shiny {
 
 class Texture;
 
-class TextureMaterial : public Material {
+class SHINYAPI TextureMaterial : public Material {
 protected:
    SPtr<Texture> texture;
    std::string uniformName;

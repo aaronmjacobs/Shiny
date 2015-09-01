@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.1)
 project(Shiny)
 
 # Save state
-set(EXISTING_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+set(SHINY_BUILD_SHARED_LIB ${BUILD_SHARED_LIBS})
 
 # Version info
 set(SHINY_VERSION_MAJOR 0)
@@ -22,6 +22,11 @@ endif(NOT CMAKE_BUILD_TYPE)
 if(WIN32)
    add_definitions(-DNOMINMAX)
 endif(WIN32)
+
+# Information importing / exporting
+if(SHINY_BUILD_SHARED_LIB)
+   add_definitions(-DSHINY_BUILD_SHARED_LIB)
+endif(SHINY_BUILD_SHARED_LIB)
 
 # Directories
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
@@ -184,7 +189,7 @@ set(GLFW_USE_CHDIR OFF CACHE INTERNAL "Make glfwInit chdir to Contents/Resources
 add_subdirectory(${GLFW_DIR})
 attach_lib("${GLFW_DIR}/include" "" "glfw")
 
-set(BUILD_SHARED_LIBS ${EXISTING_BUILD_SHARED_LIBS} CACHE INTERNAL "Build shared libraries")
+set(BUILD_SHARED_LIBS ${SHINY_BUILD_SHARED_LIB} CACHE INTERNAL "Build shared libraries")
 
 ### Building ###
 
