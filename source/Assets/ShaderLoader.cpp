@@ -199,7 +199,7 @@ SPtr<Shader> ShaderLoader::loadShader(const std::string &fileName, const GLenum 
    }
 
    std::string source;
-   if (!IOUtils::readFromDataFile(fileName, source)) {
+   if (!IOUtils::readFromFile(fileName, source)) {
       LOG_WARNING("Unable to load shader from file \"" << fileName << "\", reverting to default shader");
       return getDefaultShader(type);
    }
@@ -227,15 +227,15 @@ SPtr<ShaderProgram> ShaderLoader::loadShaderProgram(const std::string &fileName)
    std::string geometryFileName = fileName + GEOMETRY_EXTENSION;
    std::string fragmentFileName = fileName + FRAGMENT_EXTENSION;
 
-   if (IOUtils::canReadData(vertexFileName)) {
+   if (IOUtils::canRead(vertexFileName)) {
       shaderProgram->attach(loadShader(vertexFileName, GL_VERTEX_SHADER));
    }
 
-   if (IOUtils::canReadData(geometryFileName)) {
+   if (IOUtils::canRead(geometryFileName)) {
       shaderProgram->attach(loadShader(geometryFileName, GL_GEOMETRY_SHADER));
    }
 
-   if (IOUtils::canReadData(fragmentFileName)) {
+   if (IOUtils::canRead(fragmentFileName)) {
       shaderProgram->attach(loadShader(fragmentFileName, GL_FRAGMENT_SHADER));
    }
 
@@ -258,7 +258,7 @@ void ShaderLoader::reloadShaders() {
       const SPtr<Shader> &shader = itr->second;
 
       std::string source;
-      if (!IOUtils::readFromDataFile(fileName, source)) {
+      if (!IOUtils::readFromFile(fileName, source)) {
          LOG_WARNING("Unable to load shader from file \"" << fileName << "\", not reloading");
          continue;
       }

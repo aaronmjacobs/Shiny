@@ -1,7 +1,5 @@
 #include "OSUtils.h"
 
-#include "Constants.h"
-
 #ifdef __APPLE__
 #include <CoreServices/CoreServices.h>
 #include <mach-o/dyld.h>
@@ -53,7 +51,7 @@ bool getExecutablePath(std::string &executablePath) {
    return true;
 }
 
-bool getAppDataPath(std::string &appDataPath) {
+bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
    FSRef ref;
    FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &ref);
 
@@ -61,7 +59,7 @@ bool getAppDataPath(std::string &appDataPath) {
    FSRefMakePath(&ref, (UInt8*)&path, PATH_MAX);
 
    appDataPath = std::string(path);
-   appDataPath += "/" PROJECT_NAME;
+   appDataPath += "/" + appName;
 
    return true;
 }
@@ -89,7 +87,7 @@ bool getExecutablePath(std::string &executablePath) {
    return true;
 }
 
-bool getAppDataPath(std::string &appDataPath) {
+bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
    // First, check the HOME environment variable
    char *homePath = secure_getenv("HOME");
 
@@ -103,7 +101,7 @@ bool getAppDataPath(std::string &appDataPath) {
    }
 
    appDataPath = std::string(homePath);
-   appDataPath += "/.config/" PROJECT_NAME;
+   appDataPath += "/.config/" + appName;
 
    return true;
 }
@@ -143,7 +141,7 @@ bool getExecutablePath(std::string &executablePath) {
    return true;
 }
 
-bool getAppDataPath(std::string &appDataPath) {
+bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
    PWSTR path;
    if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &path) != S_OK) {
       CoTaskMemFree(path);
@@ -154,7 +152,7 @@ bool getAppDataPath(std::string &appDataPath) {
    CoTaskMemFree(path);
 
    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-   appDataPath = converter.to_bytes(widePathStr) + "/" PROJECT_NAME;
+   appDataPath = converter.to_bytes(widePathStr) + "/" + appName;
    return true;
 }
 

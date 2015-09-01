@@ -1,6 +1,8 @@
 #ifndef SHINY_LOG_H
 #define SHINY_LOG_H
 
+#include "Defines.h"
+
 #include <boxer/boxer.h>
 #include <templog/logging.h>
 
@@ -119,12 +121,12 @@ public:
 #undef CERR_SEV_THRESHOLD
 #define CERR_SEV_THRESHOLD templog::sev_debug
 
-#ifdef LOG_TO_FILE
+#ifdef SHINY_LOG_TO_FILE
 #undef FILE_SEV_THRESHOLD
 #define FILE_SEV_THRESHOLD templog::sev_info
-#endif
+#endif // def SHINY_LOG_TO_FILE
 
-#endif
+#endif // ndef NDEBUG
 
 typedef templog::logger<templog::non_filtering_logger<text_formating_policy, templog::std_write_policy>
                       , CERR_SEV_THRESHOLD

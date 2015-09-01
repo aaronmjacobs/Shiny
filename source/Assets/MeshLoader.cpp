@@ -96,12 +96,12 @@ SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName) {
       return location->second;
    }
 
-   if (!IOUtils::canReadData(fileName)) {
+   if (!IOUtils::canRead(fileName)) {
       LOG_WARNING("Unable to load mesh from file \"" << fileName << "\", reverting to default mesh");
       return getMeshForShape(MeshShape::Cube);
    }
 
-   std::ifstream in(IOUtils::dataPath(fileName));
+   std::ifstream in(fileName);
    SPtr<Mesh> mesh(meshFromStream(in));
 
    if (!mesh) {

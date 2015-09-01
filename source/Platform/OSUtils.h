@@ -15,7 +15,7 @@ bool getExecutablePath(std::string &executablePath);
 /**
  * Gets the path to the application's local data / settings / config folder, returning true on success
  */
-bool getAppDataPath(std::string &appDataPath);
+bool getAppDataPath(const std::string &appName, std::string &appDataPath);
 
 /**
  * Extracts the directory from the given path, returning true on success

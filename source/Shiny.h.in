@@ -4,6 +4,14 @@
 namespace Shiny {
 
 /**
+ * Version information
+ */
+constexpr int kVersionMajor = @SHINY_VERSION_MAJOR@;
+constexpr int kVersionMinor = @SHINY_VERSION_MINOR@;
+constexpr int kVersionMicro = @SHINY_VERSION_MICRO@;
+constexpr int kVersionBuild = @SHINY_VERSION_BUILD@;
+
+/**
  * Possible results of Shiny functions
  */
 enum class Result {

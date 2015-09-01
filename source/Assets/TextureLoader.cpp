@@ -4,7 +4,6 @@
 #include "Log.h"
 #include "ShinyAssert.h"
 #include "Graphics/Texture.h"
-#include "Platform/IOUtils.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ASSERT ASSERT
@@ -67,11 +66,10 @@ ImageInfo getDefaultImageInfo() {
 ImageInfo loadImage(const std::string &fileName) {
    ImageInfo info;
 
-   std::string dataFileName(IOUtils::dataPath(fileName));
-   info.pixels = createPixelPtr(stbi_load(dataFileName.c_str(), &info.width, &info.height, &info.composition, 0));
+   info.pixels = createPixelPtr(stbi_load(fileName.c_str(), &info.width, &info.height, &info.composition, 0));
 
    if (!info.pixels || !determineFormat(info)) {
-      LOG_WARNING("Unable to load image from file: " << dataFileName);
+      LOG_WARNING("Unable to load image from file: " << fileName);
       info = getDefaultImageInfo();
    }
 

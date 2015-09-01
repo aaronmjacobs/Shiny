@@ -1,7 +1,6 @@
 #ifndef SHINY_SHADER_PROGRAM_H
 #define SHINY_SHADER_PROGRAM_H
 
-#include "Constants.h"
 #include "GLIncludes.h"
 #include "Log.h"
 #include "Pointers.h"

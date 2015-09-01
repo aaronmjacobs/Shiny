@@ -1,0 +1,6 @@
+#ifndef SHINY_DEFINES_H
+#define SHINY_DEFINES_H
+
+#cmakedefine SHINY_LOG_TO_FILE
+
+#endif

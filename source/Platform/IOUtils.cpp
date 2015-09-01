@@ -9,9 +9,9 @@ namespace Shiny {
 
 namespace IOUtils {
 
-bool appDataPath(const std::string &fileName, std::string &path) {
+bool appDataPath(const std::string &appName, const std::string &fileName, std::string &path) {
    std::string appDataFolder;
-   if (!OSUtils::getAppDataPath(appDataFolder)) {
+   if (!OSUtils::getAppDataPath(appName, appDataFolder)) {
       return false;
    }
 
@@ -22,11 +22,6 @@ bool appDataPath(const std::string &fileName, std::string &path) {
 bool canRead(const std::string &fileName) {
    ASSERT(!fileName.empty(), "Trying to check empty file name");
    return !!std::ifstream(fileName);
-}
-
-bool canReadData(const std::string &fileName) {
-   ASSERT(!fileName.empty(), "Trying to check empty file name");
-   return canRead(dataPath(fileName));
 }
 
 bool readFromFile(const std::string &fileName, std::string &data) {
@@ -66,21 +61,6 @@ UPtr<unsigned char[]> readFromBinaryFile(const std::string &fileName) {
    in.read((char*)data.get(), size);
 
    return std::move(data);
-}
-
-UPtr<unsigned char[]> readFromBinaryDataFile(const std::string &fileName) {
-   ASSERT(!fileName.empty(), "Trying to read from empty file name");
-   return std::move(readFromBinaryFile(dataPath(fileName)));
-}
-
-bool readFromDataFile(const std::string &fileName, std::string &data) {
-   ASSERT(!fileName.empty(), "Trying to read from empty file name");
-   return readFromFile(dataPath(fileName), data);
-}
-
-bool writeToDataFile(const std::string &fileName, const std::string &data) {
-   ASSERT(!fileName.empty(), "Trying to write to empty file name");
-   return writeToFile(dataPath(fileName), data);
 }
 
 } // namespace IOUtils
