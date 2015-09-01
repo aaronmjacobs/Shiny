@@ -1,5 +1,4 @@
 set(SOURCE_NAMES
-   main.cpp
    Engine.cpp
    Shiny.cpp
    Assets/MeshLoader.cpp
