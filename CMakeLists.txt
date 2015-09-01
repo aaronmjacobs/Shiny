@@ -2,13 +2,15 @@
 
 cmake_minimum_required(VERSION 3.1)
 project(Shiny)
-set(PROJECT_DISPLAY_NAME ${PROJECT_NAME})
+
+# Save state
+set(EXISTING_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
 # Version info
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 0)
-set(VERSION_MICRO 0)
-set(VERSION_BUILD 1)
+set(SHINY_VERSION_MAJOR 0)
+set(SHINY_VERSION_MINOR 0)
+set(SHINY_VERSION_MICRO 0)
+set(SHINY_VERSION_BUILD 1)
 
 # Build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -16,66 +18,52 @@ if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "Debug")
 endif(NOT CMAKE_BUILD_TYPE)
 
-# Compiler requirements
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Platform detection
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-   set(LINUX true)
-else(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-   set(LINUX false)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-   set(64_BIT true)
-else(CMAKE_SIZEOF_VOID_P EQUAL 8)
-   set(64_BIT false)
-endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
-
-# rpath handling
-if(LINUX)
-   set(CMAKE_INSTALL_RPATH "$ORIGIN/")
-endif(LINUX)
-
 # Windows quirks
 if(WIN32)
    add_definitions(-DNOMINMAX)
 endif(WIN32)
 
 # Directories
-set(SRC_DIR "${PROJECT_SOURCE_DIR}/source")
-set(DEP_DIR "${PROJECT_SOURCE_DIR}/dependencies")
-set(BIN_INCLUDE_DIR "${PROJECT_BINARY_DIR}/include")
-set(DATA_DIR_NAME "data")
-set(DATA_DIR "${PROJECT_SOURCE_DIR}/${DATA_DIR_NAME}")
-set(RES_DIR "${PROJECT_SOURCE_DIR}/resources")
-set(BIN_RES_DIR "${PROJECT_BINARY_DIR}/resources")
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
+set(DEP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+set(SHINY_BIN_INCLUDE_DIR "${BIN_INCLUDE_DIR}/${PROJECT_NAME}")
 
 # Options
 option(SHINY_LOG_TO_FILE "Enable file logging" OFF)
 
 # Generated content
 configure_file (
-   "${SRC_DIR}/Constants.h.in"
-   "${BIN_INCLUDE_DIR}/Constants.h"
+   "${SRC_DIR}/Defines.h.in"
+   "${SHINY_BIN_INCLUDE_DIR}/Defines.h"
+)
+configure_file (
+   "${SRC_DIR}/Shiny.h.in"
+   "${SHINY_BIN_INCLUDE_DIR}/Shiny.h"
 )
 
 # Source content
 include(sources.cmake)
+set(SOURCES)
 foreach(SOURCE_NAME ${SOURCE_NAMES})
    list(APPEND SOURCES "${SRC_DIR}/${SOURCE_NAME}")
 endforeach(SOURCE_NAME)
 
 include(headers.cmake)
+set(HEADERS)
 foreach(HEADER_NAME ${HEADER_NAMES})
    list(APPEND HEADERS "${SRC_DIR}/${HEADER_NAME}")
 endforeach(HEADER_NAME)
 
+set(INCLUDES)
 list(APPEND INCLUDES
    ${SRC_DIR}
    ${BIN_INCLUDE_DIR}
+   ${SHINY_BIN_INCLUDE_DIR}
 )
+
+set(LIBS)
+set(COPY_LIBS)
 
 source_group("Dependencies" "dependencies/*")
 
@@ -197,130 +185,38 @@ set(GLFW_USE_CHDIR OFF CACHE INTERNAL "Make glfwInit chdir to Contents/Resources
 add_subdirectory(${GLFW_DIR})
 attach_lib("${GLFW_DIR}/include" "" "glfw")
 
+set(BUILD_SHARED_LIBS ${EXISTING_BUILD_SHARED_LIBS} CACHE INTERNAL "Build shared libraries")
+
 ### Building ###
 
 # Includes
 include_directories(${INCLUDES})
 
-# Binary
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS})
+# Library
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 # Link
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-### Post-Build ###
+# Compiler requirements
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
-# Symlink data folder
-if(EXISTS ${DATA_DIR})
-   if(WIN32)
-      set(SYMLINK_COMMAND "${RES_DIR}/win/symlink.bat")
-   else(WIN32)
-      set(SYMLINK_COMMAND ${CMAKE_COMMAND} -E create_symlink)
-   endif(WIN32)
-   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-      COMMAND ${SYMLINK_COMMAND} "${DATA_DIR}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${DATA_DIR_NAME}"
-   )
-endif(EXISTS ${DATA_DIR})
+### Export ###
 
-# Copy DLLs
-if(WIN32)
-   foreach(COPY_LIB ${COPY_LIBS})
-      add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${COPY_LIB}>" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-      )
-   endforeach(COPY_LIB)
-endif(WIN32)
+# Include directory
+#copy_headers(${SRC_DIR} ${SHINY_BIN_INCLUDE_DIR} true)
+#copy_headers(${SRC_DIR} ${BIN_INCLUDE_DIR} true) # TODO
 
-### Install ###
+foreach(INCLUDE ${INCLUDES})
+   copy_headers(${INCLUDE} ${BIN_INCLUDE_DIR} true)
+endforeach(INCLUDE)
+copy_headers(${SRC_DIR} ${SHINY_BIN_INCLUDE_DIR} true)
 
-if(APPLE)
-   set(APP_DIR "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app")
-   set(CONTENTS_DIR "${APP_DIR}/Contents")
-   set(MACOS_DIR "${CONTENTS_DIR}/MacOS")
-   set(RESOURCES_DIR "${CONTENTS_DIR}/Resources")
+set(SHINY_INCLUDE_DIR "${BIN_INCLUDE_DIR}" PARENT_SCOPE)
 
-   # Generate the .app file
-   install(CODE "
-      file(MAKE_DIRECTORY \"${MACOS_DIR}\")
-      file(MAKE_DIRECTORY \"${RESOURCES_DIR}\")")
-
-   # Generate the Info.plist file (at build time, not install time)
-   configure_file(
-     "${RES_DIR}/osx/Info.plist.in"
-     "${BIN_RES_DIR}/Info.plist"
-   )
-
-   # Copy the generated Info.plist file
-   install(FILES "${BIN_RES_DIR}/Info.plist" DESTINATION "${CONTENTS_DIR}")
-
-   # Copy the icon
-   set(ICON_FILE "${RES_DIR}/osx/${PROJECT_NAME}.icns")
-   if(EXISTS ${ICON_FILE})
-      install(FILES "${ICON_FILE}" DESTINATION "${RESOURCES_DIR}")
-   endif(EXISTS ${ICON_FILE})
-
-   # Copy the data folder
-   if(EXISTS ${DATA_DIR})
-      install(DIRECTORY "${DATA_DIR}" DESTINATION "${MACOS_DIR}")
-   endif(EXISTS ${DATA_DIR})
-
-   # Copy the executable (not install, so that the internal lib paths don't change)
-   install(FILES "$<TARGET_FILE:${PROJECT_NAME}>" DESTINATION "${MACOS_DIR}"
-           PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-   # Fix the bundle (copies and fixes shared libraries)
-   install(CODE "
-      include(BundleUtilities)
-      fixup_bundle(\"${APP_DIR}\" \"\" \"\")")
-endif(APPLE)
-
-if(WIN32)
-   # Copy the data folder
-   if(EXISTS ${DATA_DIR})
-      install(DIRECTORY "${DATA_DIR}" DESTINATION ".")
-   endif(EXISTS ${DATA_DIR})
-
-   # Install the executable
-   install(TARGETS ${PROJECT_NAME} DESTINATION ".")
-
-   # Install all shared libraries
-   foreach(COPY_LIB ${COPY_LIBS})
-      install(FILES "$<TARGET_FILE:${COPY_LIB}>" DESTINATION ".")
-   endforeach(COPY_LIB)
-
-   # Install system libraries
-   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP true) # Let us choose the install location
-   include(InstallRequiredSystemLibraries)
-   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-      install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION ".")
-   endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-endif(WIN32)
-
-if(LINUX)
-   # Copy the data folder
-   if(EXISTS ${DATA_DIR})
-      install(DIRECTORY "${DATA_DIR}" DESTINATION ".")
-   endif(EXISTS ${DATA_DIR})
-
-   # Copy the executable (not install, so that the rpath doesn't change)
-   install(FILES "$<TARGET_FILE:${PROJECT_NAME}>" DESTINATION "${CMAKE_INSTALL_PREFIX}"
-           PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-   # Fix the bundle (in order to copy shared libraries)
-   # Note: verify_app (called at the end of fixup_bundle) WILL fail, due to referencing external libraries
-   # In order to ignore the error / continue, replace the verify_app function with one that does nothing
-   install(CODE "
-      include(BundleUtilities)
-      function(verify_app app)
-         message(STATUS \"(Not actually verifying...)\")
-      endfunction(verify_app)
-      fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}\" \"\" \"\")")
-
-   # Install the executable (this time, fixing the rpath)
-   install(TARGETS ${PROJECT_NAME} DESTINATION ".")
-
-   # Fix the bundle (just to do a proper verify)
-   install(CODE "
-      include(BundleUtilities)
-      fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}\" \"\" \"\")")
-endif(LINUX)
+# Shared libraries
+if(BUILD_SHARED_LIBS)
+   list(APPEND COPY_LIBS ${PROJECT_NAME})
+endif(BUILD_SHARED_LIBS)
+set(SHINY_SHARED_LIBS ${COPY_LIBS} PARENT_SCOPE)
