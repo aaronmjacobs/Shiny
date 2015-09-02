@@ -25,6 +25,46 @@ Uniform::Uniform(const GLint location, const GLenum type, const std::string &nam
    : data({0}), name(name), location(location), type(type), dirty(false) {
 }
 
+void Uniform::poll(const GLuint program) {
+   switch (type) {
+      case GL_BOOL:
+         int temp;
+         glGetUniformiv(program, location, &temp);
+         data.boolVal = !!temp;
+         break;
+      case GL_INT:
+      case GL_SAMPLER_1D:
+      case GL_SAMPLER_2D:
+      case GL_SAMPLER_3D:
+      case GL_SAMPLER_CUBE:
+      case GL_SAMPLER_1D_SHADOW:
+      case GL_SAMPLER_2D_SHADOW:
+      case GL_SAMPLER_CUBE_SHADOW:
+         glGetUniformiv(program, location, &data.intVal);
+         break;
+      case GL_FLOAT:
+         glGetUniformfv(program, location, &data.floatVal);
+         break;
+      case GL_FLOAT_VEC2:
+         glGetUniformfv(program, location, glm::value_ptr(data.vec2Val));
+         break;
+      case GL_FLOAT_VEC3:
+         glGetUniformfv(program, location, glm::value_ptr(data.vec3Val));
+         break;
+      case GL_FLOAT_VEC4:
+         glGetUniformfv(program, location, glm::value_ptr(data.vec4Val));
+         break;
+      case GL_FLOAT_MAT4:
+         glGetUniformfv(program, location, glm::value_ptr(data.mat4Val));
+         break;
+      default:
+         ASSERT(false, "Invalid uniform type: %d", type);
+         break;
+   }
+
+   dirty = false;
+}
+
 void Uniform::commit() {
    if (!dirty) {
       return;
@@ -175,7 +215,10 @@ bool ShaderProgram::link() {
       } else {
          std::string name(nameBuf);
          GLint location = glGetUniformLocation(id, name.c_str());
-         uniforms.insert({ name, Uniform(location, type, name) });
+         std::pair<UniformMap::iterator, bool> element(uniforms.emplace(name, Uniform(location, type, name)));
+         if (element.second) {
+            element.first->second.poll(id);
+         }
       }
    }
 

@@ -56,6 +56,8 @@ protected:
 public:
    Uniform(const GLint location, const GLenum type, const std::string &name);
 
+   void poll(const GLuint program);
+
    void commit();
 
    GLenum getType() const {
