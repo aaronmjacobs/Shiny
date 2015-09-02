@@ -14,11 +14,65 @@ const double kMaxFrameTime = 0.25;
 
 } // namespace
 
+// static
+void Engine::windowCloseCallback(GLFWwindow *window) {
+   Engine *engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+   engine->onWindowClose();
+}
+
+// static
+void Engine::windowSizeCallback(GLFWwindow *window, int width, int height) {
+   Engine *engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+   engine->onWindowSizeChange(width, height);
+}
+
+// static
+void Engine::framebufferSizeCallback(GLFWwindow *window, int width, int height) {
+   Engine *engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+   engine->onFramebufferSizeChange(width, height);
+}
+
+// static
+void Engine::windowPosCallback(GLFWwindow *window, int xPos, int yPos) {
+   Engine *engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+   engine->onWindowMove(xPos, yPos);
+}
+
+// static
+void Engine::windowIconifyCallback(GLFWwindow *window, int iconified) {
+   Engine *engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+   engine->onWindowIconifyChange(!!iconified);
+}
+
+// static
+void Engine::windowFocusCallback(GLFWwindow *window, int focused) {
+   Engine *engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+   engine->onWindowFocusChange(!!focused);
+}
+
 Engine::Engine()
    : window(nullptr) {
 }
 
 Engine::~Engine() {
+}
+
+void Engine::onWindowClose() {
+}
+
+void Engine::onWindowSizeChange(int width, int height) {
+}
+
+void Engine::onFramebufferSizeChange(int width, int height) {
+}
+
+void Engine::onWindowMove(int xPos, int yPos) {
+}
+
+void Engine::onWindowIconifyChange(bool iconified) {
+}
+
+void Engine::onWindowFocusChange(bool focused) {
 }
 
 Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName) {
@@ -43,9 +97,21 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
 
    window = std::move(newWindow);
 
-   // TODO Callbacks and such
+   glfwSetWindowUserPointer(window.get(), this);
+
+   glfwSetWindowCloseCallback(window.get(), Engine::windowCloseCallback);
+   glfwSetWindowSizeCallback(window.get(), Engine::windowSizeCallback);
+   glfwSetFramebufferSizeCallback(window.get(), Engine::framebufferSizeCallback);
+   glfwSetWindowPosCallback(window.get(), Engine::windowPosCallback);
+   glfwSetWindowIconifyCallback(window.get(), Engine::windowIconifyCallback);
+   glfwPollEvents(); // Ignore the first window focus callback
+   glfwSetWindowFocusCallback(window.get(), Engine::windowFocusCallback);
 
    return Result::kOK;
+}
+
+void Engine::shutDown() {
+   glfwSetWindowShouldClose(window.get(), true);
 }
 
 void Engine::run() {
