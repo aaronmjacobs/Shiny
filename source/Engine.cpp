@@ -51,7 +51,7 @@ void Engine::windowFocusCallback(GLFWwindow *window, int focused) {
 }
 
 Engine::Engine()
-   : window(nullptr) {
+   : window(nullptr), running(false), runningTime(0.0f) {
 }
 
 Engine::~Engine() {
@@ -76,6 +76,8 @@ void Engine::onWindowFocusChange(bool focused) {
 }
 
 Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName) {
+   ASSERT(!running, "Trying to start up engine that is already running");
+
    if (windowWidth <= 0 || windowHeight <= 0 || !windowName) {
       return Result::kWindowParams;
    }
@@ -107,6 +109,8 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
    glfwPollEvents(); // Ignore the first window focus callback
    glfwSetWindowFocusCallback(window.get(), Engine::windowFocusCallback);
 
+   runningTime = 0.0f;
+
    return Result::kOK;
 }
 
@@ -116,6 +120,9 @@ void Engine::shutDown() {
 
 void Engine::run() {
    ASSERT(window, "Trying to run engine before starting up");
+   ASSERT(!running, "Trying to run engine that is already running");
+
+   running = true;
 
    // Timing values
    const double dt = 1.0 / kPhysicsFrameRate;
@@ -133,6 +140,7 @@ void Engine::run() {
       accumulator += frameTime;
       while (accumulator >= dt) {
          tick(dt);
+         runningTime += dt;
          accumulator -= dt;
       }
 
@@ -141,6 +149,16 @@ void Engine::run() {
       glfwSwapBuffers(window.get());
       glfwPollEvents();
    }
+
+   running = false;
+}
+
+bool Engine::isRunning() const {
+   return running;
+}
+
+float Engine::getRunningTime() const {
+   return runningTime;
 }
 
 } // namespace Shiny

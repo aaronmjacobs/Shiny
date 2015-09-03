@@ -33,6 +33,8 @@ private:
 protected:
    WindowPtr window;
    Context context;
+   bool running;
+   float runningTime;
 
    virtual void onWindowClose();
 
@@ -60,6 +62,10 @@ public:
    virtual void tick(const float dt) = 0;
 
    virtual void render() = 0;
+
+   bool isRunning() const;
+
+   float getRunningTime() const;
 };
 
 } // namespace Shiny
