@@ -1,6 +1,7 @@
 #ifndef SHINY_DEFINES_H
 #define SHINY_DEFINES_H
 
+#cmakedefine SHINY_LOG_INTERNAL
 #cmakedefine SHINY_LOG_TO_FILE
 
 #if defined(SHINY_DLL) && defined(SHINY_BUILD_SHARED_LIB)

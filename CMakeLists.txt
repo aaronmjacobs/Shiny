@@ -28,6 +28,9 @@ if(SHINY_BUILD_SHARED_LIB)
    add_definitions(-DSHINY_BUILD_SHARED_LIB)
 endif(SHINY_BUILD_SHARED_LIB)
 
+# Notify that Shiny is currently being built
+add_definitions(-DSHINY_BUILDING)
+
 # Directories
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -35,6 +38,7 @@ set(DEP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
 set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # Options
+option(SHINY_LOG_INTERNAL "Enable Shiny internal logging" ON)
 option(SHINY_LOG_TO_FILE "Enable file logging" OFF)
 
 # Generated content

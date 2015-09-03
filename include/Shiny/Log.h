@@ -14,11 +14,11 @@
 namespace {
 
 // Width of the severity tag in log output (e.g. [ warning ])
-const int SEV_NAME_WIDTH = 9;
+const int kSevNameWidth = 9;
 
 // Delimiter for splitting the message and title of logs to be written by the boxer_write_policy
-const std::string BOXER_MESSAGE_SPLIT = "|||";
-const size_t BOXER_MESSAGE_SPLIT_LEN = 3;
+const std::string kBoxerMessageSplit = "|||";
+const size_t kBoxerMessageSplitLen = 3;
 
 // Used for centering content in the log output
 std::string center(std::string input, int width) { 
@@ -62,7 +62,7 @@ public:
       auto tm = std::localtime(&t);
 
       write_obj<WritePolicy_>(token, '[');
-      write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), SEV_NAME_WIDTH));
+      write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
       write_obj<WritePolicy_>(token, "] <");
       write_obj<WritePolicy_>(token, formatTime(tm));
       write_obj<WritePolicy_>(token, "> ");
@@ -108,8 +108,8 @@ public:
    static bool is_writing(int /*sev*/, int /*aud*/){return true;}
 
    static void write_str(const std::string& str) {
-      size_t split = str.find(BOXER_MESSAGE_SPLIT);
-      boxer::show(str.substr(0, split).c_str(), str.substr(split + BOXER_MESSAGE_SPLIT_LEN).c_str(), style);
+      size_t split = str.find(kBoxerMessageSplit);
+      boxer::show(str.substr(0, split).c_str(), str.substr(split + kBoxerMessageSplitLen).c_str(), style);
    }
 };
 
@@ -128,24 +128,37 @@ public:
 
 #endif // ndef NDEBUG
 
+// Allow internal logging to be disabled
+enum LogAudience {
+   kInternal = 1,
+   kExternal
+};
+
+#ifdef SHINY_LOG_INTERNAL
+#define SHINY_LOGGER_AUDIENCE_LIST kInternal, kExternal
+#else
+#define SHINY_LOGGER_AUDIENCE_LIST kExternal
+#endif // def SHINY_LOG_INTERNAL
+
+#ifdef SHINY_BUILDING
+#define SHINY_LOG_AUDIENCE kInternal
+#else
+#define SHINY_LOG_AUDIENCE kExternal
+#endif // def SHINY_BUILDING
+
 typedef templog::logger<templog::non_filtering_logger<text_formating_policy, templog::std_write_policy>
                       , CERR_SEV_THRESHOLD
-                      , templog::audience_list<templog::aud_developer, templog::aud_support, templog::aud_user>>
+                      , templog::audience_list<SHINY_LOGGER_AUDIENCE_LIST>>
                       cerr_logger;
 
 typedef templog::logger<templog::non_filtering_logger<text_formating_policy, file_write_policy>
                       , FILE_SEV_THRESHOLD
-                      , templog::audience_list<templog::aud_developer, templog::aud_support, templog::aud_user>>
+                      , templog::audience_list<SHINY_LOGGER_AUDIENCE_LIST>>
                       file_logger;
-
-/*typedef templog::logger<templog::non_filtering_logger<boxer_formating_policy, boxer_write_policy<boxer::Style::Warning>>
-                      , templog::sev_warning
-                      , templog::audience_list<templog::aud_developer> >
-                      boxer_logger_warning;*/
 
 typedef templog::logger<templog::non_filtering_logger<boxer_formating_policy, boxer_write_policy<boxer::Style::Error>>
                       , templog::sev_error
-                      , templog::audience_list<templog::aud_developer, templog::aud_support, templog::aud_user>>
+                      , templog::audience_list<SHINY_LOGGER_AUDIENCE_LIST>>
                       boxer_logger;
 
 } // namespace
@@ -155,7 +168,7 @@ typedef templog::logger<templog::non_filtering_logger<boxer_formating_policy, bo
 do { \
    TEMPLOG_LOG(cerr_logger, _log_severity_, _log_audience_) << _log_message_; \
    TEMPLOG_LOG(file_logger, _log_severity_, _log_audience_) << _log_message_; \
-   TEMPLOG_LOG(boxer_logger, _log_severity_, _log_audience_) << _log_message_ << BOXER_MESSAGE_SPLIT << _log_title_; \
+   TEMPLOG_LOG(boxer_logger, _log_severity_, _log_audience_) << _log_message_ << kBoxerMessageSplit << _log_title_; \
 } while (0)
 
 // Simplify logging calls
@@ -167,14 +180,14 @@ do { \
 // Error   : For logging errors that do not prevent the program from continuing
 // Fatal   : For logging fatal errors that prevent the program from continuing
 
-#define LOG_DEBUG(_log_message_) LOG(_log_message_, "Debug", templog::sev_debug, templog::aud_developer)
-#define LOG_INFO(_log_message_) LOG(_log_message_, "Information", templog::sev_info, templog::aud_developer)
-#define LOG_MESSAGE(_log_message_) LOG(_log_message_, "Message", templog::sev_message, templog::aud_developer)
-#define LOG_WARNING(_log_message_) LOG(_log_message_, "Warning", templog::sev_warning, templog::aud_developer)
-#define LOG_ERROR(_log_message_) LOG(_log_message_, "Error", templog::sev_error, templog::aud_user)
+#define LOG_DEBUG(_log_message_) LOG(_log_message_, "Debug", templog::sev_debug, SHINY_LOG_AUDIENCE)
+#define LOG_INFO(_log_message_) LOG(_log_message_, "Information", templog::sev_info, SHINY_LOG_AUDIENCE)
+#define LOG_MESSAGE(_log_message_) LOG(_log_message_, "Message", templog::sev_message, SHINY_LOG_AUDIENCE)
+#define LOG_WARNING(_log_message_) LOG(_log_message_, "Warning", templog::sev_warning, SHINY_LOG_AUDIENCE)
+#define LOG_ERROR(_log_message_) LOG(_log_message_, "Error", templog::sev_error, SHINY_LOG_AUDIENCE)
 #define LOG_FATAL(_log_message_) \
 do { \
-   LOG(_log_message_, "Fatal Error", templog::sev_fatal, templog::aud_user); \
+   LOG(_log_message_, "Fatal Error", templog::sev_fatal, SHINY_LOG_AUDIENCE); \
    abort(); \
 } while(0)
 
