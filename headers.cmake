@@ -20,6 +20,7 @@ set(HEADER_NAMES
    Graphics/Texture.h
    Graphics/TextureMaterial.h
    Graphics/Viewport.h
+   Input/InputDevice.h
    Platform/IOUtils.h
    Platform/OSUtils.h
    Scene/Camera.h
@@ -30,5 +31,6 @@ set(HEADER_NAMES
 source_group("Includes" "include/Shiny/*")
 source_group("Includes\\Assets" "include/Shiny/Assets/*")
 source_group("Includes\\Graphics" "include/Shiny/Graphics/*")
+source_group("Includes\\Input" "include/Shiny/Input/*")
 source_group("Includes\\Platform" "include/Shiny/Platform/*")
 source_group("Includes\\Scene" "include/Shiny/Scene/*")

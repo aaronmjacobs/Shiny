@@ -22,5 +22,6 @@ set(SOURCE_NAMES
 source_group("Sources" "source/*")
 source_group("Sources\\Assets" "source/Assets/*")
 source_group("Sources\\Graphics" "source/Graphics/*")
+source_group("Sources\\Input" "source/Input/*")
 source_group("Sources\\Platform" "source/Platform/*")
 source_group("Sources\\Scene" "source/Scene/*")
