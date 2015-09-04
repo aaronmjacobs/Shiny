@@ -6,6 +6,8 @@
 #include "Shiny/Graphics/Model.h"
 #include "Shiny/Graphics/ShaderProgram.h"
 
+#include <algorithm>
+
 namespace Shiny {
 
 Model::Model() {
