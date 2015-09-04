@@ -20,6 +20,8 @@ set(HEADER_NAMES
    Graphics/Texture.h
    Graphics/TextureMaterial.h
    Graphics/Viewport.h
+   Input/Controller.h
+   Input/ControllerMap.h
    Input/InputDevice.h
    Input/Keyboard.h
    Input/Keys.h
