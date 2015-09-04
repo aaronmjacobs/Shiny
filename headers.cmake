@@ -21,6 +21,9 @@ set(HEADER_NAMES
    Graphics/TextureMaterial.h
    Graphics/Viewport.h
    Input/InputDevice.h
+   Input/Keyboard.h
+   Input/Keys.h
+   Input/Mouse.h
    Platform/IOUtils.h
    Platform/OSUtils.h
    Scene/Camera.h

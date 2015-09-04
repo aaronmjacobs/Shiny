@@ -13,6 +13,8 @@ set(SOURCE_NAMES
    Graphics/ShaderProgram.cpp
    Graphics/Texture.cpp
    Graphics/TextureMaterial.cpp
+   Input/Keyboard.cpp
+   Input/Mouse.cpp
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
    Scene/Camera.cpp
