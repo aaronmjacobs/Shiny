@@ -26,14 +26,37 @@ const ControllerMap kNone = {
 
 #ifdef __APPLE__
 
-// TODO
-const ControllerMap kXbox360 = kNone;
+const ControllerMap kXbox360 = {
+   kNameXbox360,
+   0.7f, 0.2f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 3, true, false },
+   { 4, false, false }, { 5, false, false }, { -1, false, false }, { -1, false, false },
+   2, 3, 0, 1, 13, 12, 14, 11, -1, -1, 8, 9, 6, 7, 5, 4
+};
 
-const ControllerMap kXboxOne = kNone;
+const ControllerMap kXboxOne = {
+   kNameXboxOne,
+   0.7f, 0.2f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 3, true, false },
+   { 4, false, false }, { 5, false, false }, { -1, false, false }, { -1, false, false },
+   2, 3, 0, 1, 13, 12, 14, 11, -1, -1, 8, 9, 6, 7, 5, 4
+};
 
-const ControllerMap kPS3 = kNone;
+const ControllerMap kPS3 = {
+   kNamePS3,
+   0.7f, 0.1f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 3, true, false },
+   { -1, false, false }, { -1, false, false }, { -1, false, false }, { -1, false, false },
+   7, 5, 4, 6, 15, 13, 12, 14, 8, 9, 10, 11, 1, 2, 0, 3
+};
 
-const ControllerMap kPS4 = kNone;
+const ControllerMap kPS4 = {
+   kNamePS4,
+   0.7f, 0.1f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 3, true, false },
+   { 4, false, false }, { 5, false, false }, { -1, false, false }, { -1, false, false },
+   17, 15, 14, 16, 0, 2, 3, 1, 6, 7, 4, 5, 10, 11, 8, 9
+};
 
 #endif // __APPLE__
 
