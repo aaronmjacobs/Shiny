@@ -7,12 +7,18 @@
 
 #include "Shiny/Graphics/Context.h"
 
+#include "Shiny/Input/Controller.h"
+
+#include <array>
 #include <functional>
 
 struct GLFWwindow;
 typedef struct GLFWwindow GLFWwindow;
 
 namespace Shiny {
+
+class Keyboard;
+class Mouse;
 
 typedef UPtr<GLFWwindow, std::function<void(GLFWwindow*)>> WindowPtr;
 
@@ -33,6 +39,9 @@ private:
 protected:
    WindowPtr window;
    Context context;
+   SPtr<Keyboard> keyboard;
+   SPtr<Mouse> mouse;
+   std::array<SPtr<Controller>, kMaxControllers> controllers;
    bool running;
    float runningTime;
 
@@ -48,6 +57,8 @@ protected:
 
    virtual void onWindowFocusChange(bool focused);
 
+   void pollInput();
+
 public:
    Engine();
 
@@ -62,6 +73,12 @@ public:
    virtual void tick(const float dt) = 0;
 
    virtual void render() = 0;
+
+   SPtr<const Keyboard> getKeyboard() const;
+
+   SPtr<const Mouse> getMouse() const;
+
+   SPtr<const Controller> getController(int which) const;
 
    bool isRunning() const;
 

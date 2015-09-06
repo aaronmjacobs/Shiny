@@ -3,6 +3,9 @@
 #include "Shiny/Shiny.h"
 #include "Shiny/ShinyAssert.h"
 
+#include "Shiny/Input/Keyboard.h"
+#include "Shiny/Input/Mouse.h"
+
 #include <algorithm>
 
 namespace Shiny {
@@ -52,6 +55,7 @@ void Engine::windowFocusCallback(GLFWwindow *window, int focused) {
 
 Engine::Engine()
    : window(nullptr), running(false), runningTime(0.0f) {
+   controllers.fill(nullptr);
 }
 
 Engine::~Engine() {
@@ -73,6 +77,16 @@ void Engine::onWindowIconifyChange(bool iconified) {
 }
 
 void Engine::onWindowFocusChange(bool focused) {
+}
+
+
+void Engine::pollInput() {
+   keyboard->poll();
+   mouse->poll();
+
+   for (const SPtr<Controller> &controller : controllers) {
+      controller->poll();
+   }
 }
 
 Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName) {
@@ -108,6 +122,13 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
    glfwSetWindowIconifyCallback(window.get(), Engine::windowIconifyCallback);
    glfwPollEvents(); // Ignore the first window focus callback
    glfwSetWindowFocusCallback(window.get(), Engine::windowFocusCallback);
+
+   keyboard = std::make_shared<Keyboard>(window.get());
+   mouse = std::make_shared<Mouse>(window.get());
+   for (int i = 0; i < controllers.size(); ++i) {
+      controllers[i] = std::make_shared<Controller>(window.get(), i);
+   }
+   pollInput();
 
    runningTime = 0.0f;
 
@@ -148,9 +169,24 @@ void Engine::run() {
 
       glfwSwapBuffers(window.get());
       glfwPollEvents();
+
+      pollInput();
    }
 
    running = false;
+}
+
+SPtr<const Keyboard> Engine::getKeyboard() const {
+   return keyboard;
+}
+
+SPtr<const Mouse> Engine::getMouse() const {
+   return mouse;
+}
+
+SPtr<const Controller> Engine::getController(int which) const {
+   ASSERT(which >= 0 && which < controllers.size(), "Invalid controller number: %d", which);
+   return controllers[which];
 }
 
 bool Engine::isRunning() const {
