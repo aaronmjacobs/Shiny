@@ -100,10 +100,33 @@ const ControllerMap* none() {
 
 #ifdef __APPLE__
 
-// TODO
 const ControllerMap* guess(const std::string &name, int numButtons, int numAxes) {
    ASSERT(numButtons >=0 && numAxes >= 0, "Invalid number of buttons (%d) and axes (%d)", numButtons, numAxes);
-   return &kNone;
+
+   // Check by name
+   if (stringContainsIgnoreCase(name, "playstation") && stringContainsIgnoreCase(name, "3")) {
+      return &kPS3;
+   }
+   if (stringContainsIgnoreCase(name, "xbox") || stringContainsIgnoreCase(name, "360")) {
+      if (numButtons == 16) {
+         return &kXboxOne;
+      }
+      return &kXbox360;
+   }
+   if (stringContainsIgnoreCase(name, "wireless controller")) {
+      return &kPS4;
+   }
+
+   // Check by number of buttons / axes
+   if (numButtons == 18 && numAxes == 6) {
+      return &kPS4;
+   }
+   if (numButtons == 19 && numAxes == 4) {
+      return &kPS3;
+   }
+
+   // Default to Xbox 360
+   return &kXbox360;
 }
 
 #endif // __APPLE__
