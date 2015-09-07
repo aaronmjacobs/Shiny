@@ -75,14 +75,36 @@ const ControllerMap kPS4 = kNone;
 
 #ifdef _WIN32
 
-// TODO
-const ControllerMap kXbox360 = kNone;
+// 5 axes, 14 buttons
+// Triggers share axis 2 (left = positive, neither = 0, right = negative)
+const ControllerMap kXbox360 = {
+   kNameXbox360,
+   0.7f, 0.2f,
+   { 0, true, false }, { 1, true, false }, { 4, true, false }, { 3, true, false },
+   { 2, true, false }, { 2, true, true }, { -1, false, false }, { -1, false, false },
+   13, 11, 10, 12, 2, 1, 3, 0, -1, -1, 4, 5, 8, 9, 6, 7
+};
 
-const ControllerMap kXboxOne = kNone;
+// 6 axes, 14 buttons
+const ControllerMap kXboxOne = {
+   kNameXboxOne,
+   0.7f, 0.2f,
+   { 0, true, false }, { 1, true, false }, { 5, true, false }, { 4, true, false },
+   { 2, false, false }, { 3, false, false }, { -1, false, false }, { -1, false, false },
+   13, 11, 10, 12, 2, 1, 3, 0, -1, -1, 4, 5, 8, 9, 6, 7
+};
 
+// Windows has bad PS3 support
 const ControllerMap kPS3 = kNone;
 
-const ControllerMap kPS4 = kNone;
+// 6 axes, 18 buttons
+const ControllerMap kPS4 = {
+   kNamePS4,
+   0.7f, 0.1f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 3, true, false },
+   { 5, false, false }, { 4, false, false }, { -1, false, false }, { -1, false, false },
+   17, 15, 14, 16, 0, 2, 3, 1, 6, 7, 4, 5, 10, 11, 8, 9
+};
 
 #endif // _WIN32
 
@@ -143,10 +165,19 @@ const ControllerMap* guess(const std::string &name, int numButtons, int numAxes)
 
 #ifdef _WIN32
 
-// TODO
 const ControllerMap* guess(const std::string &name, int numButtons, int numAxes) {
-   ASSERT(numButtons >=0 && numAxes >= 0, "Invalid number of buttons (%d) and axes (%d)", numButtons, numAxes);
-   return &kNone;
+   ASSERT(numButtons >= 0 && numAxes >= 0, "Invalid number of buttons (%d) and axes (%d)", numButtons, numAxes);
+
+   // Check by number of buttons / axes
+   if (numButtons == 18 && numAxes == 6) {
+      return &kPS4;
+   }
+   if (numButtons == 14 && numAxes == 6) {
+      return &kXboxOne;
+   }
+
+   // Default to Xbox 360
+   return &kXbox360;
 }
 
 #endif // _WIN32
