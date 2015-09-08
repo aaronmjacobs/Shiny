@@ -197,6 +197,10 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 # Boxer
 set(BOXER_DIR "${DEP_DIR}/Boxer")
 add_subdirectory(${BOXER_DIR})
+add_definitions(${BOXER_DEFINITIONS})
+list(APPEND SHINY_DEFINITIONS
+   ${BOXER_DEFINITIONS}
+)
 attach_lib("${BOXER_DIR}/include" "" "Boxer")
 
 ## Shared ##
