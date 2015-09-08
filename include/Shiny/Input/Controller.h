@@ -10,7 +10,7 @@ namespace Shiny {
 
 namespace {
 
-SHINYAPI const int kMaxControllers = GLFW_JOYSTICK_LAST + 1;
+const int kMaxControllers = GLFW_JOYSTICK_LAST + 1;
 
 } // namespace
 

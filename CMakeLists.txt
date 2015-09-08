@@ -5,6 +5,7 @@ project(Shiny)
 
 # Save state
 set(SHINY_BUILD_SHARED_LIB ${BUILD_SHARED_LIBS})
+set(SHINY_DEFINITIONS)
 
 # Version info
 set(SHINY_VERSION_MAJOR 0)
@@ -21,11 +22,17 @@ endif(NOT CMAKE_BUILD_TYPE)
 # Windows quirks
 if(WIN32)
    add_definitions(-DNOMINMAX)
+   list(APPEND SHINY_DEFINITIONS
+      -DNOMINMAX
+   )
 endif(WIN32)
 
 # Information importing / exporting
 if(SHINY_BUILD_SHARED_LIB)
    add_definitions(-DSHINY_BUILD_SHARED_LIB)
+   list(APPEND SHINY_DEFINITIONS
+      -DSHINY_DLL
+   )
 endif(SHINY_BUILD_SHARED_LIB)
 
 # Notify that Shiny is currently being built
@@ -146,6 +153,12 @@ endfunction(copy_headers)
 
 # glad
 set(GLAD_DIR "${DEP_DIR}/glad")
+if(SHINY_BUILD_SHARED_LIB)
+   add_definitions(-DGLAD_GLAPI_EXPORT -DGLAD_GLAPI_EXPORT_BUILD)
+   list(APPEND SHINY_DEFINITIONS
+      -DGLAD_GLAPI_EXPORT
+   )
+endif(SHINY_BUILD_SHARED_LIB)
 attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
 
 # GLM
@@ -163,6 +176,12 @@ copy_headers(${STB_DIR} ${BIN_INCLUDE_DIR}/stb false)
 
 # templog
 set(TEMPLOG_DIR "${DEP_DIR}/templog")
+if(SHINY_BUILD_SHARED_LIB)
+   add_definitions(-DTEMPLOG_BUILD_DLL)
+   list(APPEND SHINY_DEFINITIONS
+      -DTEMPLOG_DLL
+   )
+endif(SHINY_BUILD_SHARED_LIB)
 copy_headers(${TEMPLOG_DIR} ${BIN_INCLUDE_DIR}/templog false)
 attach_lib("${TEMPLOG_DIR}" "${TEMPLOG_DIR}/imp/logging.cpp" "")
 
@@ -192,6 +211,12 @@ set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
 set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
 set(GLFW_USE_CHDIR OFF CACHE INTERNAL "Make glfwInit chdir to Contents/Resources")
 add_subdirectory(${GLFW_DIR})
+if(BUILD_SHARED_LIBS)
+   add_definitions(-DGLFW_DLL)
+   list(APPEND SHINY_DEFINITIONS
+      -DGLFW_DLL
+   )
+endif(BUILD_SHARED_LIBS)
 attach_lib("${GLFW_DIR}/include" "" "glfw")
 
 set(BUILD_SHARED_LIBS ${SHINY_BUILD_SHARED_LIB} CACHE INTERNAL "Build shared libraries")
@@ -213,6 +238,9 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
 ### Export ###
 
+# Target
+set(SHINY_TARGET ${PROJECT_NAME} PARENT_SCOPE)
+
 # Include directories
 set(SHINY_INCLUDE_DIRS "${INCLUDES}" PARENT_SCOPE)
 
@@ -221,3 +249,6 @@ if(BUILD_SHARED_LIBS)
    list(APPEND COPY_LIBS ${PROJECT_NAME})
 endif(BUILD_SHARED_LIBS)
 set(SHINY_SHARED_LIBS ${COPY_LIBS} PARENT_SCOPE)
+
+# Definitions
+set(SHINY_DEFINITIONS ${SHINY_DEFINITIONS} PARENT_SCOPE)
