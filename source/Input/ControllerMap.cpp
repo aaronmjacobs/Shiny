@@ -62,14 +62,43 @@ const ControllerMap kPS4 = {
 
 #ifdef __linux__
 
-// TODO
-const ControllerMap kXbox360 = kNone;
+const ControllerMap kXbox360 = {
+   kNameXbox360,
+   0.7f, 0.2f,
+   { 0, true, false }, { 1, true, false }, { 3, true, false }, { 4, true, false },
+   { 2, false, false }, { 5, false, false }, { -1, false, false }, { -1, false, false },
+   11, 12, 13, 14, 2, 1, 3, 0, -1, -1, 4, 5, 9, 10, 6, 7
+};
 
-const ControllerMap kXboxOne = kNone;
+// 8 axes, 11 buttons
+// Microsoft X-Box One pad
+const ControllerMap kXboxOne = {
+   kNameXboxOne,
+   0.7f, 0.2f,
+   { 0, true, false }, { 1, true, false }, { 3, true, false }, { 4, true, false },
+   { 2, false, false }, { 5, false, false }, { 6, false, false }, { 7, false, false },
+   -1, -1, -1, -1, 2, 1, 3, 0, -1, -1, 4, 5, 9, 10, 6, 7
+};
 
-const ControllerMap kPS3 = kNone;
+// 27 axes, 19 buttons
+// Sony PLAYSTATION(R)3 Controller
+const ControllerMap kPS3 = {
+   kNamePS3,
+   0.7f, 0.1f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 3, true, false },
+   { 12, false, false }, { 13, false, false }, { -1, false, false }, { -1, false, false },
+   7, 5, 4, 6, 15, 13, 12, 14, -1, -1, 10, 11, 1, 2, 0, 3
+};
 
-const ControllerMap kPS4 = kNone;
+// 12 axes, 14 buttons
+// Sony Computer Entertainment Wireless Controller
+const ControllerMap kPS4 = {
+   kNamePS4,
+   0.7f, 0.1f,
+   { 0, true, false }, { 1, true, false }, { 2, true, false }, { 5, true, false },
+   { 3, false, false }, { 4, false, false }, { 6, false, false }, { 7, false, false },
+   -1, -1, -1, -1, 0, 2, 3, 1, 6, 7, 4, 5, 10, 11, 8, 9
+};
 
 #endif // __linux__
 
@@ -155,10 +184,33 @@ const ControllerMap* guess(const std::string &name, int numButtons, int numAxes)
 
 #ifdef __linux__
 
-// TODO
 const ControllerMap* guess(const std::string &name, int numButtons, int numAxes) {
    ASSERT(numButtons >=0 && numAxes >= 0, "Invalid number of buttons (%d) and axes (%d)", numButtons, numAxes);
-   return &kNone;
+
+   // Check by name
+   if (stringContainsIgnoreCase(name, "playstation") && stringContainsIgnoreCase(name, "3")) {
+      return &kPS3;
+   }
+   if (stringContainsIgnoreCase(name, "sony")) {
+      return &kPS4;
+   }
+   if (stringContainsIgnoreCase(name, "one")) {
+      return &kXboxOne;
+   }
+
+   // Check by number of buttons / axes
+   if (numButtons == 14 && numAxes == 12) {
+      return &kPS4;
+   }
+   if (numButtons == 19 && numAxes == 27) {
+      return &kPS3;
+   }
+   if (numButtons == 11 && numAxes == 8) {
+      return &kXboxOne;
+   }
+
+   // Default to Xbox 360
+   return &kXbox360;
 }
 
 #endif // __linux__
