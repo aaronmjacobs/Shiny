@@ -10,8 +10,7 @@ namespace Shiny {
  */
 constexpr int kVersionMajor = @SHINY_VERSION_MAJOR@;
 constexpr int kVersionMinor = @SHINY_VERSION_MINOR@;
-constexpr int kVersionMicro = @SHINY_VERSION_MICRO@;
-constexpr int kVersionBuild = @SHINY_VERSION_BUILD@;
+constexpr int kVersionPatch = @SHINY_VERSION_PATCH@;
 
 /**
  * Possible results of Shiny functions
