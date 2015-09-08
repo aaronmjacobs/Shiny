@@ -163,7 +163,8 @@ copy_headers(${STB_DIR} ${BIN_INCLUDE_DIR}/stb false)
 
 # templog
 set(TEMPLOG_DIR "${DEP_DIR}/templog")
-attach_lib("${TEMPLOG_DIR}/include" "${TEMPLOG_DIR}/imp/logging.cpp" "")
+copy_headers(${TEMPLOG_DIR} ${BIN_INCLUDE_DIR}/templog false)
+attach_lib("${TEMPLOG_DIR}" "${TEMPLOG_DIR}/imp/logging.cpp" "")
 
 # tinyobj
 set(TINYOBJ_DIR "${DEP_DIR}/tinyobjloader")
