@@ -14,7 +14,7 @@ namespace Shiny {
 namespace {
 
 void bindAttribute(GLuint id, GLint attribute) {
-   glBindAttribLocation(id, attribute, ShaderAttributes::NAMES[attribute]);
+   glBindAttribLocation(id, attribute, ShaderAttributes::kNames[attribute]);
 }
 
 } // namespace
@@ -164,7 +164,7 @@ void Uniform::setValue(const glm::mat4 &value) {
 
 ShaderProgram::ShaderProgram()
    : id(glCreateProgram()) {
-   for (int i = 0; i < ShaderAttributes::NAMES.size(); ++i) {
+   for (int i = 0; i < ShaderAttributes::kNames.size(); ++i) {
       bindAttribute(id, i);
    }
 }

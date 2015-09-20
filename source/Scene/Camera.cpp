@@ -9,26 +9,26 @@ namespace Shiny {
 
 namespace {
 
-const glm::vec3 FRONT(0.0f, 0.0f, -1.0f);
-const glm::vec3 RIGHT(1.0f, 0.0f, 0.0f);
-const glm::vec3 UP(0.0f, 1.0f, 0.0f);
+const glm::vec3 kFront(0.0f, 0.0f, -1.0f);
+const glm::vec3 kRight(1.0f, 0.0f, 0.0f);
+const glm::vec3 kUp(0.0f, 1.0f, 0.0f);
 
 } // namespace
 
 glm::vec3 Camera::getFront() const {
-   return FRONT * transform.orientation;
+   return kFront * transform.orientation;
 }
 
 glm::vec3 Camera::getRight() const {
-   return RIGHT * transform.orientation;
+   return kRight * transform.orientation;
 }
 
 glm::vec3 Camera::getUp() const {
-   return UP * transform.orientation;
+   return kUp * transform.orientation;
 }
 
 glm::mat4 Camera::getViewMatrix() const {
-   return glm::lookAt(transform.position, transform.position + getFront(), UP);
+   return glm::lookAt(transform.position, transform.position + getFront(), kUp);
 }
 
 void Camera::setPosition(const glm::vec3 &pos) {
@@ -48,15 +48,15 @@ void Camera::strafe(float amount) {
 }
 
 void Camera::rotate(float pitch, float yaw) {
-   glm::quat pitchChange = glm::angleAxis(pitch, RIGHT);
-   glm::quat yawChange = glm::angleAxis(yaw, UP);
+   glm::quat pitchChange = glm::angleAxis(pitch, kRight);
+   glm::quat yawChange = glm::angleAxis(yaw, kUp);
    transform.orientation = glm::normalize(pitchChange * transform.orientation * yawChange);
 }
 
 void Camera::lookAt(const glm::vec3 &loc) {
    ASSERT(transform.position != loc, "Camera trying to look at self");
 
-   setOrientation(glm::toQuat(glm::lookAt(transform.position, loc, UP)));
+   setOrientation(glm::toQuat(glm::lookAt(transform.position, loc, kUp)));
 }
 
 } //namespace Shiny

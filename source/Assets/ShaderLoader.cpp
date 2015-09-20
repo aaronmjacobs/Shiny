@@ -14,11 +14,11 @@ namespace Shiny {
 
 namespace {
 
-const char* VERTEX_EXTENSION = ".vert";
-const char* GEOMETRY_EXTENSION = ".geom";
-const char* FRAGMENT_EXTENSION = ".frag";
+const char* kVertexExtension = ".vert";
+const char* kGeometryExtension = ".geom";
+const char* kFragmentExtension = ".frag";
 
-const char* DEFAULT_VERTEX_SOURCE = GLSL(
+const char* kDefaultVertexSource = GLSL(
    uniform mat4 uModelMatrix;
    uniform mat4 uViewMatrix;
    uniform mat4 uProjMatrix;
@@ -30,7 +30,7 @@ const char* DEFAULT_VERTEX_SOURCE = GLSL(
    }
 );
 
-const char* DEFAULT_GEOMETRY_SOURCE = GLSL(
+const char* kDefaultGeometrySource = GLSL(
    layout(points) in;
    layout(points, max_vertices = 1) out;
 
@@ -41,7 +41,7 @@ const char* DEFAULT_GEOMETRY_SOURCE = GLSL(
    }
 );
 
-const char* DEFAULT_FRAGMENT_SOURCE = GLSL(
+const char* kDefaultFragmentSource = GLSL(
    out vec4 color;
 
    void main() {
@@ -102,14 +102,14 @@ std::string getShaderLinkError(const SPtr<ShaderProgram> &shaderProgram) {
 const char* getDefaultShaderSource(const GLenum type) {
    switch (type) {
       case GL_VERTEX_SHADER:
-         return DEFAULT_VERTEX_SOURCE;
+         return kDefaultVertexSource;
       case GL_GEOMETRY_SHADER:
-         return DEFAULT_GEOMETRY_SOURCE;
+         return kDefaultGeometrySource;
       case GL_FRAGMENT_SHADER:
-         return DEFAULT_FRAGMENT_SOURCE;
+         return kDefaultFragmentSource;
       default:
          ASSERT(false, "Invalid shader type: %i", type);
-         return DEFAULT_VERTEX_SOURCE;
+         return kDefaultVertexSource;
    }
 }
 
@@ -225,9 +225,9 @@ SPtr<ShaderProgram> ShaderLoader::loadShaderProgram(const std::string &fileName)
    }
 
    SPtr<ShaderProgram> shaderProgram(std::make_shared<ShaderProgram>());
-   std::string vertexFileName = fileName + VERTEX_EXTENSION;
-   std::string geometryFileName = fileName + GEOMETRY_EXTENSION;
-   std::string fragmentFileName = fileName + FRAGMENT_EXTENSION;
+   std::string vertexFileName = fileName + kVertexExtension;
+   std::string geometryFileName = fileName + kGeometryExtension;
+   std::string fragmentFileName = fileName + kFragmentExtension;
 
    if (IOUtils::canRead(vertexFileName)) {
       shaderProgram->attach(loadShader(vertexFileName, GL_VERTEX_SHADER));

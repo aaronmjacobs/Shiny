@@ -79,7 +79,6 @@ void Engine::onWindowIconifyChange(bool iconified) {
 void Engine::onWindowFocusChange(bool focused) {
 }
 
-
 void Engine::pollInput() {
    keyboard->poll();
    mouse->poll();

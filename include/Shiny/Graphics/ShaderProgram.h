@@ -18,14 +18,14 @@ namespace Shiny {
 namespace ShaderAttributes {
 
 enum SHINYAPI Attributes : GLint {
-   POSITION = 0,
-   NORMAL = 1,
-   TEX_COORD = 2
+   kPosition = 0,
+   kNormal = 1,
+   kTexCoord = 2
 };
 
 namespace {
 
-SHINYAPI const std::array<const char*, 3> NAMES = {{
+SHINYAPI const std::array<const char*, 3> kNames = {{
    "aPosition",
    "aNormal",
    "aTexCoord"

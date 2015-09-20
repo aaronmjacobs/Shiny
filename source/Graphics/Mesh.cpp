@@ -25,8 +25,8 @@ Mesh::Mesh(UPtr<float[]> vertices, unsigned int numVertices, UPtr<float[]> norma
       glBindBuffer(GL_ARRAY_BUFFER, vbo);
       glBufferData(GL_ARRAY_BUFFER, sizeof(float) * dimensionality * numVertices, vertices.get(), usage);
 
-      glEnableVertexAttribArray(ShaderAttributes::POSITION);
-      glVertexAttribPointer(ShaderAttributes::POSITION, dimensionality, GL_FLOAT, GL_FALSE, 0, 0);
+      glEnableVertexAttribArray(ShaderAttributes::kPosition);
+      glVertexAttribPointer(ShaderAttributes::kPosition, dimensionality, GL_FLOAT, GL_FALSE, 0, 0);
    }
 
    if (numNormals > 0) {
@@ -35,8 +35,8 @@ Mesh::Mesh(UPtr<float[]> vertices, unsigned int numVertices, UPtr<float[]> norma
       glBindBuffer(GL_ARRAY_BUFFER, nbo);
       glBufferData(GL_ARRAY_BUFFER, sizeof(float) * dimensionality * numNormals, normals.get(), usage);
 
-      glEnableVertexAttribArray(ShaderAttributes::NORMAL);
-      glVertexAttribPointer(ShaderAttributes::NORMAL, dimensionality, GL_FLOAT, GL_FALSE, 0, 0);
+      glEnableVertexAttribArray(ShaderAttributes::kNormal);
+      glVertexAttribPointer(ShaderAttributes::kNormal, dimensionality, GL_FLOAT, GL_FALSE, 0, 0);
    }
 
    if (numIndices > 0) {
@@ -52,8 +52,8 @@ Mesh::Mesh(UPtr<float[]> vertices, unsigned int numVertices, UPtr<float[]> norma
       glBindBuffer(GL_ARRAY_BUFFER, tbo);
       glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * numTexCoords, texCoords.get(), usage);
 
-      glEnableVertexAttribArray(ShaderAttributes::TEX_COORD);
-      glVertexAttribPointer(ShaderAttributes::TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, 0);
+      glEnableVertexAttribArray(ShaderAttributes::kTexCoord);
+      glVertexAttribPointer(ShaderAttributes::kTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
    }
 
    glBindVertexArray(0);
