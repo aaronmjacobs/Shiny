@@ -201,7 +201,7 @@ SPtr<Shader> ShaderLoader::loadShader(const std::string &fileName, const GLenum 
    }
 
    std::string source;
-   if (!IOUtils::readFromFile(fileName, source)) {
+   if (!IOUtils::readTextFile(fileName, source)) {
       LOG_WARNING("Unable to load shader from file \"" << fileName << "\", reverting to default shader");
       return getDefaultShader(type);
    }
@@ -260,7 +260,7 @@ void ShaderLoader::reloadShaders() {
       const SPtr<Shader> &shader = itr->second;
 
       std::string source;
-      if (!IOUtils::readFromFile(fileName, source)) {
+      if (!IOUtils::readTextFile(fileName, source)) {
          LOG_WARNING("Unable to load shader from file \"" << fileName << "\", not reloading");
          continue;
       }

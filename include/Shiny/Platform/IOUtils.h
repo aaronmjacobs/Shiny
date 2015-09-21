@@ -4,6 +4,7 @@
 #include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
+#include <ios>
 #include <string>
 
 namespace Shiny {
@@ -14,11 +15,6 @@ namespace Shiny {
 namespace IOUtils {
 
 /**
- * Gets the absolute path of a resource stored in the app data folder, given a relative path, returning true on success
- */
-SHINYAPI bool appDataPath(const std::string &fileName, std::string &path);
-
-/**
  * Determines if the file with the given name can be read
  */
 SHINYAPI bool canRead(const std::string &fileName);
@@ -26,17 +22,28 @@ SHINYAPI bool canRead(const std::string &fileName);
 /**
  * Reads the entire contents of the text file with the given name
  */
-SHINYAPI bool readFromFile(const std::string &fileName, std::string &data);
+SHINYAPI bool readTextFile(const std::string &fileName, std::string &data);
 
 /**
- * Reads the entire contents of the binary file with the given name
+ * Reads the entire contents of the binary file with the given name, storing the number of bytes in numBytes if set
  */
-SHINYAPI UPtr<unsigned char[]> readFromBinaryFile(const std::string &fileName);
+SHINYAPI UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, std::streamsize *numBytes = nullptr);
 
 /**
  * Writes the contents of the given text to the file with the given name, returning true on success
  */
-SHINYAPI bool writeToFile(const std::string &fileName, const std::string &data);
+SHINYAPI bool writeTextFile(const std::string &fileName, const std::string &data);
+
+/**
+ * Writes the contents of the given array to the file with the given name, returning true on success
+ */
+SHINYAPI bool writeBinaryFile(const std::string &fileName, unsigned char *data, std::streamsize numBytes);
+
+/**
+ * Gets the absolute path of a resource stored in the app data folder given a relative path and application name,
+ * returning true on success
+ */
+SHINYAPI bool appDataPath(const std::string &appName, const std::string &fileName, std::string &path);
 
 } // namespace IOUtils
 
