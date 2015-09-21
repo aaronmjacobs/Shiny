@@ -59,19 +59,4 @@ void terminate() {
    glfwTerminate();
 }
 
-Result loadGL() {
-   static bool loaded = false;
-
-   if (loaded) {
-      return Result::kOK;
-   }
-
-   if (!gladLoadGL()) {
-      return Result::kGladLoad;
-   }
-
-   loaded = true;
-   return Result::kOK;
-}
-
 } // namespace Shiny

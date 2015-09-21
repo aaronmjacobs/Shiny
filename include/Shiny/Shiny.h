@@ -6,13 +6,6 @@
 namespace Shiny {
 
 /**
- * Version information
- */
-constexpr int kVersionMajor = @SHINY_VERSION_MAJOR@;
-constexpr int kVersionMinor = @SHINY_VERSION_MINOR@;
-constexpr int kVersionPatch = @SHINY_VERSION_PATCH@;
-
-/**
  * Possible results of Shiny functions
  */
 enum class SHINYAPI Result {
@@ -38,11 +31,6 @@ SHINYAPI Result init();
  * Terminates Shiny
  */
 SHINYAPI void terminate();
-
-/**
- * Loads OpenGL - must be called after an OpenGL context is created
- */
-SHINYAPI Result loadGL();
 
 } // namespace Shiny
 

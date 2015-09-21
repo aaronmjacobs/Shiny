@@ -53,8 +53,8 @@ configure_file (
    "${BIN_INCLUDE_DIR}/${PROJECT_NAME}/Defines.h"
 )
 configure_file (
-   "${INCLUDE_DIR}/${PROJECT_NAME}/Shiny.h.in"
-   "${BIN_INCLUDE_DIR}/${PROJECT_NAME}/Shiny.h"
+   "${INCLUDE_DIR}/${PROJECT_NAME}/Version.h.in"
+   "${BIN_INCLUDE_DIR}/${PROJECT_NAME}/Version.h"
 )
 
 # Source content

@@ -16,6 +16,22 @@ namespace {
 const double kPhysicsFrameRate = 60.0;
 const double kMaxFrameTime = 0.25;
 
+// Loads OpenGL - must be called after an OpenGL context is created
+Result loadGL() {
+   static bool loaded = false;
+
+   if (loaded) {
+      return Result::kOK;
+   }
+
+   if (!gladLoadGL()) {
+      return Result::kGladLoad;
+   }
+
+   loaded = true;
+   return Result::kOK;
+}
+
 } // namespace
 
 // static

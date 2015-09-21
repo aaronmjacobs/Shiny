@@ -1,9 +1,11 @@
 set(HEADER_NAMES
+   Defines.h
    Engine.h
    Log.h
    Pointers.h
    Shiny.h
    ShinyAssert.h
+   Version.h
    Assets/DefaultImageSource.h
    Assets/MeshLoader.h
    Assets/ShaderLoader.h
