@@ -2,9 +2,10 @@
 #define SHINY_CONTROLLER_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/GLIncludes.h"
 
 #include "Shiny/Input/InputDevice.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Shiny {
 

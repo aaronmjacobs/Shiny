@@ -1,5 +1,6 @@
-#include "Shiny/GLIncludes.h"
 #include "Shiny/ShinyAssert.h"
+
+#include "Shiny/Graphics/OpenGL.h"
 
 #include "Shiny/Input/Controller.h"
 #include "Shiny/Input/ControllerMap.h"

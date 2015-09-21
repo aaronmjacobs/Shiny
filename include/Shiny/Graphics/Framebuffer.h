@@ -2,9 +2,9 @@
 #define SHINY_FRAMEBUFFER_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/GLIncludes.h"
 #include "Shiny/Pointers.h"
 
+#include "Shiny/Graphics/OpenGL.h"
 #include "Shiny/Graphics/Viewport.h"
 
 namespace Shiny {

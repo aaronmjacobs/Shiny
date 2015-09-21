@@ -1,10 +1,11 @@
 #include "Shiny/Engine.h"
-#include "Shiny/GLIncludes.h"
 #include "Shiny/Shiny.h"
 #include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Input/Keyboard.h"
 #include "Shiny/Input/Mouse.h"
+
+#include <GLFW/glfw3.h>
 
 #include <algorithm>
 

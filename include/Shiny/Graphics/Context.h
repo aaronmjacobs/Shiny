@@ -2,7 +2,8 @@
 #define SHINY_CONTEXT_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/GLIncludes.h"
+
+#include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 

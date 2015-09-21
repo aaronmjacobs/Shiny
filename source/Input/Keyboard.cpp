@@ -1,7 +1,8 @@
-#include "Shiny/GLIncludes.h"
 #include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Input/Keyboard.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Shiny {
 

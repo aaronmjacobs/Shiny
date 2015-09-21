@@ -214,6 +214,7 @@ set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
 set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
 set(GLFW_USE_CHDIR OFF CACHE INTERNAL "Make glfwInit chdir to Contents/Resources")
 add_subdirectory(${GLFW_DIR})
+add_definitions(-DGLFW_INCLUDE_NONE)
 if(BUILD_SHARED_LIBS)
    add_definitions(-DGLFW_DLL)
    list(APPEND SHINY_DEFINITIONS

@@ -2,8 +2,9 @@
 #define SHINY_MESH_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/GLIncludes.h"
 #include "Shiny/Pointers.h"
+
+#include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 

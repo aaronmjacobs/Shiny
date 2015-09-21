@@ -1,6 +1,5 @@
 set(HEADER_NAMES
    Engine.h
-   GLIncludes.h
    Log.h
    Pointers.h
    Shiny.h
@@ -14,6 +13,7 @@ set(HEADER_NAMES
    Graphics/Material.h
    Graphics/Mesh.h
    Graphics/Model.h
+   Graphics/OpenGL.h
    Graphics/RenderData.h
    Graphics/Shader.h
    Graphics/ShaderProgram.h

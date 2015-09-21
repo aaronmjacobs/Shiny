@@ -2,9 +2,10 @@
 #define SHINY_SHADER_PROGRAM_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/GLIncludes.h"
 #include "Shiny/Log.h"
 #include "Shiny/Pointers.h"
+
+#include "Shiny/Graphics/OpenGL.h"
 
 #include <glm/glm.hpp>
 

@@ -1,8 +1,11 @@
-#include "Shiny/GLIncludes.h"
 #include "Shiny/Log.h"
 #include "Shiny/Shiny.h"
 
+#include "Shiny/Graphics/OpenGL.h"
+
 #include "Shiny/Platform/OSUtils.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Shiny {
 

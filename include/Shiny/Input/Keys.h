@@ -2,7 +2,8 @@
 #define SHINY_KEYS_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/GLIncludes.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Shiny {
 

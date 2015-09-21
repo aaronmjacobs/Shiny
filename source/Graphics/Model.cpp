@@ -1,9 +1,9 @@
-#include "Shiny/GLIncludes.h"
 #include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Graphics/Material.h"
 #include "Shiny/Graphics/Mesh.h"
 #include "Shiny/Graphics/Model.h"
+#include "Shiny/Graphics/OpenGL.h"
 #include "Shiny/Graphics/ShaderProgram.h"
 
 #include <algorithm>

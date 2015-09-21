@@ -1,6 +1,6 @@
-#include "Shiny/GLIncludes.h"
-
 #include "Shiny/Input/Mouse.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Shiny {
 
