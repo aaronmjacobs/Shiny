@@ -35,6 +35,7 @@ set(HEADER_NAMES
    Scene/SceneObject.h
    Scene/Transform.h
    Text/Font.h
+   Text/FontAtlas.h
 )
 source_group("Includes" "include/Shiny/*")
 source_group("Includes\\Assets" "include/Shiny/Assets/*")

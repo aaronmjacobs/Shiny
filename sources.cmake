@@ -23,6 +23,7 @@ set(SOURCE_NAMES
    Scene/Scene.cpp
    Scene/SceneObject.cpp
    Text/Font.cpp
+   Text/FontAtlas.cpp
 )
 source_group("Sources" "source/*")
 source_group("Sources\\Assets" "source/Assets/*")
