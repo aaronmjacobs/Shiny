@@ -22,6 +22,7 @@ set(SOURCE_NAMES
    Scene/Camera.cpp
    Scene/Scene.cpp
    Scene/SceneObject.cpp
+   Text/Font.cpp
 )
 source_group("Sources" "source/*")
 source_group("Sources\\Assets" "source/Assets/*")
@@ -29,3 +30,4 @@ source_group("Sources\\Graphics" "source/Graphics/*")
 source_group("Sources\\Input" "source/Input/*")
 source_group("Sources\\Platform" "source/Platform/*")
 source_group("Sources\\Scene" "source/Scene/*")
+source_group("Sources\\Text" "source/Text/*")
