@@ -37,10 +37,10 @@ set(HEADER_NAMES
    Text/Font.h
    Text/FontAtlas.h
 )
-source_group("Includes" "include/Shiny/*")
-source_group("Includes\\Assets" "include/Shiny/Assets/*")
-source_group("Includes\\Graphics" "include/Shiny/Graphics/*")
-source_group("Includes\\Input" "include/Shiny/Input/*")
-source_group("Includes\\Platform" "include/Shiny/Platform/*")
-source_group("Includes\\Scene" "include/Shiny/Scene/*")
-source_group("Includes\\Text" "include/Shiny/Text/*")
+source_group("Includes" "${INCLUDE_DIR}/Shiny/*")
+source_group("Includes\\Assets" "${INCLUDE_DIR}/Shiny/Assets/*")
+source_group("Includes\\Graphics" "${INCLUDE_DIR}/Shiny/Graphics/*")
+source_group("Includes\\Input" "${INCLUDE_DIR}/Shiny/Input/*")
+source_group("Includes\\Platform" "${INCLUDE_DIR}/Shiny/Platform/*")
+source_group("Includes\\Scene" "${INCLUDE_DIR}/Shiny/Scene/*")
+source_group("Includes\\Text" "${INCLUDE_DIR}/Shiny/Text/*")

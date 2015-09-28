@@ -81,7 +81,7 @@ list(APPEND INCLUDES
 set(LIBS)
 set(COPY_LIBS)
 
-source_group("Dependencies" "dependencies/*")
+source_group("Dependencies" "${DEP_DIR}/*")
 
 ### Libraries ###
 
@@ -139,8 +139,8 @@ endmacro(list_subdirs)
 function(copy_headers source dest recurse)
    file(MAKE_DIRECTORY "${dest}")
 
-   file(GLOB HEADERS "${source}/*.h" "${source}/*.hpp" "${source}/*.inl")
-   file(COPY ${HEADERS} DESTINATION "${dest}")
+   file(GLOB HEADER_FILES "${source}/*.h" "${source}/*.hpp" "${source}/*.inl")
+   file(COPY ${HEADER_FILES} DESTINATION "${dest}")
 
    if(recurse)
       list_subdirs(SUBDIRS ${source})

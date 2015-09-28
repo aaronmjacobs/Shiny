@@ -25,10 +25,10 @@ set(SOURCE_NAMES
    Text/Font.cpp
    Text/FontAtlas.cpp
 )
-source_group("Sources" "source/*")
-source_group("Sources\\Assets" "source/Assets/*")
-source_group("Sources\\Graphics" "source/Graphics/*")
-source_group("Sources\\Input" "source/Input/*")
-source_group("Sources\\Platform" "source/Platform/*")
-source_group("Sources\\Scene" "source/Scene/*")
-source_group("Sources\\Text" "source/Text/*")
+source_group("Sources" "${SRC_DIR}/*")
+source_group("Sources\\Assets" "${SRC_DIR}/Assets/*")
+source_group("Sources\\Graphics" "${SRC_DIR}/Graphics/*")
+source_group("Sources\\Input" "${SRC_DIR}/Input/*")
+source_group("Sources\\Platform" "${SRC_DIR}/Platform/*")
+source_group("Sources\\Scene" "${SRC_DIR}/Scene/*")
+source_group("Sources\\Text" "${SRC_DIR}/Text/*")
