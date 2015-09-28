@@ -2,75 +2,49 @@
 #define SHINY_MESH_H
 
 #include "Shiny/Defines.h"
-#include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 
 class SHINYAPI Mesh {
+public:
+   static const unsigned int kDefaultDimensionality = 3;
+   static const GLenum kDefaultUsage = GL_STATIC_DRAW;
+
 protected:
    GLuint vbo;
    GLuint nbo;
-   GLuint ibo;
    GLuint tbo;
+   GLuint ibo;
    GLuint vao;
 
-   UPtr<float[]> vertices;
-   UPtr<unsigned int[]> indices;
-
-   unsigned int numVertices;
    unsigned int numIndices;
-   unsigned int dimensionality;
 
 public:
-   Mesh(UPtr<float[]> vertices, unsigned int numVertices, UPtr<float[]> normals, unsigned int numNormals,
-        UPtr<unsigned int[]> indices, unsigned int numIndices, UPtr<float[]> texCoords, unsigned int numTexCoords,
-        unsigned int dimensionality = 3, GLenum usage = GL_STATIC_DRAW);
+   Mesh();
+
+   Mesh(const float *vertices, unsigned int numVertices, const float *normals, unsigned int numNormals,
+        const float *texCoords, unsigned int numTexCoords, const unsigned int *indices, unsigned int numIndices,
+        unsigned int dimensionality = kDefaultDimensionality, GLenum usage = kDefaultUsage);
 
    Mesh(Mesh &&other);
 
    virtual ~Mesh();
 
-   GLuint getVBO() const {
-     return vbo;
-   }
+   void bindVAO() const;
 
-   GLuint getNBO() const {
-     return nbo;
-   }
+   void draw() const;
 
-   GLuint getIBO() const {
-     return ibo;
-   }
+   void setVertices(const float *vertices, unsigned int numVertices,
+                    unsigned int dimensionality = kDefaultDimensionality, GLenum usage = kDefaultUsage);
 
-   GLuint getTBO() const {
-      return tbo;
-   }
+   void setNormals(const float *normals, unsigned int numNormals,
+                   unsigned int dimensionality = kDefaultDimensionality, GLenum usage = kDefaultUsage);
 
-   GLuint getVAO() const {
-      return vao;
-   }
+   void setTexCoords(const float *texCoords, unsigned int numTexCoords, GLenum usage = kDefaultUsage);
 
-   float* getVertices() const {
-      return vertices.get();
-   }
-
-   unsigned int getNumVertices() const {
-      return numVertices;
-   }
-
-   unsigned int* getIndices() const {
-      return indices.get();
-   }
-
-   unsigned int getNumIndices() const {
-     return numIndices;
-   }
-
-   unsigned int getDimensionality() const {
-      return dimensionality;
-   }
+   void setIndices(const unsigned int *indices, unsigned int numIndices, GLenum usage = kDefaultUsage);
 };
 
 } // namespace Shiny

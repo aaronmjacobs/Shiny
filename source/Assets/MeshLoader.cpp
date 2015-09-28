@@ -53,30 +53,17 @@ SPtr<Mesh> meshFromStream(std::istream &in) {
       return nullptr;
    }
 
-   tinyobj::shape_t &shape = shapes.at(0);
+   const tinyobj::shape_t &shape = shapes.at(0);
+   unsigned int dimensionality = 3;
 
-   // Vertices
-   unsigned int numVertices = shape.mesh.positions.size() / 3;
-   UPtr<float[]> vertices(new float[numVertices * 3]);
-   memcpy(vertices.get(), shape.mesh.positions.data(), sizeof(float) * 3 * numVertices);
-
-   // Normals
-   unsigned int numNormals = shape.mesh.normals.size() / 3;
-   UPtr<float[]> normals(new float[numNormals * 3]);
-   memcpy(normals.get(), shape.mesh.normals.data(), sizeof(float) * 3 * numNormals);
-
-   // Indices
-   unsigned int numIndices = shape.mesh.indices.size();
-   UPtr<unsigned int[]> indices(new unsigned int[numIndices]);
-   memcpy(indices.get(), shape.mesh.indices.data(), sizeof(unsigned int) * numIndices);
-
-   // Texture coordinates
+   unsigned int numVertices = shape.mesh.positions.size() / dimensionality;
+   unsigned int numNormals = shape.mesh.normals.size() / dimensionality;
    unsigned int numTexCoords = shape.mesh.texcoords.size() / 2;
-   UPtr<float[]> texCoords(new float[numTexCoords * 2]);
-   memcpy(texCoords.get(), shape.mesh.texcoords.data(), sizeof(float) * 2 * numTexCoords);
+   unsigned int numIndices = shape.mesh.indices.size();
 
-   return std::make_shared<Mesh>(std::move(vertices), numVertices, std::move(normals), numNormals,
-                                 std::move(indices), numIndices, std::move(texCoords), numTexCoords);
+   return std::make_shared<Mesh>(shape.mesh.positions.data(), numVertices, shape.mesh.normals.data(), numNormals,
+                                 shape.mesh.texcoords.data(), numTexCoords, shape.mesh.indices.data(), numIndices,
+                                 dimensionality);
 }
 
 SPtr<Mesh> getMeshFromMemory(const char *data) {

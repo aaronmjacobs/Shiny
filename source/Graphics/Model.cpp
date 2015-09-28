@@ -28,14 +28,14 @@ Model::~Model() {
 
 void Model::draw(RenderData renderData) {
    if (mesh && program) {
-      glBindVertexArray(mesh->getVAO());
+      mesh->bindVAO();
 
       for (const SPtr<Material> &material : materials) {
          material->apply(program, renderData);
       }
 
       program->commit();
-      glDrawElements(GL_TRIANGLES, mesh->getNumIndices(), GL_UNSIGNED_INT, 0);
+      mesh->draw();
    }
 }
 
