@@ -36,6 +36,7 @@ set(HEADER_NAMES
    Scene/Transform.h
    Text/Font.h
    Text/FontAtlas.h
+   Text/TextRenderer.h
 )
 source_group("Includes" "${INCLUDE_DIR}/Shiny/*")
 source_group("Includes\\Assets" "${INCLUDE_DIR}/Shiny/Assets/*")

@@ -24,6 +24,7 @@ set(SOURCE_NAMES
    Scene/SceneObject.cpp
    Text/Font.cpp
    Text/FontAtlas.cpp
+   Text/TextRenderer.cpp
 )
 source_group("Sources" "${SRC_DIR}/*")
 source_group("Sources\\Assets" "${SRC_DIR}/Assets/*")
