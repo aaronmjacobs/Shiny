@@ -23,6 +23,8 @@ public:
    virtual ~TextureMaterial();
 
    virtual void apply(const SPtr<ShaderProgram> &program, RenderData &renderData) override;
+
+   void setTexture(const SPtr<Texture> &texture);
 };
 
 } // namespace Shiny

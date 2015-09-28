@@ -9,7 +9,6 @@ namespace Shiny {
 
 TextureMaterial::TextureMaterial(const SPtr<Texture> &texture, const std::string &uniformName)
    : texture(texture), uniformName(uniformName) {
-   ASSERT(texture, "Trying to create TextureMaterial from null texture");
 }
 
 TextureMaterial::~TextureMaterial() {
@@ -18,12 +17,20 @@ TextureMaterial::~TextureMaterial() {
 void TextureMaterial::apply(const SPtr<ShaderProgram> &program, RenderData &renderData) {
    ASSERT(program, "Trying to apply TextureMaterial to null ShaderProgram");
 
+   if (!texture) {
+      return;
+   }
+
    GLint textureUnit = renderData.aquireTextureUnit();
 
    glActiveTexture(GL_TEXTURE0 + textureUnit);
    texture->bind();
 
    program->setUniformValue(uniformName, textureUnit);
+}
+
+void TextureMaterial::setTexture(const SPtr<Shiny::Texture> &texture) {
+   this->texture = texture;
 }
 
 } // namespace Shiny
