@@ -126,6 +126,7 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
    if (glResult != Result::kOK) {
       return glResult;
    }
+   context.poll();
 
    window = std::move(newWindow);
 

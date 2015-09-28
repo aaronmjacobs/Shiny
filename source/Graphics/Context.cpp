@@ -1,3 +1,5 @@
+#include "Shiny/ShinyAssert.h"
+
 #include "Shiny/Graphics/Context.h"
 
 namespace Shiny {
@@ -19,11 +21,12 @@ void Context::onDestroy(Context *context) {
 
 // static
 Context* Context::current() {
+   ASSERT(currentContext, "Current context is null");
    return currentContext;
 }
 
 Context::Context()
-   : activeProgram(0) {
+   : currentProgram(0), boundVAO(0) {
 }
 
 Context::~Context() {
@@ -34,10 +37,22 @@ void Context::makeCurrent() {
    setCurrent(this);
 }
 
+void Context::poll() {
+   glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&currentProgram));
+   glGetIntegerv(GL_VERTEX_ARRAY_BINDING, reinterpret_cast<GLint*>(&boundVAO));
+}
+
 void Context::useProgram(GLuint program) {
-   if (program != activeProgram) {
+   if (program != currentProgram) {
       glUseProgram(program);
-      activeProgram = program;
+      currentProgram = program;
+   }
+}
+
+void Context::bindVertexArray(GLuint vao) {
+   if (vao != boundVAO) {
+      glBindVertexArray(vao);
+      boundVAO = vao;
    }
 }
 

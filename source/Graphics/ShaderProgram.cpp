@@ -226,10 +226,7 @@ bool ShaderProgram::link() {
 }
 
 void ShaderProgram::use() const {
-   Context *context = Context::current();
-   if (context) {
-      context->useProgram(id);
-   }
+   Context::current()->useProgram(id);
 }
 
 bool ShaderProgram::hasUniform(const std::string &name) const {

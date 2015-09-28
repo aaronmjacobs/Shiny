@@ -15,7 +15,8 @@ protected:
 
    static void onDestroy(Context *context);
 
-   GLuint activeProgram;
+   GLuint currentProgram;
+   GLuint boundVAO;
 
 public:
    static Context* current();
@@ -26,7 +27,11 @@ public:
 
    void makeCurrent();
 
+   void poll();
+
    void useProgram(GLuint program);
+
+   void bindVertexArray(GLuint vao);
 };
 
 } // namespace Shiny
