@@ -72,10 +72,14 @@ int glyphsForCategory(Glyph::Category mask, std::array<int, kMaxGlyphs> &glyphs)
    return count;
 }
 
+bool inCategoryData(char c, const CategoryData &data) {
+   return c >= data.firstGlyph && c <= data.lastGlyph;
+}
+
 Glyph::Category categorize(char c) {
-   for (const CategoryData &category : kCategoryData) {
-      if (c >= category.firstGlyph && c <= category.lastGlyph) {
-         return category.id;
+   for (const CategoryData &data : kCategoryData) {
+      if (inCategoryData(c, data)) {
+         return data.id;
       }
    }
 
@@ -91,19 +95,19 @@ int charIndex(char c, Glyph::Category mask) {
 
    int index = 0;
 
-   for (const CategoryData &category : kCategoryData) {
+   for (const CategoryData &data : kCategoryData) {
       // If the category is not in the generated atlas, skip over it
-      if (!(category.id & mask)) {
+      if (!(data.id & mask)) {
          continue;
       }
 
-      if (charMaskId == category.id) {
+      if (inCategoryData(c, data)) {
          // If the character is in the current category, increase the index by its offset
-         index += (c - category.firstGlyph);
-      } else if(charMaskId > category.id) {
+         index += (c - data.firstGlyph);
+      } else if(charMaskId > data.id) {
          // If the character is in a category later than the current one, increase the index by the number of glyphs
          // in the category
-         index += category.numGlyphs;
+         index += data.numGlyphs;
       }
    }
 
@@ -144,7 +148,7 @@ bool pack(const SPtr<Font> &font, stbtt_pack_context *packContext, stbtt_pack_ra
 } // namespace
 
 FontAtlas::FontAtlas(const SPtr<Font> &font, float fontSize, Glyph::Category glyphCategory)
-   : font(font), fontSize(fontSize), glyphCategory(glyphCategory), packData(new FontPackData),
+   : font(font), fontSize(fontSize), fontSpacing({}), glyphCategory(glyphCategory), packData(new FontPackData),
      textureWidth(0), textureHeight(0), generated(false) {
    ASSERT(font, "Trying to create FontAtlas with null font");
    ASSERT(fontSize > 0.0f, "Trying to create FontAtlas with invalid font size: %f", fontSize);
@@ -177,6 +181,18 @@ bool FontAtlas::generate() {
       return false;
    }
 
+   stbtt_fontinfo fontInfo;
+   int res = stbtt_InitFont(&fontInfo, font->data(), stbtt_GetFontOffsetForIndex(font->data(), 0));
+   if (!res) {
+      return false;
+   }
+   float scale = stbtt_ScaleForPixelHeight(&fontInfo, fontSize);
+   int ascent, descent, lineGap;
+   stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
+   fontSpacing.ascent = ascent * scale;
+   fontSpacing.descent = descent * scale;
+   fontSpacing.lineGap = lineGap * scale;
+
    texture = std::make_shared<Texture>(GL_TEXTURE_2D);
    texture->bind();
 
@@ -195,11 +211,11 @@ bool FontAtlas::generate() {
    return true;
 }
 
-std::vector<GlyphQuad> FontAtlas::process(const std::string &text) const {
+std::vector<GlyphQuad> FontAtlas::process(const std::string &text, float *width, float *height) const {
    ASSERT(generated, "Trying to process text with font atlas that is not generated");
 
    std::vector<GlyphQuad> quads;
-   float x = 0.0f, y = 0.0f;
+   float x = 0.0f, y = fontSize;
 
    for (char c : text) {
       int index = charIndex(c, glyphCategory);
@@ -210,6 +226,13 @@ std::vector<GlyphQuad> FontAtlas::process(const std::string &text) const {
       stbtt_aligned_quad q;
       stbtt_GetPackedQuad(packData->charData.data(), textureWidth, textureHeight, index, &x, &y, &q, 0);
       quads.push_back({ q.x0, q.y0, q.s0, q.t0, q.x1, q.y1, q.s1, q.t1 });
+   }
+
+   if (width) {
+      *width = x;
+   }
+   if (height) {
+      *height = y;
    }
 
    return quads;

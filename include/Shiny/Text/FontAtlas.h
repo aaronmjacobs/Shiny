@@ -32,11 +32,18 @@ struct SHINYAPI GlyphQuad {
    float x1, y1, s1, t1;
 };
 
+struct SHINYAPI FontSpacing {
+   float ascent;
+   float descent;
+   float lineGap;
+};
+
 class SHINYAPI FontAtlas {
 protected:
    SPtr<Font> font;
    SPtr<Texture> texture;
    float fontSize;
+   FontSpacing fontSpacing;
    Glyph::Category glyphCategory;
 
    UPtr<FontPackData> packData;
@@ -51,7 +58,7 @@ public:
 
    bool generate();
 
-   std::vector<GlyphQuad> process(const std::string &text) const;
+   std::vector<GlyphQuad> process(const std::string &text, float *width = nullptr, float *height = nullptr) const;
 
    const SPtr<Font>& getFont() const {
       return font;
@@ -67,6 +74,10 @@ public:
 
    Glyph::Category getGlyphCategory() const {
       return glyphCategory;
+   }
+
+   FontSpacing getFontSpacing() const {
+      return fontSpacing;
    }
 
    bool isGenerated() const {
