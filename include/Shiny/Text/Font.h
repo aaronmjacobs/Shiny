@@ -11,16 +11,13 @@ namespace Shiny {
 class SHINYAPI Font {
 protected:
    UPtr<unsigned char[]> fontData;
-   std::string fontName;
 
 public:
-   Font(UPtr<unsigned char[]> data, const std::string &name);
+   Font(UPtr<unsigned char[]> data);
 
    virtual ~Font();
 
    unsigned char* data();
-
-   const std::string& name() const;
 };
 
 } // namespace Shiny
