@@ -270,8 +270,8 @@ void ShaderLoader::reloadShaders() {
                      << fileName << "\", reverting to default shader. Error message: \""
                      << getShaderCompileError(shader) << "\"");
 
-         const std::string &defaultSource = getDefaultShaderSource(shader->getType());
-         if (!shader->compile(defaultSource.c_str())) {
+         const char *defaultSource = getDefaultShaderSource(shader->getType());
+         if (!shader->compile(defaultSource)) {
             LOG_MESSAGE("Error compiling default " << getShaderTypeName(shader->getType())
                         << " shader. Error message: \"" << getShaderCompileError(shader) << "\"");
             LOG_FATAL("Unable to compile default " << getShaderTypeName(shader->getType()) << " shader");
