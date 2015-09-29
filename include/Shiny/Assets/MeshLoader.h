@@ -21,6 +21,9 @@ class SHINYAPI MeshLoader {
 protected:
    MeshMap meshMap;
 
+   SPtr<Mesh> cubeMesh;
+   SPtr<Mesh> xyPlaneMesh;
+
 public:
    MeshLoader();
 

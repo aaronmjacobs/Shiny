@@ -113,31 +113,7 @@ const char* getDefaultShaderSource(const GLenum type) {
    }
 }
 
-SPtr<Shader> getDefaultShader(const GLenum type) {
-   static SPtr<Shader> defaultVertexShader = nullptr;
-   static SPtr<Shader> defaultGeometryShader = nullptr;
-   static SPtr<Shader> defaultFragmentShader = nullptr;
-
-   switch (type) {
-      case GL_VERTEX_SHADER:
-         if (defaultVertexShader) {
-            return defaultVertexShader;
-         }
-         break;
-      case GL_GEOMETRY_SHADER:
-         if (defaultGeometryShader) {
-            return defaultGeometryShader;
-         }
-         break;
-      case GL_FRAGMENT_SHADER:
-         if (defaultFragmentShader) {
-            return defaultFragmentShader;
-         }
-         break;
-      default:
-         ASSERT(false, "Invalid shader type: %i", type);
-   }
-
+SPtr<Shader> createDefaultShader(const GLenum type) {
    SPtr<Shader> shader(std::make_shared<Shader>(type));
    if (!shader->compile(getDefaultShaderSource(type))) {
       LOG_MESSAGE("Error compiling default " << getShaderTypeName(type) << " shader. Error message: \""
@@ -145,34 +121,14 @@ SPtr<Shader> getDefaultShader(const GLenum type) {
       LOG_FATAL("Unable to compile default " << getShaderTypeName(type) << " shader");
    }
 
-   switch (type) {
-      case GL_VERTEX_SHADER:
-         defaultVertexShader = shader;
-         break;
-      case GL_GEOMETRY_SHADER:
-         defaultGeometryShader = shader;
-         break;
-      case GL_FRAGMENT_SHADER:
-         defaultFragmentShader = shader;
-         break;
-      default:
-         ASSERT(false, "Invalid shader type: %i", type);
-         return nullptr;
-   }
-
    return shader;
 }
 
-SPtr<ShaderProgram> getDefaultShaderProgram() {
-   static SPtr<ShaderProgram> defaultShaderProgram = nullptr;
-
-   if (defaultShaderProgram) {
-      return defaultShaderProgram;
-   }
-
-   defaultShaderProgram = std::make_shared<ShaderProgram>();
-   defaultShaderProgram->attach(getDefaultShader(GL_VERTEX_SHADER));
-   defaultShaderProgram->attach(getDefaultShader(GL_FRAGMENT_SHADER));
+SPtr<ShaderProgram> createDefaultShaderProgram(const SPtr<Shader> &defaultVertexShader,
+                                               const SPtr<Shader> &defaultFragmentShader) {
+   SPtr<ShaderProgram>defaultShaderProgram(std::make_shared<ShaderProgram>());
+   defaultShaderProgram->attach(defaultVertexShader);
+   defaultShaderProgram->attach(defaultFragmentShader);
 
    if (!defaultShaderProgram->link()) {
       LOG_MESSAGE("Error linking default shader program. Error message: \""
@@ -189,6 +145,39 @@ ShaderLoader::ShaderLoader() {
 }
 
 ShaderLoader::~ShaderLoader() {
+}
+
+SPtr<Shader> ShaderLoader::getDefaultShader(const GLenum type) {
+   switch (type) {
+      case GL_VERTEX_SHADER:
+         if (!defaultVertexShader) {
+            defaultVertexShader = createDefaultShader(type);
+         }
+         return defaultVertexShader;
+      case GL_GEOMETRY_SHADER:
+         if (!defaultGeometryShader) {
+            defaultGeometryShader = createDefaultShader(type);
+         }
+         return defaultGeometryShader;
+      case GL_FRAGMENT_SHADER:
+         if (!defaultFragmentShader) {
+            defaultFragmentShader = createDefaultShader(type);
+         }
+         return defaultFragmentShader;
+         break;
+      default:
+         ASSERT(false, "Invalid shader type: %i", type);
+         return nullptr;
+   }
+}
+
+SPtr<ShaderProgram> ShaderLoader::getDefaultShaderProgram() {
+   if (!defaultShaderProgram) {
+      defaultShaderProgram = createDefaultShaderProgram(getDefaultShader(GL_VERTEX_SHADER),
+                                                        getDefaultShader(GL_FRAGMENT_SHADER));
+   }
+
+   return defaultShaderProgram;
 }
 
 SPtr<Shader> ShaderLoader::loadShader(const std::string &fileName, const GLenum type) {

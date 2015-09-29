@@ -103,9 +103,6 @@ SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName) {
 }
 
 SPtr<Mesh> MeshLoader::getMeshForShape(MeshShape shape) {
-   static SPtr<Mesh> cubeMesh = nullptr;
-   static SPtr<Mesh> xyPlaneMesh = nullptr;
-
    switch (shape) {
       case MeshShape::Cube:
          if (!cubeMesh) {

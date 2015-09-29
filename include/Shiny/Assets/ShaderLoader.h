@@ -22,6 +22,14 @@ protected:
    ShaderMap shaderMap;
    ShaderProgramMap shaderProgramMap;
 
+   SPtr<Shader> defaultVertexShader;
+   SPtr<Shader> defaultGeometryShader;
+   SPtr<Shader> defaultFragmentShader;
+   SPtr<ShaderProgram> defaultShaderProgram;
+
+   SPtr<Shader> getDefaultShader(const GLenum type);
+   SPtr<ShaderProgram> getDefaultShaderProgram();
+
 public:
    ShaderLoader();
 
