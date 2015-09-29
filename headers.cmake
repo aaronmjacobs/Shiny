@@ -38,10 +38,10 @@ set(HEADER_NAMES
    Text/FontAtlas.h
    Text/TextRenderer.h
 )
-source_group("Includes" "${INCLUDE_DIR}/Shiny/*")
-source_group("Includes\\Assets" "${INCLUDE_DIR}/Shiny/Assets/*")
-source_group("Includes\\Graphics" "${INCLUDE_DIR}/Shiny/Graphics/*")
-source_group("Includes\\Input" "${INCLUDE_DIR}/Shiny/Input/*")
-source_group("Includes\\Platform" "${INCLUDE_DIR}/Shiny/Platform/*")
-source_group("Includes\\Scene" "${INCLUDE_DIR}/Shiny/Scene/*")
-source_group("Includes\\Text" "${INCLUDE_DIR}/Shiny/Text/*")
+source_group("Includes" "(${INCLUDE_DIR}|${BIN_INCLUDE_DIR})/${PROJECT_NAME}/*")
+source_group("Includes\\Assets" "${INCLUDE_DIR}/${PROJECT_NAME}/Assets/*")
+source_group("Includes\\Graphics" "${INCLUDE_DIR}/${PROJECT_NAME}/Graphics/*")
+source_group("Includes\\Input" "${INCLUDE_DIR}/${PROJECT_NAME}/Input/*")
+source_group("Includes\\Platform" "${INCLUDE_DIR}/${PROJECT_NAME}/Platform/*")
+source_group("Includes\\Scene" "${INCLUDE_DIR}/${PROJECT_NAME}/Scene/*")
+source_group("Includes\\Text" "${INCLUDE_DIR}/${PROJECT_NAME}/Text/*")
