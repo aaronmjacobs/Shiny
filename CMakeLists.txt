@@ -228,6 +228,28 @@ if(BUILD_SHARED_LIBS)
 endif(BUILD_SHARED_LIBS)
 attach_lib("${GLFW_DIR}/include" "" "glfw")
 
+# OpenAL
+set(OPENAL_DIR "${DEP_DIR}/openal-soft")
+set(ALSOFT_UTILS OFF CACHE INTERNAL "Build and install utility programs")
+set(ALSOFT_NO_CONFIG_UTIL ON CACHE INTERNAL "Disable building the alsoft-config utility")
+set(ALSOFT_EXAMPLES OFF CACHE INTERNAL "Build and install example programs")
+set(ALSOFT_CONFIG OFF CACHE INTERNAL "Install alsoft.conf sample configuration file")
+set(ALSOFT_HRTF_DEFS OFF CACHE INTERNAL "Install HRTF definition files")
+set(ALSOFT_INSTALL OFF CACHE INTERNAL "Install headers and libraries")
+add_subdirectory(${OPENAL_DIR})
+if(WIN32)
+   set(OPENAL_LIBRARY OpenAL32)
+else(WIN32)
+   set(OPENAL_LIBRARY openal)
+endif(WIN32)
+if(NOT BUILD_SHARED_LIBS)
+   add_definitions(-DAL_LIBTYPE_STATIC)
+   list(APPEND SHINY_DEFINITIONS
+      -DAL_LIBTYPE_STATIC
+   )
+endif(NOT BUILD_SHARED_LIBS)
+attach_lib("${OPENAL_DIR}/include" "" "${OPENAL_LIBRARY}")
+
 set(BUILD_SHARED_LIBS ${SHINY_BUILD_SHARED_LIB} CACHE INTERNAL "Build shared libraries")
 
 ### Building ###

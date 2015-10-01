@@ -19,3 +19,6 @@
 [submodule "dependencies/templog"]
 	path = dependencies/templog
 	url = https://github.com/aaronmjacobs/templog.git
+[submodule "dependencies/openal-soft"]
+	path = dependencies/openal-soft
+	url = https://github.com/kcat/openal-soft.git
