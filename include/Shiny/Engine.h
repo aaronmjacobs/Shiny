@@ -5,6 +5,8 @@
 #include "Shiny/Pointers.h"
 #include "Shiny/Shiny.h"
 
+#include "Shiny/Audio/AudioSystem.h"
+
 #include "Shiny/Graphics/Context.h"
 
 #include "Shiny/Input/Controller.h"
@@ -38,6 +40,7 @@ private:
 
 protected:
    WindowPtr window;
+   AudioSystem audioSystem;
    Context context;
    SPtr<Keyboard> keyboard;
    SPtr<Mouse> mouse;

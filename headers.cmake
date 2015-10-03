@@ -10,6 +10,7 @@ set(HEADER_NAMES
    Assets/MeshLoader.h
    Assets/ShaderLoader.h
    Assets/TextureLoader.h
+   Audio/AudioSystem.h
    Graphics/Context.h
    Graphics/Framebuffer.h
    Graphics/Material.h
@@ -40,6 +41,7 @@ set(HEADER_NAMES
 )
 source_group("Includes" "(${INCLUDE_DIR}|${BIN_INCLUDE_DIR})/${PROJECT_NAME}/*")
 source_group("Includes\\Assets" "${INCLUDE_DIR}/${PROJECT_NAME}/Assets/*")
+source_group("Includes\\Audio" "${INCLUDE_DIR}/${PROJECT_NAME}/Audio/*")
 source_group("Includes\\Graphics" "${INCLUDE_DIR}/${PROJECT_NAME}/Graphics/*")
 source_group("Includes\\Input" "${INCLUDE_DIR}/${PROJECT_NAME}/Input/*")
 source_group("Includes\\Platform" "${INCLUDE_DIR}/${PROJECT_NAME}/Platform/*")

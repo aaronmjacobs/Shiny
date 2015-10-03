@@ -149,10 +149,14 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
 
    runningTime = 0.0f;
 
+   audioSystem.startUp();
+
    return Result::kOK;
 }
 
 void Engine::shutDown() {
+   audioSystem.shutDown();
+
    glfwSetWindowShouldClose(window.get(), true);
 }
 
