@@ -10,6 +10,9 @@ set(HEADER_NAMES
    Assets/MeshLoader.h
    Assets/ShaderLoader.h
    Assets/TextureLoader.h
+   Audio/AudioBuffer.h
+   Audio/AudioError.h
+   Audio/AudioSource.h
    Audio/AudioSystem.h
    Graphics/Context.h
    Graphics/Framebuffer.h

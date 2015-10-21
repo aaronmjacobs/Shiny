@@ -4,6 +4,8 @@ set(SOURCE_NAMES
    Assets/MeshLoader.cpp
    Assets/ShaderLoader.cpp
    Assets/TextureLoader.cpp
+   Audio/AudioBuffer.cpp
+   Audio/AudioSource.cpp
    Audio/AudioSystem.cpp
    Graphics/Context.cpp
    Graphics/Framebuffer.cpp

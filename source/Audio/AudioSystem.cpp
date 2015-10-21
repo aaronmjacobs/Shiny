@@ -1,21 +1,37 @@
 #include "Shiny/Log.h"
 #include "Shiny/ShinyAssert.h"
 
+#include "Shiny/Audio/AudioBuffer.h"
+#include "Shiny/Audio/AudioError.h"
+#include "Shiny/Audio/AudioSource.h"
 #include "Shiny/Audio/AudioSystem.h"
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/norm.hpp>
 
 #include <array>
+
+#define SHINY_CHECK_AUDIO_SYSTEM_VALID(what) SHINY_CHECK_AUDIO_VALID(context, what, "audio system")
+
+#define SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT(what) do{\
+SHINY_CHECK_AUDIO_SYSTEM_VALID(what);\
+SHINY_CHECK_AUDIO_VALID(isContextCurrent(), what, "audio system context");\
+}while(0)
 
 namespace Shiny {
 
 namespace {
 
+const glm::vec3 kForward(0.0f, 0.0f, -1.0f);
+const glm::vec3 kUp(0.0f, 1.0f, 0.0f);
+
 void closeDevice(ALCdevice *device) {
    if (device) {
       alcCloseDevice(device);
+      SHINY_CHECK_ALC_ERROR(device, "closing device");
    }
 }
 
@@ -43,30 +59,49 @@ void destroyContext(ALCcontext *context) {
    }
 }
 
-const char* errorString(ALCenum error) {
-   switch (error) {
-      case AL_NO_ERROR:
-         return "";
-      case AL_INVALID_NAME:
-         return "Invalid name parameter";
-      case AL_INVALID_ENUM:
-         return "Invalid enum parameter";
-      case AL_INVALID_VALUE:
-         return "Invalid value parameter";
-      case AL_INVALID_OPERATION:
-         return "Illegal call";
-      case AL_OUT_OF_MEMORY:
-         return "Unable to allocate memory";
+AudioSystem::DistanceModel getDistanceModelClass(ALint alDistanceModel) {
+   switch (alDistanceModel) {
+      case AL_NONE:
+         return AudioSystem::DistanceModel::kNone;
+      case AL_INVERSE_DISTANCE:
+         return AudioSystem::DistanceModel::kInverseDistance;
+      case AL_INVERSE_DISTANCE_CLAMPED:
+         return AudioSystem::DistanceModel::kInverseDistanceClamped;
+      case AL_LINEAR_DISTANCE:
+         return AudioSystem::DistanceModel::kLinearDistance;
+      case AL_LINEAR_DISTANCE_CLAMPED:
+         return AudioSystem::DistanceModel::kLinearDistanceClamped;
+      case AL_EXPONENT_DISTANCE:
+         return AudioSystem::DistanceModel::kExponentDistance;
+      case AL_EXPONENT_DISTANCE_CLAMPED:
+         return AudioSystem::DistanceModel::kExponentDistanceClamped;
       default:
-         return "Invalid error";
+         ASSERT(false, "Invalid AL distance model");
+         return AudioSystem::DistanceModel::kNone;
    }
 }
 
-#ifdef NDEBUG
-#define CHECK_AL_ERROR(location) do{}while(0)
-#else
-#define CHECK_AL_ERROR(location) do{ ALCenum alError = alGetError(); ASSERT(alError == AL_NO_ERROR, "OpenAL error while %s: %s", (location), errorString(alError)); }while(0)
-#endif
+ALenum getDistanceModelEnum(AudioSystem::DistanceModel distanceModel) {
+   switch (distanceModel) {
+      case AudioSystem::DistanceModel::kNone:
+         return AL_NONE;
+      case AudioSystem::DistanceModel::kInverseDistance:
+         return AL_INVERSE_DISTANCE;
+      case AudioSystem::DistanceModel::kInverseDistanceClamped:
+         return AL_INVERSE_DISTANCE_CLAMPED;
+      case AudioSystem::DistanceModel::kLinearDistance:
+         return AL_LINEAR_DISTANCE;
+      case AudioSystem::DistanceModel::kLinearDistanceClamped:
+         return AL_LINEAR_DISTANCE_CLAMPED;
+      case AudioSystem::DistanceModel::kExponentDistance:
+         return AL_EXPONENT_DISTANCE;
+      case AudioSystem::DistanceModel::kExponentDistanceClamped:
+         return AL_EXPONENT_DISTANCE_CLAMPED;
+      default:
+         ASSERT(false, "Invalid distance model class");
+         return AL_NONE;
+   }
+}
 
 } // namespace
 
@@ -77,19 +112,9 @@ AudioSystem::~AudioSystem() {
    shutDown();
 }
 
-void AudioSystem::makeContextCurrent() {
-   ASSERT(context, "Audio context not created");
-
-   ALCcontext *current = alcGetCurrentContext();
-   if (context.get() != current) {
-      if (!alcMakeContextCurrent(context.get())) {
-         LOG_ERROR("Unable to make audio context current");
-      }
-      CHECK_AL_ERROR("making audio context current");
-   }
-}
-
 void AudioSystem::startUp() {
+   ASSERT(!device && !context, "Trying to start up audio system that has already been started");
+
    device = getDevice();
    if (!device) {
       LOG_ERROR("Unable to open audio device");
@@ -98,10 +123,14 @@ void AudioSystem::startUp() {
 
    context = UPtr<ALCcontext, std::function<void(ALCcontext*)>>(alcCreateContext(device.get(), nullptr),
                                                                 destroyContext);
+   SHINY_CHECK_ALC_ERROR(device.get(), "creating audio context");
    if (!context) {
       LOG_ERROR("Unable to create audio context");
+      device = nullptr;
       return;
    }
+
+   makeContextCurrent();
 }
 
 void AudioSystem::shutDown() {
@@ -110,32 +139,141 @@ void AudioSystem::shutDown() {
    device = nullptr;
 }
 
-void AudioSystem::setMasterVolume(float volume) {
-   makeContextCurrent();
+SPtr<AudioBuffer> AudioSystem::generateBuffer() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating audio buffer");
 
-   alListenerf(AL_GAIN, volume);
-   CHECK_AL_ERROR("setting master volume");
+   // Tied to the device, not the context, so no need to make it current
+   return SPtr<AudioBuffer>(new AudioBuffer);
+}
+
+SPtr<AudioSource> AudioSystem::generateSource() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating audio source");
+
+   return SPtr<AudioSource>(new AudioSource(device.get(), context.get()));
+}
+
+bool AudioSystem::isContextCurrent() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID("checking if audio context is current");
+
+   return alcGetCurrentContext() == context.get();
+}
+
+void AudioSystem::makeContextCurrent() {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID("making audio context current");
+
+   if (isContextCurrent()) {
+      return;
+   }
+
+   if (!alcMakeContextCurrent(context.get())) {
+      LOG_ERROR("Unable to make audio context current");
+   }
+   SHINY_CHECK_ALC_ERROR(device.get(), "making audio context current");
+}
+
+AudioSystem::DistanceModel AudioSystem::getDistanceModel() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting distance model");
+
+   ALint distanceModel = alGetInteger(AL_DISTANCE_MODEL);
+   SHINY_CHECK_AL_ERROR("getting distance model");
+
+   return getDistanceModelClass(distanceModel);
+}
+
+void AudioSystem::setDistanceModel(DistanceModel distanceModel) {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting distance model");
+
+   alDistanceModel(getDistanceModelEnum(distanceModel));
+   SHINY_CHECK_AL_ERROR("setting distance model");
+}
+
+float AudioSystem::getDopplerFactor() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting doppler factor");
+
+   ALfloat dopplerFactor = alGetFloat(AL_DOPPLER_FACTOR);
+   SHINY_CHECK_AL_ERROR("getting doppler factor");
+
+   return dopplerFactor;
+}
+
+void AudioSystem::setDopplerFactor(float dopplerFactor) {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting doppler factor");
+   ASSERT(dopplerFactor >= 0.0f, "Invalid doppler factor value: %f, should be non-negative", dopplerFactor);
+
+   alDopplerFactor(dopplerFactor);
+   SHINY_CHECK_AL_ERROR("setting doppler factor");
+}
+
+float AudioSystem::getSpeedOfSound() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting speed of sound");
+
+   ALfloat speedOfSound = alGetFloat(AL_SPEED_OF_SOUND);
+   SHINY_CHECK_AL_ERROR("getting speed of sound");
+
+   return speedOfSound;
+}
+
+void AudioSystem::setSpeedOfSound(float speedOfSound) {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting speed of sound");
+   ASSERT(speedOfSound > 0.0f, "Invalid speed of sound value: %f, sould be positive", speedOfSound);
+
+   alSpeedOfSound(speedOfSound);
+   SHINY_CHECK_AL_ERROR("setting speed of sound");
+}
+
+glm::vec3 AudioSystem::getListenerPosition() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting listener position");
+
+   glm::vec3 position(0.0f);
+   alGetListenerfv(AL_POSITION, glm::value_ptr(position));
+   SHINY_CHECK_AL_ERROR("getting listener position");
+
+   return position;
 }
 
 void AudioSystem::setListenerPosition(const glm::vec3 &position) {
-   makeContextCurrent();
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting listener position");
+   ASSERT(!isnan(position.x) && !isnan(position.y) && !isnan(position.z), "Invalid position, has NaN value");
 
    alListenerfv(AL_POSITION, glm::value_ptr(position));
-   CHECK_AL_ERROR("setting listener position");
+   SHINY_CHECK_AL_ERROR("setting listener position");
+}
+
+glm::vec3 AudioSystem::getListenerVelocity() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting listener velocity");
+
+   glm::vec3 velocity(0.0f);
+   alGetListenerfv(AL_VELOCITY, glm::value_ptr(velocity));
+   SHINY_CHECK_AL_ERROR("getting listener velocity");
+
+   return velocity;
 }
 
 void AudioSystem::setListenerVelocity(const glm::vec3 &velocity) {
-   makeContextCurrent();
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting listener velocity");
+   ASSERT(!isnan(velocity.x) && !isnan(velocity.y) && !isnan(velocity.z), "Invalid velocity, has NaN value");
 
    alListenerfv(AL_VELOCITY, glm::value_ptr(velocity));
-   CHECK_AL_ERROR("setting listener velocity");
+   SHINY_CHECK_AL_ERROR("setting listener velocity");
+}
+
+glm::quat AudioSystem::getListenerOrientation() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting listener orientation");
+
+   std::array<float, 6> values = {{
+      kForward.x, kForward.y, kForward.z,
+      kUp.x, kUp.y, kUp.z
+   }};
+   alGetListenerfv(AL_ORIENTATION, values.data());
+   SHINY_CHECK_AL_ERROR("getting listener orientation");
+
+   glm::vec3 direction(values[0], values[1], values[2]);
+   glm::vec3 up(values[3], values[4], values[5]);
+   return glm::toQuat(glm::lookAtRH(glm::vec3(0.0f), direction, up));
 }
 
 void AudioSystem::setListenerOrientation(const glm::quat &orientation) {
-   static const glm::vec3 kForward(0.0f, 0.0f, -1.0f);
-   static const glm::vec3 kUp(0.0f, 1.0f, 0.0f);
-
-   makeContextCurrent();
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting listener orientation");
 
    glm::vec3 forward = kForward * orientation;
    glm::vec3 up = kUp * orientation;
@@ -145,7 +283,25 @@ void AudioSystem::setListenerOrientation(const glm::quat &orientation) {
    }};
 
    alListenerfv(AL_ORIENTATION, values.data());
-   CHECK_AL_ERROR("setting listener orientation");
+   SHINY_CHECK_AL_ERROR("setting listener orientation");
+}
+
+float AudioSystem::getListenerGain() const {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("getting listener gain");
+
+   float gain = 1.0f;
+   alGetListenerf(AL_GAIN, &gain);
+   SHINY_CHECK_AL_ERROR("getting listener gain");
+
+   return gain;
+}
+
+void AudioSystem::setListenerGain(float gain) {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("setting listener gain");
+   ASSERT(gain >= 0.0f, "Invalid gain value: %f, sould be non-negative", gain);
+
+   alListenerf(AL_GAIN, gain);
+   SHINY_CHECK_AL_ERROR("setting listener gain");
 }
 
 } // namespace Shiny
