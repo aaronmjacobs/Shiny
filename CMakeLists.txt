@@ -174,6 +174,7 @@ attach_lib("${PEMPEK_DIR}/src" "${PEMPEK_DIR}/src/pempek_assert.cpp" "")
 # stb
 set(STB_DIR "${DEP_DIR}/stb")
 copy_headers(${STB_DIR} ${BIN_INCLUDE_DIR}/stb false)
+file(COPY "${STB_DIR}/stb_vorbis.c" DESTINATION "${BIN_INCLUDE_DIR}/stb")
 
 # templog
 set(TEMPLOG_DIR "${DEP_DIR}/templog")

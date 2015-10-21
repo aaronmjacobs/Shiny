@@ -6,6 +6,7 @@ set(HEADER_NAMES
    Shiny.h
    ShinyAssert.h
    Version.h
+   Assets/AudioLoader.h
    Assets/DefaultImageSource.h
    Assets/MeshLoader.h
    Assets/ShaderLoader.h

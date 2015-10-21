@@ -1,6 +1,7 @@
 set(SOURCE_NAMES
    Engine.cpp
    Shiny.cpp
+   Assets/AudioLoader.cpp
    Assets/MeshLoader.cpp
    Assets/ShaderLoader.cpp
    Assets/TextureLoader.cpp
