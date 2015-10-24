@@ -8,6 +8,9 @@
 
 #include "Shiny/Platform/IOUtils.h"
 
+#if defined(GLSL)
+#  undef GLSL
+#endif
 #define GLSL(source) "#version 150 core\n" #source
 
 namespace Shiny {
@@ -116,9 +119,8 @@ const char* getDefaultShaderSource(const GLenum type) {
 SPtr<Shader> createDefaultShader(const GLenum type) {
    SPtr<Shader> shader(std::make_shared<Shader>(type));
    if (!shader->compile(getDefaultShaderSource(type))) {
-      LOG_MESSAGE("Error compiling default " << getShaderTypeName(type) << " shader. Error message: \""
+      LOG_ERROR("Error compiling default " << getShaderTypeName(type) << " shader. Error message: \""
                   << getShaderCompileError(shader) << "\"");
-      LOG_FATAL("Unable to compile default " << getShaderTypeName(type) << " shader");
    }
 
    return shader;
@@ -127,13 +129,24 @@ SPtr<Shader> createDefaultShader(const GLenum type) {
 SPtr<ShaderProgram> createDefaultShaderProgram(const SPtr<Shader> &defaultVertexShader,
                                                const SPtr<Shader> &defaultFragmentShader) {
    SPtr<ShaderProgram>defaultShaderProgram(std::make_shared<ShaderProgram>());
-   defaultShaderProgram->attach(defaultVertexShader);
-   defaultShaderProgram->attach(defaultFragmentShader);
 
-   if (!defaultShaderProgram->link()) {
-      LOG_MESSAGE("Error linking default shader program. Error message: \""
-                  << getShaderLinkError(defaultShaderProgram) << "\"");
-      LOG_FATAL("Unable to link default shader");
+   int shaderCount = 0;
+   if (defaultVertexShader) {
+      defaultShaderProgram->attach(defaultVertexShader);
+      ++shaderCount;
+   }
+   if (defaultFragmentShader) {
+      defaultShaderProgram->attach(defaultFragmentShader);
+      ++shaderCount;
+   }
+
+   if (shaderCount >= 2) {
+      if (!defaultShaderProgram->link()) {
+         LOG_ERROR("Error linking default shader program. Error message: \""
+                   << getShaderLinkError(defaultShaderProgram) << "\"");
+      }
+   } else {
+      LOG_ERROR("Not enough shaders to link default shader program");
    }
 
    return defaultShaderProgram;
@@ -191,14 +204,14 @@ SPtr<Shader> ShaderLoader::loadShader(const std::string &fileName, const GLenum 
 
    std::string source;
    if (!IOUtils::readTextFile(fileName, source)) {
-      LOG_WARNING("Unable to load shader from file \"" << fileName << "\", reverting to default shader");
+      LOG_WARNING("Unable to load shader from file \"" << fileName << "\", reverting to default");
       return getDefaultShader(type);
    }
 
    SPtr<Shader> shader(std::make_shared<Shader>(type));
    if (!shader->compile(source.c_str())) {
       LOG_WARNING("Unable to compile " << getShaderTypeName(shader->getType()) << " shader loaded from file \""
-                  << fileName << "\", reverting to default shader. Error message: \""
+                  << fileName << "\", reverting to default. Error message: \""
                   << getShaderCompileError(shader) << "\"");
       shader = getDefaultShader(type);
    }
@@ -218,22 +231,31 @@ SPtr<ShaderProgram> ShaderLoader::loadShaderProgram(const std::string &fileName)
    std::string geometryFileName = fileName + kGeometryExtension;
    std::string fragmentFileName = fileName + kFragmentExtension;
 
+   int shaderCount = 0;
    if (IOUtils::canRead(vertexFileName)) {
       shaderProgram->attach(loadShader(vertexFileName, GL_VERTEX_SHADER));
+      ++shaderCount;
    }
 
    if (IOUtils::canRead(geometryFileName)) {
       shaderProgram->attach(loadShader(geometryFileName, GL_GEOMETRY_SHADER));
+      ++shaderCount;
    }
 
    if (IOUtils::canRead(fragmentFileName)) {
       shaderProgram->attach(loadShader(fragmentFileName, GL_FRAGMENT_SHADER));
+      ++shaderCount;
    }
 
-   if (!shaderProgram->link()) {
-      LOG_WARNING("Unable to link '" << fileName
-                  << "' shader program, reverting to default shader program. Error message: \""
-                  << getShaderLinkError(shaderProgram) << "\"");
+   if (shaderCount >= 2) {
+      if (!shaderProgram->link()) {
+         LOG_WARNING("Unable to link '" << fileName
+                     << "' shader program, reverting to default. Error message: \""
+                     << getShaderLinkError(shaderProgram) << "\"");
+         shaderProgram = getDefaultShaderProgram();
+      }
+   } else {
+      LOG_WARNING("Not enough shaders to link program, reverting to default");
       shaderProgram = getDefaultShaderProgram();
    }
 
@@ -256,14 +278,13 @@ void ShaderLoader::reloadShaders() {
 
       if (!shader->compile(source.c_str())) {
          LOG_WARNING("Unable to compile " << getShaderTypeName(shader->getType()) << " shader loaded from file \""
-                     << fileName << "\", reverting to default shader. Error message: \""
+                     << fileName << "\", reverting to default. Error message: \""
                      << getShaderCompileError(shader) << "\"");
 
          const char *defaultSource = getDefaultShaderSource(shader->getType());
          if (!shader->compile(defaultSource)) {
-            LOG_MESSAGE("Error compiling default " << getShaderTypeName(shader->getType())
+            LOG_ERROR("Error compiling default " << getShaderTypeName(shader->getType())
                         << " shader. Error message: \"" << getShaderCompileError(shader) << "\"");
-            LOG_FATAL("Unable to compile default " << getShaderTypeName(shader->getType()) << " shader");
          }
       }
    }

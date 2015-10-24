@@ -105,6 +105,22 @@ ALenum getDistanceModelEnum(AudioSystem::DistanceModel distanceModel) {
 
 } // namespace
 
+// static
+const char* AudioSystem::errorString(Result result) {
+   switch (result) {
+      case Result::kOK:
+         return "No error";
+      case Result::kDevice:
+         return "Unable to open audio device";
+      case Result::kContext:
+         return "Unable to create audio context";
+      case Result::kContextCurrent:
+         return "Unable to make audio context current";
+      default:
+         return "Unknown error";
+   }
+}
+
 AudioSystem::AudioSystem() {
 }
 
@@ -112,25 +128,25 @@ AudioSystem::~AudioSystem() {
    shutDown();
 }
 
-void AudioSystem::startUp() {
+AudioSystem::Result AudioSystem::startUp() {
    ASSERT(!device && !context, "Trying to start up audio system that has already been started");
 
    device = getDevice();
    if (!device) {
-      LOG_ERROR("Unable to open audio device");
-      return;
+      LOG_ERROR(errorString(Result::kDevice));
+      return Result::kDevice;
    }
 
    context = UPtr<ALCcontext, std::function<void(ALCcontext*)>>(alcCreateContext(device.get(), nullptr),
                                                                 destroyContext);
    SHINY_CHECK_ALC_ERROR(device.get(), "creating audio context");
    if (!context) {
-      LOG_ERROR("Unable to create audio context");
       device = nullptr;
-      return;
+      LOG_ERROR(errorString(Result::kContext));
+      return Result::kContext;
    }
 
-   makeContextCurrent();
+   return makeContextCurrent();
 }
 
 void AudioSystem::shutDown() {
@@ -158,17 +174,21 @@ bool AudioSystem::isContextCurrent() const {
    return alcGetCurrentContext() == context.get();
 }
 
-void AudioSystem::makeContextCurrent() {
+AudioSystem::Result AudioSystem::makeContextCurrent() {
    SHINY_CHECK_AUDIO_SYSTEM_VALID("making audio context current");
 
    if (isContextCurrent()) {
-      return;
+      return Result::kOK;
    }
 
+   Result result = Result::kOK;
    if (!alcMakeContextCurrent(context.get())) {
-      LOG_ERROR("Unable to make audio context current");
+      result = Result::kContextCurrent;
+      LOG_ERROR(errorString(result));
    }
    SHINY_CHECK_ALC_ERROR(device.get(), "making audio context current");
+
+   return result;
 }
 
 AudioSystem::DistanceModel AudioSystem::getDistanceModel() const {

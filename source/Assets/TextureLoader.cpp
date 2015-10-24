@@ -58,7 +58,8 @@ ImageInfo getDefaultImageInfo() {
                                                                   &defaultImageInfo.composition, 0));
 
    if (!defaultImageInfo.pixels || !determineFormat(defaultImageInfo)) {
-      LOG_FATAL("Unable to load default texture");
+      LOG_ERROR("Unable to load default image");
+      defaultImageInfo.pixels = nullptr;
    }
 
    return defaultImageInfo;
@@ -70,7 +71,7 @@ ImageInfo loadImage(const std::string &fileName) {
    info.pixels = createPixelPtr(stbi_load(fileName.c_str(), &info.width, &info.height, &info.composition, 0));
 
    if (!info.pixels || !determineFormat(info)) {
-      LOG_WARNING("Unable to load image from file: " << fileName);
+      LOG_WARNING("Unable to load image from file: " << fileName << ", reverting to default");
       info = getDefaultImageInfo();
    }
 

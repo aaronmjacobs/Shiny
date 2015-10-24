@@ -1,5 +1,5 @@
-#include "Shiny/Log.h"
 #include "Shiny/Shiny.h"
+#include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Graphics/OpenGL.h"
 
@@ -12,7 +12,7 @@ namespace Shiny {
 namespace {
 
 void errorCallback(int error, const char* description) {
-   LOG_FATAL("GLFW error " << error << ": " << description);
+   ASSERT(false, "GLFW error %d: %s", error, description);
 }
 
 } // namespace
@@ -25,12 +25,6 @@ const char* errorString(Result result) {
          return "Unable to set program working directory";
       case Result::kGlfwInit:
          return "Unable to initialize GLFW";
-      case Result::kGladLoad:
-         return "Unable to load OpenGL via glad";
-      case Result::kWindowParams:
-         return "Invalid window parameters";
-      case Result::kCreateWindow:
-         return "Unable to create window";
       default:
          return "Unknown error";
    }

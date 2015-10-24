@@ -11,10 +11,7 @@ namespace Shiny {
 enum class SHINYAPI Result {
    kOK,
    kWorkingDirectory,
-   kGlfwInit,
-   kGladLoad,
-   kWindowParams,
-   kCreateWindow
+   kGlfwInit
 };
 
 /**

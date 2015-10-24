@@ -21,6 +21,13 @@ class AudioSource;
 
 class SHINYAPI AudioSystem {
 public:
+   enum class SHINYAPI Result {
+      kOK,
+      kDevice,
+      kContext,
+      kContextCurrent
+   };
+
    enum class SHINYAPI DistanceModel {
       kNone,
       kInverseDistance,
@@ -31,6 +38,8 @@ public:
       kExponentDistanceClamped
    };
 
+   static const char* errorString(Result result);
+
 protected:
    SPtr<ALCdevice> device;
    UPtr<ALCcontext, std::function<void(ALCcontext*)>> context;
@@ -40,7 +49,7 @@ public:
 
    virtual ~AudioSystem();
 
-   void startUp();
+   Result startUp();
 
    void shutDown();
 
@@ -50,7 +59,7 @@ public:
 
    bool isContextCurrent() const;
 
-   void makeContextCurrent();
+   Result makeContextCurrent();
 
    DistanceModel getDistanceModel() const;
 

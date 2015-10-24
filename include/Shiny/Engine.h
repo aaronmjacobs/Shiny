@@ -25,6 +25,17 @@ class Mouse;
 typedef UPtr<GLFWwindow, std::function<void(GLFWwindow*)>> WindowPtr;
 
 class SHINYAPI Engine {
+public:
+   enum class SHINYAPI Result {
+      kOK,
+      kGladLoad,
+      kWindowParams,
+      kCreateWindow,
+      kAudioInit
+   };
+
+   static const char* errorString(Result result);
+
 private:
    static void windowCloseCallback(GLFWwindow *window);
 

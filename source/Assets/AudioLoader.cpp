@@ -1,3 +1,4 @@
+#include "Shiny/Log.h"
 #include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Assets/AudioLoader.h"
@@ -238,6 +239,7 @@ SPtr<AudioSource> AudioLoader::loadSound(const AudioSystem &audioSystem, const s
    if (!buffer) {
       // Failed to load, use empty buffer
       buffer = audioSystem.generateBuffer();
+      LOG_WARNING("Unable to load sound from file \"" << fileName << "\", reverting to default (nothing)");
    }
 
    SPtr<AudioSource> source(audioSystem.generateSource());

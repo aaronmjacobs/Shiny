@@ -17,22 +17,40 @@ const double kPhysicsFrameRate = 60.0;
 const double kMaxFrameTime = 0.25;
 
 // Loads OpenGL - must be called after an OpenGL context is created
-Result loadGL() {
+Engine::Result loadGL() {
    static bool loaded = false;
 
    if (loaded) {
-      return Result::kOK;
+      return Engine::Result::kOK;
    }
 
    if (!gladLoadGL()) {
-      return Result::kGladLoad;
+      return Engine::Result::kGladLoad;
    }
 
    loaded = true;
-   return Result::kOK;
+   return Engine::Result::kOK;
 }
 
 } // namespace
+
+// static
+const char* Engine::errorString(Result result) {
+   switch (result) {
+      case Result::kOK:
+         return "No error";
+      case Result::kGladLoad:
+         return "Unable to load OpenGL via glad";
+      case Result::kWindowParams:
+         return "Invalid window parameters";
+      case Result::kCreateWindow:
+         return "Unable to create window";
+      case Result::kAudioInit:
+         return "Unable to initialize audio system";
+      default:
+         return "Unknown error";
+   }
+}
 
 // static
 void Engine::windowCloseCallback(GLFWwindow *window) {
@@ -105,7 +123,7 @@ void Engine::pollInput() {
    }
 }
 
-Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName) {
+Engine::Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName) {
    ASSERT(!running, "Trying to start up engine that is already running");
 
    if (windowWidth <= 0 || windowHeight <= 0 || !windowName) {
@@ -149,7 +167,9 @@ Result Engine::startUp(int windowWidth, int windowHeight, const char *windowName
 
    runningTime = 0.0f;
 
-   audioSystem.startUp();
+   if (audioSystem.startUp() != AudioSystem::Result::kOK) {
+      return Result::kAudioInit;
+   }
 
    return Result::kOK;
 }

@@ -57,11 +57,16 @@ AudioSource::State getSourceState(ALint alState) {
    }
 }
 
-void makeContextCurrent(ALCdevice* const device, ALCcontext* const context) {
+bool makeContextCurrent(ALCdevice* const device, ALCcontext* const context) {
+   bool success = true;
+
    if (!alcMakeContextCurrent(context)) {
-      LOG_ERROR("Unable to make audio context current");
+      success = false;
+      LOG_ERROR("Unable to make audio context current inside AudioSource destructor");
    }
    SHINY_CHECK_ALC_ERROR(device, "making audio context current");
+
+   return success;
 }
 
 } // namespace
@@ -79,7 +84,10 @@ AudioSource::~AudioSource() {
    // Make sure the right context is current
    ALCcontext *currentContext = alcGetCurrentContext();
    if (currentContext != context) {
-      makeContextCurrent(device, context);
+      if (!makeContextCurrent(device, context)) {
+         // If we're unable to make the proper context current, it's probably been destroyed. Not much we can do anyways.
+         return;
+      }
    }
 
    alDeleteSources(1, &name);
