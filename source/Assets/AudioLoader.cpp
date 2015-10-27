@@ -14,10 +14,13 @@
 #include <array>
 #include <cstdint>
 #include <cstring>
+#include <fstream>
 
 namespace Shiny {
 
 namespace {
+
+// Metadata
 
 enum class AudioFileType {
    kUnknown,
@@ -25,9 +28,10 @@ enum class AudioFileType {
    kOggVorbis
 };
 
-struct WavChunkInfo {
-   std::array<char, 5> id;
-   int32_t size;
+struct WavInfo {
+   int sampleRate;
+   int dataChunkSize;
+   AudioBuffer::Format format;
 };
 
 struct VorbisInfo {
@@ -66,45 +70,55 @@ AudioFileType determineFileType(const std::string &fileName) {
    return AudioFileType::kUnknown;
 }
 
-template<typename Integer>
-Integer readWavInt(const unsigned char *source, long *offset) {
-   Integer value;
+// WavReader
 
-   memcpy(&value, source + *offset, sizeof(value));
-   *offset += sizeof(value);
+class WavReader {
+private:
+   struct ChunkInfo {
+      std::array<char, 5> id;
+      int32_t size;
+   };
 
-   return value;
-}
+   bool findChunk(const char *name, ChunkInfo *chunkInfo);
 
-template<size_t size>
-std::array<char, size + 1> readWavString(const unsigned char *source, long *offset) {
-   std::array<char, size + 1> string;
-   string[size] = '\0';
+public:
+   virtual bool read(void *dest, size_t numBytes) = 0;
 
-   memcpy(string.data(), source + *offset, size);
-   *offset += size;
+   virtual bool skip(size_t numBytes) = 0;
 
-   return string;
-}
+   virtual void reset() = 0;
 
-WavChunkInfo readChunkHeader(const unsigned char *data, long *offset) {
-   return { readWavString<4>(data, offset), readWavInt<typeof(WavChunkInfo::size)>(data, offset) };
-}
+   template<typename T>
+   bool readStruct(T *dest) {
+      return read(dest, sizeof(*dest));
+   }
 
-WavChunkInfo findChunk(const unsigned char *data, long *offset, long numBytes, const char *name) {
+   bool readString(std::array<char, 5> *dest);
+
+   bool readHeader(WavInfo *wavInfo);
+};
+
+bool WavReader::findChunk(const char *name, ChunkInfo *chunkInfo) {
    ASSERT(strlen(name) == 4, "Invalid WAV chunk name: %s", name);
 
-   WavChunkInfo chunkInfo = {};
+   chunkInfo->size = 0;
 
+   bool chunkRead = true;
    do {
-      *offset += chunkInfo.size;
-      chunkInfo = readChunkHeader(data, offset);
-   } while (strcmp(chunkInfo.id.data(), name) != 0 && *offset < numBytes);
+      chunkRead = chunkRead && skip(chunkInfo->size);
+      chunkRead = chunkRead && readString(&chunkInfo->id);
+      chunkRead = chunkRead && readStruct(&chunkInfo->size);
+   } while (chunkRead && strcmp(chunkInfo->id.data(), name) != 0);
 
-   return chunkInfo;
+   return chunkRead;
 }
 
-SPtr<AudioBuffer> loadWavBuffer(const AudioSystem &audioSystem, const unsigned char *data, long numBytes) {
+bool WavReader::readString(std::array<char, 5> *dest) {
+   dest->at(dest->size() - 1) = '\0';
+   return read(dest->data(), dest->size() - 1);
+}
+
+bool WavReader::readHeader(WavInfo *wavInfo) {
    enum WaveFormat : uint16_t {
       kPCM = 0x0001,
       kIEEEFloat = 0x0003,
@@ -113,39 +127,45 @@ SPtr<AudioBuffer> loadWavBuffer(const AudioSystem &audioSystem, const unsigned c
       kExtensible = 0xFFFE
    };
 
-   long offset = 0;
+   reset();
 
    // RIFF chunk
-   WavChunkInfo riffChunkInfo = findChunk(data, &offset, numBytes, "RIFF");
-   if (offset >= numBytes || offset + riffChunkInfo.size > numBytes) {
-      // Chunk not found, or not enough data remaining to read chunk
-      return nullptr;
+   ChunkInfo riffChunkInfo;
+   if (!findChunk("RIFF", &riffChunkInfo)) {
+      return false;
    }
 
    // WAVEID
-   std::array<char, 5> waveID = readWavString<4>(data, &offset);
-   if (strcmp(waveID.data(), "WAVE") != 0) {
-      // Bad header data
-      return nullptr;
+   std::array<char, 5> waveStr;
+   if (!readString(&waveStr) || strcmp(waveStr.data(), "WAVE") != 0) {
+      return false;
    }
 
    // Format chunk
-   WavChunkInfo formatChunkInfo = findChunk(data, &offset, numBytes, "fmt ");
-   if (offset >= numBytes || offset + formatChunkInfo.size > numBytes) {
-      // Chunk not found, or not enough data remaining to read chunk
-      return nullptr;
+   ChunkInfo formatChunkInfo;
+   if (!findChunk("fmt ", &formatChunkInfo)) {
+      return false;
    }
 
-   uint16_t formatTag = readWavInt<uint16_t>(data, &offset);
-   if (formatTag != kPCM) {
+   uint16_t formatTag;
+   if (!readStruct(&formatTag) || formatTag != kPCM) {
       // Only PCM currently supported
-      return nullptr;
+      return false;
    }
 
-   int16_t numChannels = readWavInt<int16_t>(data, &offset);
-   int32_t sampleRate = readWavInt<int32_t>(data, &offset);
-   offset += 6; // 6 bytes we don't care about (avg bytes per second and block align)
-   int16_t bitsPerSample = readWavInt<int16_t>(data, &offset);
+   int16_t numChannels;
+   if (!readStruct(&numChannels)) {
+      return false;
+   }
+   int32_t sampleRate;
+   if (!readStruct(&sampleRate)) {
+      return false;
+   }
+   skip(6); // 6 bytes we don't care about (avg bytes per second and block align)
+   int16_t bitsPerSample;
+   if (!readStruct(&bitsPerSample)) {
+      return false;
+   }
 
    AudioBuffer::Format format;
    if (numChannels == 1 && bitsPerSample == 8) {
@@ -158,27 +178,128 @@ SPtr<AudioBuffer> loadWavBuffer(const AudioSystem &audioSystem, const unsigned c
       format = AudioBuffer::Format::kStereo16;
    } else {
       // Unsupported number of channels / bits per sample
-      return nullptr;
+      return false;
    }
 
    // Data chunk
-   WavChunkInfo dataChunkInfo = findChunk(data, &offset, numBytes, "data");
-   if (offset >= numBytes || offset + dataChunkInfo.size > numBytes) {
-      // Chunk not found, or not enough data remaining to read chunk
+   ChunkInfo dataChunkInfo;
+   if (!findChunk("data", &dataChunkInfo)) {
+      return false;
+   }
+
+   wavInfo->sampleRate = sampleRate;
+   wavInfo->dataChunkSize = dataChunkInfo.size;
+   wavInfo->format = format;
+
+   return true;
+}
+
+// WavMemReader
+
+class WavMemReader : public WavReader {
+private:
+   const unsigned char *memory;
+   const long memSize;
+   long offset;
+
+public:
+   WavMemReader(const unsigned char *memory, const long memSize);
+
+   virtual bool read(void *dest, size_t numBytes) override;
+
+   virtual bool skip(size_t numBytes) override;
+
+   virtual void reset() override;
+
+   const unsigned char* getCurrentPos() const {
+      return memory + offset;
+   }
+};
+
+WavMemReader::WavMemReader(const unsigned char *memory, const long memSize)
+   : memory(memory), memSize(memSize), offset(0) {
+}
+
+bool WavMemReader::read(void *dest, size_t numBytes) {
+   size_t bytesRead = offset + numBytes > memSize ? memSize - offset : numBytes;
+
+   memcpy(dest, memory + offset, bytesRead);
+   offset += bytesRead;
+
+   return bytesRead == numBytes;
+}
+
+bool WavMemReader::skip(size_t numBytes) {
+   size_t bytesSkipped = offset + numBytes > memSize ? memSize - offset : numBytes;
+
+   offset += bytesSkipped;
+
+   return bytesSkipped == numBytes;
+}
+
+void WavMemReader::reset() {
+   offset = 0;
+}
+
+// WavFileReader
+
+class WavFileReader : public WavReader {
+private:
+   std::ifstream file;
+
+public:
+   WavFileReader(const std::string &fileName);
+
+   virtual bool read(void *dest, size_t numBytes) override;
+
+   virtual bool skip(size_t numBytes) override;
+
+   virtual void reset() override;
+};
+
+WavFileReader::WavFileReader(const std::string &fileName)
+   : file(fileName, std::ifstream::binary) {
+}
+
+bool WavFileReader::read(void *dest, size_t numBytes) {
+   file.read(reinterpret_cast<char*>(dest), numBytes);
+   std::streamsize bytesRead = file.gcount();
+
+   return bytesRead == numBytes;
+}
+
+bool WavFileReader::skip(size_t numBytes) {
+   std::streampos currentPos = file.tellg();
+   std::streampos desiredNewPos = currentPos + std::streamoff(numBytes);
+
+   file.seekg(desiredNewPos);
+   std::streampos actualNewPos = file.tellg();
+
+   // Note: if seekg goes past the end of the file, this will still be true - failure will not be detected until the
+   // next read operation
+   return desiredNewPos == actualNewPos;
+}
+
+void WavFileReader::reset() {
+   file.seekg(0, std::ios_base::beg);
+}
+
+// Buffer loading
+
+SPtr<AudioBuffer> loadWavBuffer(const AudioSystem &audioSystem, const unsigned char *data, long numBytes) {
+   WavMemReader reader(data, numBytes);
+   WavInfo info;
+   if (!reader.readHeader(&info)) {
       return nullptr;
    }
 
    SPtr<AudioBuffer> buffer(audioSystem.generateBuffer());
-   buffer->setData(format, data + offset, dataChunkInfo.size, sampleRate);
+   buffer->setData(info.format, reader.getCurrentPos(), info.dataChunkSize, info.sampleRate);
 
    return buffer;
 }
 
 UPtr<short[]> loadVorbisFromMemory(const unsigned char *data, long numBytes, VorbisInfo *info) {
-   ASSERT(info, "Passed null info pointer");
-   ASSERT(numBytes >= 0, "Invalid number of bytes: %ld", numBytes);
-   ASSERT(data || numBytes == 0, "Invalid data pointer");
-
    short *audioData = nullptr;
    info->numSamples = stb_vorbis_decode_memory(data, (int)numBytes, &info->numChannels, &info->sampleRate, &audioData);
    info->format = info->numChannels == 1 ? AudioBuffer::Format::kMono16 : AudioBuffer::Format::kStereo16;

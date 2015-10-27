@@ -32,8 +32,9 @@ UPtr<unsigned char[]> readBinaryFile(const std::string &fileName,  std::streamsi
       return nullptr;
    }
 
+   std::streampos start = in.tellg();
    in.seekg(0, std::ios_base::end);
-   std::streamsize size = in.tellg();
+   std::streamoff size = in.tellg() - start;
    in.seekg(0, std::ios_base::beg);
 
    UPtr<unsigned char[]> data(new unsigned char[size]);
