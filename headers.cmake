@@ -15,6 +15,8 @@ set(HEADER_NAMES
    Audio/AudioError.h
    Audio/AudioSource.h
    Audio/AudioSystem.h
+   Audio/Sound.h
+   Audio/Stream.h
    Graphics/Context.h
    Graphics/Framebuffer.h
    Graphics/Material.h

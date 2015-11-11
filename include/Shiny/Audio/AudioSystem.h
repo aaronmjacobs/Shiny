@@ -18,6 +18,9 @@ namespace Shiny {
 
 class AudioBuffer;
 class AudioSource;
+class Sound;
+class Stream;
+class StreamDataSource;
 
 class SHINYAPI AudioSystem {
 public:
@@ -56,6 +59,10 @@ public:
    SPtr<AudioBuffer> generateBuffer() const;
 
    SPtr<AudioSource> generateSource() const;
+
+   SPtr<Sound> generateSound(const SPtr<AudioSource> &source);
+
+   SPtr<Stream> generateStream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource);
 
    bool isContextCurrent() const;
 

@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <queue>
+#include <list>
 #include <vector>
 
 struct ALCcontext_struct;
@@ -40,7 +40,7 @@ protected:
    unsigned int name;
    ALCdevice* const device;
    ALCcontext* const context;
-   std::queue<SPtr<AudioBuffer>> bufferQueue;
+   std::list<SPtr<AudioBuffer>> bufferQueue;
 
    AudioSource(ALCdevice* const device, ALCcontext* const context);
 
@@ -65,7 +65,7 @@ public:
 
    std::vector<SPtr<AudioBuffer>> unqueueBuffers(int num);
 
-   const std::queue<SPtr<AudioBuffer>> getBufferQueue() const;
+   const std::list<SPtr<AudioBuffer>>& getBufferQueue() const;
 
    Type getType() const;
 

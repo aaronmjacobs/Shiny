@@ -97,23 +97,16 @@ int AudioBuffer::getNumChannels() const {
    return numSamples;
 }
 
-int AudioBuffer::getLengthInSamples() const {
-   SHINY_CHECK_AUDIO_BUFFER_VALID("getting length in samples");
+int AudioBuffer::getSizeInSamples() const {
+   SHINY_CHECK_AUDIO_BUFFER_VALID("getting size in samples");
 
-   int sizeInBytes = getSize();
-   int numChannels = getNumChannels();
-   int bitsPerSample = getBitsPerSample();
-
-   return (sizeInBytes * 8) / (numChannels * bitsPerSample);
+   return bytesToSamples(getSize(), getNumChannels(), getBitsPerSample());
 }
 
-float AudioBuffer::getLengthInSeconds() const {
-   SHINY_CHECK_AUDIO_BUFFER_VALID("getting length in seconds");
+float AudioBuffer::getSizeInSeconds() const {
+   SHINY_CHECK_AUDIO_BUFFER_VALID("getting size in seconds");
 
-   int lengthInSamples = getLengthInSamples();
-   int frequency = getFrequency();
-
-   return static_cast<float>(lengthInSamples) / frequency;
+   return samplesToSeconds(getSizeInSamples(), getFrequency());
 }
 
 } // namespace Shiny

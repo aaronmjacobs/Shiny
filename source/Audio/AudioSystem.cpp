@@ -5,6 +5,8 @@
 #include "Shiny/Audio/AudioError.h"
 #include "Shiny/Audio/AudioSource.h"
 #include "Shiny/Audio/AudioSystem.h"
+#include "Shiny/Audio/Sound.h"
+#include "Shiny/Audio/Stream.h"
 
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -166,6 +168,18 @@ SPtr<AudioSource> AudioSystem::generateSource() const {
    SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating audio source");
 
    return SPtr<AudioSource>(new AudioSource(device.get(), context.get()));
+}
+
+SPtr<Sound> AudioSystem::generateSound(const SPtr<AudioSource> &source) {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating sound");
+
+   return SPtr<Sound>(new Sound(source));
+}
+
+SPtr<Stream> AudioSystem::generateStream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource) {
+   SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating stream");
+
+   return SPtr<Stream>(new Stream(source, std::move(dataSource)));
 }
 
 bool AudioSystem::isContextCurrent() const {

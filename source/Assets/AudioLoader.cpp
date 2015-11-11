@@ -5,6 +5,8 @@
 
 #include "Shiny/Audio/AudioBuffer.h"
 #include "Shiny/Audio/AudioSource.h"
+#include "Shiny/Audio/Sound.h"
+#include "Shiny/Audio/Stream.h"
 
 #include "Shiny/Platform/IOUtils.h"
 
@@ -82,7 +84,7 @@ private:
    bool findChunk(const char *name, ChunkInfo *chunkInfo);
 
 public:
-   virtual bool read(void *dest, size_t numBytes) = 0;
+   virtual size_t read(void *dest, size_t numBytes) = 0;
 
    virtual bool skip(size_t numBytes) = 0;
 
@@ -90,7 +92,7 @@ public:
 
    template<typename T>
    bool readStruct(T *dest) {
-      return read(dest, sizeof(*dest));
+      return read(dest, sizeof(*dest)) == sizeof(*dest);
    }
 
    bool readString(std::array<char, 5> *dest);
@@ -115,7 +117,7 @@ bool WavReader::findChunk(const char *name, ChunkInfo *chunkInfo) {
 
 bool WavReader::readString(std::array<char, 5> *dest) {
    dest->at(dest->size() - 1) = '\0';
-   return read(dest->data(), dest->size() - 1);
+   return read(dest->data(), dest->size() - 1) == dest->size() - 1;
 }
 
 bool WavReader::readHeader(WavInfo *wavInfo) {
@@ -205,7 +207,7 @@ private:
 public:
    WavMemReader(const unsigned char *memory, const long memSize);
 
-   virtual bool read(void *dest, size_t numBytes) override;
+   virtual size_t read(void *dest, size_t numBytes) override;
 
    virtual bool skip(size_t numBytes) override;
 
@@ -220,13 +222,13 @@ WavMemReader::WavMemReader(const unsigned char *memory, const long memSize)
    : memory(memory), memSize(memSize), offset(0) {
 }
 
-bool WavMemReader::read(void *dest, size_t numBytes) {
+size_t WavMemReader::read(void *dest, size_t numBytes) {
    size_t bytesRead = offset + numBytes > memSize ? memSize - offset : numBytes;
 
    memcpy(dest, memory + offset, bytesRead);
    offset += bytesRead;
 
-   return bytesRead == numBytes;
+   return bytesRead;
 }
 
 bool WavMemReader::skip(size_t numBytes) {
@@ -246,26 +248,31 @@ void WavMemReader::reset() {
 class WavFileReader : public WavReader {
 private:
    std::ifstream file;
+   std::streampos start;
 
 public:
    WavFileReader(const std::string &fileName);
 
-   virtual bool read(void *dest, size_t numBytes) override;
+   virtual size_t read(void *dest, size_t numBytes) override;
 
    virtual bool skip(size_t numBytes) override;
 
    virtual void reset() override;
+
+   std::streamoff getCurrentPos() {
+      return file.tellg() - start;
+   }
 };
 
 WavFileReader::WavFileReader(const std::string &fileName)
-   : file(fileName, std::ifstream::binary) {
+   : file(fileName, std::ifstream::binary), start(file.tellg()) {
 }
 
-bool WavFileReader::read(void *dest, size_t numBytes) {
+size_t WavFileReader::read(void *dest, size_t numBytes) {
    file.read(reinterpret_cast<char*>(dest), numBytes);
    std::streamsize bytesRead = file.gcount();
 
-   return bytesRead == numBytes;
+   return bytesRead;
 }
 
 bool WavFileReader::skip(size_t numBytes) {
@@ -281,7 +288,90 @@ bool WavFileReader::skip(size_t numBytes) {
 }
 
 void WavFileReader::reset() {
+   file.clear();
    file.seekg(0, std::ios_base::beg);
+}
+
+class WavFileDataSource : public StreamDataSource {
+private:
+   WavFileReader reader;
+   WavInfo info;
+   std::streamoff dataOffset;
+
+public:
+   WavFileDataSource(const std::string &fileName);
+
+   virtual ~WavFileDataSource();
+
+   virtual bool fill(AudioBuffer *buffer, bool circular) override;
+
+   virtual bool seekTo(int offset) override;
+
+   virtual int getOffset() override;
+
+   virtual int getSize() override;
+
+   virtual int getNumChannels() override;
+
+   virtual int getBitsPerSample() override;
+
+   virtual int getFrequency() override;
+};
+
+WavFileDataSource::WavFileDataSource(const std::string &fileName)
+   : reader(fileName) {
+   reader.readHeader(&info); // TODO Check (in init function?)
+   dataOffset = reader.getCurrentPos();
+}
+
+WavFileDataSource::~WavFileDataSource() {
+}
+
+bool WavFileDataSource::fill(AudioBuffer *buffer, bool circular) {
+   static constexpr unsigned int kDefaultBufferSize = 16384;
+
+   std::array<unsigned char, kDefaultBufferSize> data;
+   size_t bytesRead = reader.read(data.data(), data.size());
+
+   if (circular && bytesRead != data.size()) {
+      // Loop necessary if file size < kDefaultBufferSize
+      size_t additionalBytesRead = 0;
+      do
+      {
+         seekTo(0);
+         additionalBytesRead = reader.read(data.data() + bytesRead, data.size() - bytesRead);
+         bytesRead += additionalBytesRead;
+      } while (bytesRead != data.size() && additionalBytesRead != 0);
+   }
+
+   buffer->setData(info.format, data.data(), bytesRead, info.sampleRate);
+
+   return bytesRead == data.size();
+}
+
+bool WavFileDataSource::seekTo(int offset) {
+   reader.reset();
+   return reader.skip(dataOffset + offset);
+}
+
+int WavFileDataSource::getOffset() {
+   return static_cast<int>(reader.getCurrentPos()) - static_cast<int>(dataOffset);
+}
+
+int WavFileDataSource::getSize() {
+   return static_cast<int>(info.dataChunkSize);
+}
+
+int WavFileDataSource::getNumChannels() {
+   return info.format == AudioBuffer::Format::kMono8 || info.format == AudioBuffer::Format::kMono16 ? 1 : 2;
+}
+
+int WavFileDataSource::getBitsPerSample() {
+   return info.format == AudioBuffer::Format::kMono8 || info.format == AudioBuffer::Format::kStereo8 ? 8 : 16;
+}
+
+int WavFileDataSource::getFrequency() {
+   return info.sampleRate;
 }
 
 // Buffer loading
@@ -355,7 +445,7 @@ AudioLoader::AudioLoader() {
 AudioLoader::~AudioLoader() {
 }
 
-SPtr<AudioSource> AudioLoader::loadSound(const AudioSystem &audioSystem, const std::string &fileName) {
+SPtr<Sound> AudioLoader::loadSound(AudioSystem &audioSystem, const std::string &fileName) {
    SPtr<AudioBuffer> buffer(loadBuffer(audioSystem, fileName));
    if (!buffer) {
       // Failed to load, use empty buffer
@@ -366,7 +456,11 @@ SPtr<AudioSource> AudioLoader::loadSound(const AudioSystem &audioSystem, const s
    SPtr<AudioSource> source(audioSystem.generateSource());
    source->setCurrentBuffer(buffer);
 
-   return source;
+   return audioSystem.generateSound(source);
+}
+
+SPtr<Stream> AudioLoader::loadStream(AudioSystem &audioSystem, const std::string &fileName) {
+   return audioSystem.generateStream(audioSystem.generateSource(), UPtr<StreamDataSource>(new WavFileDataSource(fileName)));
 }
 
 } // namespace Shiny

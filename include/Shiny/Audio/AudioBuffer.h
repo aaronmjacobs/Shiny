@@ -3,6 +3,7 @@
 
 #include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
+#include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Audio/AudioSystem.h"
 
@@ -16,6 +17,34 @@ public:
       kStereo8,
       kStereo16
    };
+
+   static int bytesToSamples(int numBytes, int numChannels, int bitsPerSample) {
+      ASSERT(numChannels > 0 && bitsPerSample > 0,
+          "Invalid number of channels / bits per sample: %d / %d", numChannels, bitsPerSample);
+      ASSERT(bitsPerSample % 8 == 0, "Bits per sample should be evenly divisble by 8: %d", bitsPerSample);
+
+      return (numBytes * 8) / (numChannels * bitsPerSample);
+   }
+
+   static int samplesToBytes(int numSamples, int numChannels, int bitsPerSample) {
+      ASSERT(numChannels > 0 && bitsPerSample > 0,
+          "Invalid number of channels / bits per sample: %d / %d", numChannels, bitsPerSample);
+      ASSERT(bitsPerSample % 8 == 0, "Bits per sample should be evenly divisble by 8: %d", bitsPerSample);
+
+      return numSamples * numChannels * (bitsPerSample / 8);
+   }
+
+   static float samplesToSeconds(int numSamples, int frequency) {
+      ASSERT(frequency > 0, "Invalid frequency: %d", frequency);
+
+      return static_cast<float>(numSamples) / frequency;
+   }
+
+   static int secondsToSamples(float numSeconds, int frequency) {
+      ASSERT(frequency > 0, "Invalid frequency: %d", frequency);
+
+      return static_cast<int>(numSeconds * frequency);
+   }
 
 protected:
    unsigned int name;
@@ -39,9 +68,9 @@ public:
 
    int getNumChannels() const;
 
-   int getLengthInSamples() const;
+   int getSizeInSamples() const;
 
-   float getLengthInSeconds() const;
+   float getSizeInSeconds() const;
 };
 
 } // namespace Shiny

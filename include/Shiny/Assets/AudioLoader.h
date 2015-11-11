@@ -8,8 +8,9 @@
 
 namespace Shiny {
 
-class AudioSource;
 class AudioSystem;
+class Sound;
+class Stream;
 
 class SHINYAPI AudioLoader {
 public:
@@ -17,7 +18,9 @@ public:
 
    virtual ~AudioLoader();
 
-   SPtr<AudioSource> loadSound(const AudioSystem &audioSystem, const std::string &fileName);
+   SPtr<Sound> loadSound(AudioSystem &audioSystem, const std::string &fileName);
+
+   SPtr<Stream> loadStream(AudioSystem &audioSystem, const std::string &fileName);
 };
 
 } // namespace Shiny

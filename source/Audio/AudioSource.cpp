@@ -134,16 +134,13 @@ SPtr<AudioBuffer> AudioSource::getCurrentBuffer() const {
    alGetSourcei(name, AL_BUFFER, &bufferName);
    SHINY_CHECK_AL_SOURCE_ERROR("getting current buffer");
 
-   ASSERT((bufferName == AL_NONE && bufferQueue.empty()) || (bufferName != AL_NONE && !bufferQueue.empty()),
-          "buffer queue size out of sync");
-   if (bufferQueue.empty()) {
-      return nullptr;
+   for (const SPtr<AudioBuffer> &buffer : bufferQueue) {
+      if (buffer->getName() == bufferName) {
+         return buffer;
+      }
    }
 
-   const SPtr<AudioBuffer> buffer(bufferQueue.front());
-   ASSERT(buffer->getName() == bufferName, "buffer queue order out of sync");
-
-   return buffer;
+   return nullptr;
 }
 
 void AudioSource::setCurrentBuffer(const SPtr<AudioBuffer> &buffer) {
@@ -153,7 +150,7 @@ void AudioSource::setCurrentBuffer(const SPtr<AudioBuffer> &buffer) {
    ASSERT(state == State::kInitial || state == State::kStopped, "Trying to set current buffer in invalid state");
 
    bufferQueue = {};
-   bufferQueue.push(buffer);
+   bufferQueue.push_back(buffer);
    int bufferName = buffer ? (int)buffer->getName() : AL_NONE;
 
    alSourcei(name, AL_BUFFER, bufferName);
@@ -180,7 +177,7 @@ void AudioSource::queueBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {
 
    std::vector<ALuint> bufferNames;
    for (const SPtr<AudioBuffer> &buffer : buffers) {
-      bufferQueue.push(buffer);
+      bufferQueue.push_back(buffer);
       bufferNames.push_back(buffer->getName());
    }
 
@@ -203,13 +200,13 @@ std::vector<SPtr<AudioBuffer>> AudioSource::unqueueBuffers(int num) {
       const SPtr<AudioBuffer> &buffer(bufferQueue.front());
       ASSERT(buffer->getName() == bufferName, "buffer queue order out of sync");
       buffers.push_back(buffer);
-      bufferQueue.pop();
+      bufferQueue.pop_front();
    }
 
    return buffers;
 }
 
-const std::queue<SPtr<AudioBuffer>> AudioSource::getBufferQueue() const {
+const std::list<SPtr<AudioBuffer>>& AudioSource::getBufferQueue() const {
    SHINY_CHECK_AUDIO_SOURCE_VALID("getting buffer queue");
 
    return bufferQueue;

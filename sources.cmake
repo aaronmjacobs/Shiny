@@ -8,6 +8,8 @@ set(SOURCE_NAMES
    Audio/AudioBuffer.cpp
    Audio/AudioSource.cpp
    Audio/AudioSystem.cpp
+   Audio/Sound.cpp
+   Audio/Stream.cpp
    Graphics/Context.cpp
    Graphics/Framebuffer.cpp
    Graphics/Mesh.cpp
