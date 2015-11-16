@@ -14,6 +14,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>
 
+#include <algorithm>
 #include <array>
 
 #define SHINY_CHECK_AUDIO_SYSTEM_VALID(what) SHINY_CHECK_AUDIO_VALID(context, what, "audio system")
@@ -157,6 +158,20 @@ void AudioSystem::shutDown() {
    device = nullptr;
 }
 
+void AudioSystem::tick(const float dt) {
+   // Remove all deallocated sounds
+   sounds.erase(std::remove_if(sounds.begin(), sounds.end(), [](const WPtr<Sound> &sound) {
+      return sound.expired();
+   }), sounds.end());
+
+   for (const WPtr<Sound> &wSound : sounds) {
+      SPtr<Sound> sound = wSound.lock();
+      ASSERT(sound, "Sound should not be deallocated");
+
+      sound->tick(dt);
+   }
+}
+
 SPtr<AudioBuffer> AudioSystem::generateBuffer() const {
    SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating audio buffer");
 
@@ -173,13 +188,19 @@ SPtr<AudioSource> AudioSystem::generateSource() const {
 SPtr<Sound> AudioSystem::generateSound(const SPtr<AudioSource> &source) {
    SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating sound");
 
-   return SPtr<Sound>(new Sound(source));
+   SPtr<Sound> sound(new Sound(source));
+   sounds.push_back(sound);
+
+   return sound;
 }
 
 SPtr<Stream> AudioSystem::generateStream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource) {
    SHINY_CHECK_AUDIO_SYSTEM_VALID_CURRENT("generating stream");
 
-   return SPtr<Stream>(new Stream(source, std::move(dataSource)));
+   SPtr<Stream> stream(new Stream(source, std::move(dataSource)));
+   sounds.push_back(stream);
+
+   return stream;
 }
 
 bool AudioSystem::isContextCurrent() const {

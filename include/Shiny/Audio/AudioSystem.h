@@ -8,6 +8,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <functional>
+#include <vector>
 
 struct ALCcontext_struct;
 typedef struct ALCcontext_struct ALCcontext;
@@ -46,6 +47,7 @@ public:
 protected:
    SPtr<ALCdevice> device;
    UPtr<ALCcontext, std::function<void(ALCcontext*)>> context;
+   std::vector<WPtr<Sound>> sounds;
 
 public:
    AudioSystem();
@@ -55,6 +57,8 @@ public:
    Result startUp();
 
    void shutDown();
+
+   virtual void tick(const float dt);
 
    SPtr<AudioBuffer> generateBuffer() const;
 
