@@ -17,6 +17,8 @@
 #include <cstdint>
 #include <cstring>
 #include <fstream>
+#include <functional>
+#include <vector>
 
 namespace Shiny {
 
@@ -42,6 +44,8 @@ struct VorbisInfo {
    int sampleRate;
    AudioBuffer::Format format;
 };
+
+static constexpr unsigned int kDefaultBufferSize = 16384;
 
 std::string lowerCase(const std::string &str) {
    std::string lower(str);
@@ -292,6 +296,8 @@ void WavFileReader::reset() {
    file.seekg(0, std::ios_base::beg);
 }
 
+// Stream reading / data sources
+
 class NullDataSource : public StreamDataSource {
 public:
    virtual bool fill(AudioBuffer *buffer) override { return false; }
@@ -361,9 +367,7 @@ bool WavFileDataSource::initialize() {
 bool WavFileDataSource::fill(AudioBuffer *buffer) {
    ASSERT(initialized, "Trying to fill buffer with an uninitialized WavFileDataSource");
 
-   static constexpr unsigned int kDefaultBufferSize = 16384;
-
-   std::array<unsigned char, kDefaultBufferSize> data;
+   std::vector<unsigned char> data(kDefaultBufferSize);
    size_t bytesRead = reader.read(data.data(), data.size());
 
    buffer->setData(info.format, data.data(), bytesRead, info.sampleRate);
@@ -410,6 +414,143 @@ int WavFileDataSource::getFrequency() const {
    ASSERT(initialized, "Trying to get frequency of an uninitialized WavFileDataSource");
 
    return info.sampleRate;
+}
+
+class VorbisFileDataSource : public StreamDataSource {
+private:
+   typedef UPtr<stb_vorbis, std::function<void(stb_vorbis*)>> VorbisFileReader;
+   static const int bitsPerSample = 16;
+
+   VorbisFileReader reader;
+   VorbisInfo info;
+   std::string fileName;
+
+public:
+   VorbisFileDataSource(const std::string &fileName);
+
+   virtual ~VorbisFileDataSource();
+
+   bool initialize();
+
+   virtual bool fill(AudioBuffer *buffer) override;
+
+   virtual bool seekTo(int offset) override;
+
+   virtual int getOffset() const override;
+
+   virtual int getSize() const override;
+
+   virtual int getNumChannels() const override;
+
+   virtual int getBitsPerSample() const override;
+
+   virtual int getFrequency() const override;
+};
+
+VorbisFileDataSource::VorbisFileDataSource(const std::string &fileName)
+   : reader(nullptr), info({0}), fileName(fileName) {
+}
+
+VorbisFileDataSource::~VorbisFileDataSource() {
+}
+
+bool VorbisFileDataSource::initialize() {
+   ASSERT(!reader, "Trying to initialize an already-initialized VorbisFileDataSource");
+
+   reader = VorbisFileReader(stb_vorbis_open_filename(fileName.c_str(), nullptr, nullptr), stb_vorbis_close);
+   if (!reader) {
+      return false;
+   }
+
+   stb_vorbis_info vorbisInfo = stb_vorbis_get_info(reader.get());
+
+   info.numChannels = vorbisInfo.channels;
+   info.numSamples = stb_vorbis_stream_length_in_samples(reader.get());
+   info.sampleRate = vorbisInfo.sample_rate;
+   info.format = info.numChannels == 1 ? AudioBuffer::Format::kMono16 : AudioBuffer::Format::kStereo16;
+
+   return true;
+}
+
+bool VorbisFileDataSource::fill(AudioBuffer *buffer) {
+   ASSERT(reader, "Trying to fill buffer with an uninitialized VorbisFileDataSource");
+
+   std::vector<short> data(kDefaultBufferSize / sizeof(short));
+   int samplesRead = stb_vorbis_get_samples_short_interleaved(reader.get(), info.numChannels, data.data(), data.size());
+   int bytesRead = AudioBuffer::samplesToBytes(samplesRead, info.numChannels, bitsPerSample);
+
+   buffer->setData(info.format, data.data(), bytesRead, info.sampleRate);
+
+   return bytesRead > 0;
+}
+
+bool VorbisFileDataSource::seekTo(int offset) {
+   ASSERT(reader, "Trying to seek to offset with an uninitialized VorbisFileDataSource");
+
+   int sampleOffset = AudioBuffer::bytesToSamples(offset, info.numChannels, bitsPerSample);
+   return stb_vorbis_seek(reader.get(), sampleOffset);
+}
+
+int VorbisFileDataSource::getOffset() const {
+   ASSERT(reader, "Trying to get offset of an uninitialized VorbisFileDataSource");
+
+   int sampleOffset = stb_vorbis_get_sample_offset(reader.get());
+   ASSERT(sampleOffset >= -1, "Invalid sample offset: %d", sampleOffset);
+
+   return AudioBuffer::samplesToBytes(sampleOffset == -1 ? 0 : sampleOffset, info.numChannels, bitsPerSample);
+}
+
+int VorbisFileDataSource::getSize() const {
+   ASSERT(reader, "Trying to get size of an uninitialized VorbisFileDataSource");
+
+   return AudioBuffer::samplesToBytes(info.numSamples, info.numChannels, bitsPerSample);
+}
+
+int VorbisFileDataSource::getNumChannels() const {
+   ASSERT(reader, "Trying to get number of channels of an uninitialized VorbisFileDataSource");
+
+   return info.numChannels;
+}
+
+int VorbisFileDataSource::getBitsPerSample() const {
+   ASSERT(reader, "Trying to get bits per sample of an uninitialized VorbisFileDataSource");
+
+   return bitsPerSample;
+}
+
+int VorbisFileDataSource::getFrequency() const {
+   ASSERT(reader, "Trying to get frequency of an uninitialized VorbisFileDataSource");
+
+   return info.sampleRate;
+}
+
+UPtr<StreamDataSource> loadStreamDataSource(const std::string &fileName) {
+   UPtr<StreamDataSource> dataSource;
+   AudioFileType fileType = determineFileType(fileName);
+
+   switch (fileType) {
+      case AudioFileType::kUnknown:
+         dataSource = nullptr;
+         break;
+      case AudioFileType::kWav:
+         {
+            UPtr<WavFileDataSource> wavDataSource(new WavFileDataSource(fileName));
+            if (wavDataSource->initialize()) {
+               dataSource = std::move(wavDataSource);
+            }
+         }
+         break;
+      case AudioFileType::kOggVorbis:
+         {
+            UPtr<VorbisFileDataSource> vorbisDataSource(new VorbisFileDataSource(fileName));
+            if (vorbisDataSource->initialize()) {
+               dataSource = std::move(vorbisDataSource);
+            }
+         }
+         break;
+   }
+
+   return dataSource;
 }
 
 // Buffer loading
@@ -498,11 +639,9 @@ SPtr<Sound> AudioLoader::loadSound(AudioSystem &audioSystem, const std::string &
 }
 
 SPtr<Stream> AudioLoader::loadStream(AudioSystem &audioSystem, const std::string &fileName) {
-   UPtr<StreamDataSource> dataSource;
-   UPtr<WavFileDataSource> wavDataSource(new WavFileDataSource(fileName));
-   if (wavDataSource->initialize()) {
-      dataSource = std::move(wavDataSource);
-   } else {
+   UPtr<StreamDataSource> dataSource = loadStreamDataSource(fileName);
+   if (!dataSource) {
+      // Failed to load, use empty stream data source
       LOG_WARNING("Unable to load stream from file \"" << fileName << "\", reverting to default (nothing)");
       dataSource = UPtr<NullDataSource>(new NullDataSource);
    }
