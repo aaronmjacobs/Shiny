@@ -1,4 +1,4 @@
-#include "Shiny/Log.h"
+ #include "Shiny/Log.h"
 #include "Shiny/ShinyAssert.h"
 
 #include "Shiny/Audio/AudioBuffer.h"
@@ -9,145 +9,47 @@ namespace Shiny {
 
 namespace {
 
-const int kNumBuffers = 2;
+const int kNoTarget = -1;
 
 } // namespace
    
 Stream::Stream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource)
-   : Sound(source), dataSource(std::move(dataSource)), initialized(false), looping(false), allowedToStop(false) {
-   ASSERT(source->getNumBuffersQueued() == 0 && source->getNumBuffersProcessed() == 0,
-          "Trying to create stream with audio source that already has buffers");
+   : Sound(source), dataSource(std::move(dataSource)), targetPlayOffset(kNoTarget), looping(false) {
+   ASSERT(source->getNumBuffersQueued() > 0 || source->getNumBuffersProcessed() > 0,
+          "Trying to create stream with audio source that has no buffers");
 }
 
 Stream::~Stream() {
 }
 
-void Stream::fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {
+bool Stream::fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {
+   bool dataRead = false;
+
    for (const SPtr<AudioBuffer> &buffer : buffers) {
-      if (!dataSource->fill(buffer.get(), looping)) {
-         // No more data to read
-         allowedToStop = true;
+      bool readSuccess = dataSource->fill(buffer.get());
+      if (!readSuccess && looping) {
+         if (!dataSource->seekTo(0)) {
+            LOG_WARNING("Unable to rewind stream data source");
+         }
+         readSuccess = dataSource->fill(buffer.get());
       }
+
+      dataRead = dataRead || readSuccess;
    }
+
+   return dataRead;
 }
 
-void Stream::initialize(const AudioSystem &audioSystem) {
-   ASSERT(!initialized, "Trying to initialize already-initialized stream");
+void Stream::setOffsetInBytes(int byteOffset, bool now) {
+   ASSERT(byteOffset >= 0 && byteOffset < dataSource->getSize(), "Invalid byte offset: %d", byteOffset);
 
-   if (!dataSource->seekTo(0)) {
-      LOG_WARNING("Unable to rewind stream data source during initialization");
-   }
-
-   std::vector<SPtr<AudioBuffer>> buffers(kNumBuffers);
-   for (SPtr<AudioBuffer> &buffer : buffers) {
-      buffer = audioSystem.generateBuffer();
-   }
-
-   fillBuffers(buffers);
-   source->queueBuffers(buffers);
-
-   initialized = true;
-}
-
-void Stream::tick(const float dt) {
-   ASSERT(initialized, "Trying to tick uninitialized stream");
-
-   Sound::tick(dt);
-
-   int numProcessed = source->getNumBuffersProcessed();
-   if (numProcessed == 0) {
+   if (!now) {
+      targetPlayOffset = byteOffset;
       return;
    }
 
-   std::vector<SPtr<AudioBuffer>> buffers(source->unqueueBuffers(numProcessed));
-
-   fillBuffers(buffers);
-   source->queueBuffers(buffers);
-
-   if (!allowedToStop && source->getState() == AudioSource::State::kStopped) {
-      // This is bat country!
-      play();
-   }
-}
-
-void Stream::play() {
-   ASSERT(initialized, "Trying to play uninitialized stream");
-
-   AudioSource::State state = source->getState();
-   if (state == AudioSource::State::kStopped || state == AudioSource::State::kPlaying) {
-      rewind();
-   }
-
-   Sound::play();
-   allowedToStop = false;
-}
-
-void Stream::stop() {
-   ASSERT(initialized, "Trying to stop uninitialized stream");
-
-   Sound::stop();
-   setOffsetInBytes(0);
-   allowedToStop = true;
-}
-
-void Stream::rewind() {
-   ASSERT(initialized, "Trying to rewind uninitialized stream");
-
-   stop();
-   Sound::rewind();
-}
-
-float Stream::getOffsetInSeconds() const {
-   ASSERT(initialized, "Trying to get second offset of uninitialized stream");
-
-   return AudioBuffer::samplesToSeconds(getOffsetInSamples(), dataSource->getFrequency());
-}
-
-void Stream::setOffsetInSeconds(float secondOffset) {
-   ASSERT(initialized, "Trying to set second offset of uninitialized stream");
-
-   setOffsetInSamples(AudioBuffer::secondsToSamples(secondOffset, dataSource->getFrequency()));
-}
-
-int Stream::getOffsetInSamples() const {
-   ASSERT(initialized, "Trying to get sample offset of uninitialized stream");
-
-   return AudioBuffer::bytesToSamples(getOffsetInBytes(), dataSource->getNumChannels(), dataSource->getBitsPerSample());
-}
-
-void Stream::setOffsetInSamples(int sampleOffset) {
-   ASSERT(initialized, "Trying to set sample offset of uninitialized stream");
-
-   setOffsetInBytes(AudioBuffer::samplesToBytes(sampleOffset,
-                                                dataSource->getNumChannels(), dataSource->getBitsPerSample()));
-}
-
-int Stream::getOffsetInBytes() const {
-   ASSERT(initialized, "Trying to get byte offset of uninitialized stream");
-
-   const std::list<SPtr<AudioBuffer>> &queuedBuffers = source->getBufferQueue();
-   int activeSize = 0;
-   for (const SPtr<AudioBuffer> &buffer : queuedBuffers) {
-      activeSize += buffer->getSize();
-   }
-
-   int offset = (dataSource->getOffset() - activeSize) + Sound::getOffsetInBytes();
-   if (offset < 0) {
-      // Necessary due to looping (data in buffers, but data source just rewound)
-      offset += dataSource->getSize();
-   }
-
-   return offset;
-}
-
-void Stream::setOffsetInBytes(int byteOffset) {
-   ASSERT(initialized, "Trying to set byte offset of uninitialized stream");
-   ASSERT(byteOffset >= 0 && byteOffset < dataSource->getSize(), "Invalid byte offset: %d", byteOffset);
-
-   AudioSource::State state = source->getState();
-
    // Put into the 'stopped' state to force all buffers to become 'processed'
-   if (state == AudioSource::State::kInitial) {
+   if (source->getState() == AudioSource::State::kInitial) {
       Sound::play();
    }
    Sound::stop();
@@ -159,36 +61,107 @@ void Stream::setOffsetInBytes(int byteOffset) {
 
    fillBuffers(buffers);
    source->queueBuffers(buffers);
+}
 
-   if (state == AudioSource::State::kStopped && byteOffset == 0) {
+void Stream::tick(const float dt) {
+   Sound::tick(dt);
+
+   int numProcessed = source->getNumBuffersProcessed();
+   if (numProcessed == 0) {
       return;
    }
-   Sound::rewind();
-   if (state == AudioSource::State::kInitial) {
-      return;
+
+   std::vector<SPtr<AudioBuffer>> buffers(source->unqueueBuffers(numProcessed));
+   bool dataRead = fillBuffers(buffers);
+   source->queueBuffers(buffers);
+
+   // The only time the source should ever be in the 'stopped' state is if OpenAL is starved for data
+   // (the Stream 'stop' function actually puts the source in the 'initial' state)
+   // If OpenAL stopped due to data starvation, but we provided more data, start playing again
+   if (dataRead && source->getState() == AudioSource::State::kStopped) {
+      // This is bat country!
+      Sound::play();
+   }
+}
+
+void Stream::play() {
+   if (targetPlayOffset != kNoTarget || !isPaused()) {
+      setOffsetInBytes(targetPlayOffset == kNoTarget ? 0 : targetPlayOffset, true);
    }
    Sound::play();
-   if (state == AudioSource::State::kPlaying) {
-      return;
+
+   targetPlayOffset = kNoTarget;
+}
+
+void Stream::stop() {
+   rewind();
+}
+
+void Stream::rewind() {
+   Sound::rewind();
+
+   targetPlayOffset = kNoTarget;
+}
+
+float Stream::getOffsetInSeconds() const {
+   return AudioBuffer::samplesToSeconds(getOffsetInSamples(), dataSource->getFrequency());
+}
+
+void Stream::setOffsetInSeconds(float secondOffset) {
+   setOffsetInSamples(AudioBuffer::secondsToSamples(secondOffset, dataSource->getFrequency()));
+}
+
+int Stream::getOffsetInSamples() const {
+   return AudioBuffer::bytesToSamples(getOffsetInBytes(), dataSource->getNumChannels(), dataSource->getBitsPerSample());
+}
+
+void Stream::setOffsetInSamples(int sampleOffset) {
+   setOffsetInBytes(AudioBuffer::samplesToBytes(sampleOffset,
+                                                dataSource->getNumChannels(), dataSource->getBitsPerSample()));
+}
+
+int Stream::getOffsetInBytes() const {
+   if (source->getState() == AudioSource::State::kInitial) {
+      return 0;
    }
-   Sound::pause();
+
+   const std::list<SPtr<AudioBuffer>> &queuedBuffers = source->getBufferQueue();
+   int activeSize = 0;
+   for (const SPtr<AudioBuffer> &buffer : queuedBuffers) {
+      activeSize += buffer->getSize();
+   }
+
+   int offset = (dataSource->getOffset() - activeSize) + Sound::getOffsetInBytes();
+   // Offset can be less than zero when looping (due to data source seeking to beginnig while stream is playing)
+   if (offset < 0) {
+      int dataSize = dataSource->getSize();
+      ASSERT(dataSize != 0, "Data size is zero, but offset is not: %d", offset);
+
+      int numDataSteps = 1 + ((-offset - 1) / dataSize);
+      offset += dataSize * numDataSteps;
+   }
+
+   return offset;
+}
+
+void Stream::setOffsetInBytes(int byteOffset) {
+   bool playing = isPlaying();
+   setOffsetInBytes(byteOffset, playing);
+
+   if (playing) {
+      Sound::play();
+   }
 }
 
 float Stream::getSizeInSeconds() const {
-   ASSERT(initialized, "Trying to get size in seconds of uninitialized stream");
-
    return AudioBuffer::samplesToSeconds(getSizeInSamples(), dataSource->getFrequency());
 }
 
 int Stream::getSizeInSamples() const {
-   ASSERT(initialized, "Trying to get size in samples of uninitialized stream");
-
    return AudioBuffer::bytesToSamples(getSizeInBytes(), dataSource->getNumChannels(), dataSource->getBitsPerSample());
 }
 
 int Stream::getSizeInBytes() const {
-   ASSERT(initialized, "Trying to get size in bytes of uninitialized stream");
-
    return dataSource->getSize();
 }
 

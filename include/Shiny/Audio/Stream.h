@@ -15,40 +15,39 @@ class SHINYAPI StreamDataSource {
    public:
       /*!
        * Fills the buffer with audio data. If no more data is available, sets the buffer data to be empty. Returns true
-       * if buffer is able to be filled entirely, false otherwise.
+       * if more than zero bytes are placed in the buffer, false otherwise.
        */
-      virtual bool fill(AudioBuffer *buffer, bool circular) = 0;
+      virtual bool fill(AudioBuffer *buffer) = 0;
 
       virtual bool seekTo(int offset) = 0;
 
-      virtual int getOffset() = 0;
+      virtual int getOffset() const = 0;
 
-      virtual int getSize() = 0;
+      virtual int getSize() const = 0;
 
-      virtual int getNumChannels() = 0;
+      virtual int getNumChannels() const = 0;
 
-      virtual int getBitsPerSample() = 0;
+      virtual int getBitsPerSample() const = 0;
 
-      virtual int getFrequency() = 0;
+      virtual int getFrequency() const = 0;
    };
 
 class SHINYAPI Stream : public Sound {
 protected:
    UPtr<StreamDataSource> dataSource;
-   bool initialized;
+   int targetPlayOffset;
    bool looping;
-   bool allowedToStop;
 
    Stream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource);
 
-   void fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers);
+   bool fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers);
+
+   void setOffsetInBytes(int byteOffset, bool now);
 
 public:
    friend SPtr<Stream> AudioSystem::generateStream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource);
 
    virtual ~Stream() override;
-
-   void initialize(const AudioSystem &audioSystem);
 
    virtual void tick(const float dt) override;
 
