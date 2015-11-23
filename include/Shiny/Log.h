@@ -44,30 +44,14 @@ std::string center(std::string input, int width) {
    return std::string((width - input.length()) / 2, ' ') + input + std::string((width - input.length() + 1) / 2, ' ');
 }
 
-// Format time to a string (mm-dd-yyyy hh:mm:ss)
+// Format time to a string (hh:mm:ss)
 std::string formatTime(struct tm *tm) {
    std::stringstream ss;
 
    ss << std::setfill('0')
-      /*<< std::setw(2) << tm->tm_mon + 1 << '-'
-      << std::setw(2) << tm->tm_mday << '-'
-      << std::setw(4) << tm->tm_year + 1900 << ' '*/
       << std::setw(2) << tm->tm_hour << ':'
       << std::setw(2) << tm->tm_min << ':'
       << std::setw(2) << tm->tm_sec;
-
-   return ss.str();
-}
-
-// Format time to a string (mm-dd-yyyy-hh)
-std::string formatTimeForFilename(struct tm *tm) {
-   std::stringstream ss;
-
-   ss << std::setfill('0')
-   << std::setw(2) << tm->tm_mon + 1 << '-'
-   << std::setw(2) << tm->tm_mday << '-'
-   << std::setw(4) << tm->tm_year + 1900 << '-'
-   << std::setw(2) << tm->tm_hour;
 
    return ss.str();
 }
@@ -76,7 +60,7 @@ std::string formatTimeForFilename(struct tm *tm) {
 #define SHINY_FILENAME(_shiny_path_) (strrchr(_shiny_path_, '/') ? strrchr(_shiny_path_, '/') + 1 :\
                                      (strrchr(_shiny_path_, '\\') ? strrchr(_shiny_path_, '\\') + 1 : _shiny_path_))
 
-// Text formatting policy (console, file, etc.)
+// Text formatting policy
 class text_formating_policy : public templog::formating_policy_base<text_formating_policy> {
 public:
    template< class WritePolicy_, int Sev_, int Aud_, class WriteToken_, class ParamList_ >
@@ -88,11 +72,11 @@ public:
       write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
       write_obj<WritePolicy_>(token, "] <");
       write_obj<WritePolicy_>(token, formatTime(tm));
-      write_obj<WritePolicy_>(token, "> (");
+      write_obj<WritePolicy_>(token, "> ");
       write_obj<WritePolicy_>(token, SHINY_FILENAME(TEMPLOG_SOURCE_FILE));
-      write_obj<WritePolicy_>(token, ": ");
+      write_obj<WritePolicy_>(token, "(");
       write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_LINE);
-      write_obj<WritePolicy_>(token, ") ");
+      write_obj<WritePolicy_>(token, "): ");
       write_params<WritePolicy_>(token, parameters);
    }
 };
@@ -103,25 +87,6 @@ public:
    template< class WritePolicy_, int Sev_, int Aud_, class WriteToken_, class ParamList_ >
    static void write(WriteToken_& token, TEMPLOG_SOURCE_SIGN_IGNORE, const ParamList_& parameters) {
       write_params<WritePolicy_>(token, parameters);
-   }
-};
-
-// File writing policy
-class file_write_policy : public templog::non_incremental_write_policy_base<file_write_policy,true> {
-public:
-   template< int Sev_, int Aud_ >
-   struct writes { enum { result = true }; };
-
-   static bool is_writing(int /*sev*/, int /*aud*/){return true;}
-
-   static void write_str(const std::string& str) {
-      auto t = std::time(nullptr);
-      auto tm = std::localtime(&t);
-
-      std::ofstream out(formatTimeForFilename(tm) + ".log", std::ios_base::app);
-      if (out) {
-         out << str;
-      }
    }
 };
 
@@ -149,23 +114,17 @@ public:
 };
 
 // Prevent text logging in release builds
-#define CERR_SEV_THRESHOLD templog::sev_fatal + 1
-#define FILE_SEV_THRESHOLD templog::sev_fatal + 1
+#define SHINY_CERR_SEV_THRESHOLD templog::sev_fatal + 1
 
 // Prevent messages boxes lower than error in release builds
-#define MSG_BOX_SEV_THRESHOLD templog::sev_error
+#define SHINY_MSG_BOX_SEV_THRESHOLD templog::sev_error
 
 #if !defined(NDEBUG)
-#  undef CERR_SEV_THRESHOLD
-#  define CERR_SEV_THRESHOLD templog::sev_debug
+#  undef SHINY_CERR_SEV_THRESHOLD
+#  define SHINY_CERR_SEV_THRESHOLD templog::sev_debug
 
-#  undef MSG_BOX_SEV_THRESHOLD
-#  define MSG_BOX_SEV_THRESHOLD templog::sev_debug
-
-#  if defined(SHINY_LOG_TO_FILE)
-#     undef FILE_SEV_THRESHOLD
-#     define FILE_SEV_THRESHOLD templog::sev_info
-#  endif // defined(SHINY_LOG_TO_FILE)
+#  undef SHINY_MSG_BOX_SEV_THRESHOLD
+#  define SHINY_MSG_BOX_SEV_THRESHOLD templog::sev_debug
 #endif // !defined(NDEBUG)
 
 // Allow internal logging to be disabled
@@ -188,29 +147,16 @@ enum LogAudience {
 #endif // defined(SHINY_BUILDING)
 
 typedef templog::logger<templog::non_filtering_logger<text_formating_policy, templog::std_write_policy>
-                      , CERR_SEV_THRESHOLD
+                      , SHINY_CERR_SEV_THRESHOLD
                       , templog::audience_list<SHINY_LOGGER_AUDIENCE_LIST>>
                       cerr_logger;
 
-typedef templog::logger<templog::non_filtering_logger<text_formating_policy, file_write_policy>
-                      , FILE_SEV_THRESHOLD
-                      , templog::audience_list<SHINY_LOGGER_AUDIENCE_LIST>>
-                      file_logger;
-
 typedef templog::logger<templog::non_filtering_logger<boxer_formating_policy, boxer_write_policy>
-                      , MSG_BOX_SEV_THRESHOLD
+                      , SHINY_MSG_BOX_SEV_THRESHOLD
                       , templog::audience_list<kUser>> // Only show message boxes when the user should be notified
                       boxer_logger;
 
 } // namespace
-
-// Send the log to each of our loggers (and let them do the filtering)
-#define LOG(_log_message_, _log_title_, _log_severity_, _log_audience_) \
-do { \
-   TEMPLOG_LOG(cerr_logger, _log_severity_, _log_audience_) << _log_message_; \
-   TEMPLOG_LOG(file_logger, _log_severity_, _log_audience_) << _log_message_; \
-   TEMPLOG_LOG(boxer_logger, _log_severity_, _log_audience_) << _log_title_ << kBoxerMessageSplit << _log_message_; \
-} while (0)
 
 // Simplify logging calls
 
@@ -221,33 +167,43 @@ do { \
 // Error   : For logging errors that do not prevent the program from continuing
 // Fatal   : For logging fatal errors that prevent the program from continuing
 
-#define LOG_DEBUG(_log_message_) LOG(_log_message_, kSevDebug, templog::sev_debug, SHINY_LOG_AUDIENCE)
-#define LOG_INFO(_log_message_) LOG(_log_message_, kSevInfo, templog::sev_info, SHINY_LOG_AUDIENCE)
-#define LOG_MESSAGE(_log_message_) LOG(_log_message_, kSevMessage, templog::sev_message, SHINY_LOG_AUDIENCE)
-#define LOG_WARNING(_log_message_) LOG(_log_message_, kSevWarning, templog::sev_warning, SHINY_LOG_AUDIENCE)
-#define LOG_ERROR(_log_message_) LOG(_log_message_, kSevError, templog::sev_error, SHINY_LOG_AUDIENCE)
+#define SHINY_LOG(_log_message_, _log_title_, _log_severity_) \
+do { \
+   TEMPLOG_LOG(cerr_logger, _log_severity_, SHINY_LOG_AUDIENCE) << _log_message_; \
+} while (0)
+
+#define LOG_DEBUG(_log_message_) SHINY_LOG(_log_message_, kSevDebug, templog::sev_debug)
+#define LOG_INFO(_log_message_) SHINY_LOG(_log_message_, kSevInfo, templog::sev_info)
+#define LOG_MESSAGE(_log_message_) SHINY_LOG(_log_message_, kSevMessage, templog::sev_message)
+#define LOG_WARNING(_log_message_) SHINY_LOG(_log_message_, kSevWarning, templog::sev_warning)
+#define LOG_ERROR(_log_message_) SHINY_LOG(_log_message_, kSevError, templog::sev_error)
 
 // Don't use message boxes or FATAL internally
 #if !defined(SHINY_BUILDING)
 
 // Easy calls to create message boxes
 
-#  define LOG_DEBUG_MSG_BOX(_log_message_) LOG(_log_message_, kSevDebug, templog::sev_debug, kUser)
-#  define LOG_INFO_MSG_BOX(_log_message_) LOG(_log_message_, kSevInfo, templog::sev_info, kUser)
-#  define LOG_MESSAGE_MSG_BOX(_log_message_) LOG(_log_message_, kSevMessage, templog::sev_message, kUser)
-#  define LOG_WARNING_MSG_BOX(_log_message_) LOG(_log_message_, kSevWarning, templog::sev_warning, kUser)
-#  define LOG_ERROR_MSG_BOX(_log_message_) LOG(_log_message_, kSevError, templog::sev_error, kUser)
+#define SHINY_LOG_MSG_BOX(_log_message_, _log_title_, _log_severity_) \
+do { \
+   TEMPLOG_LOG(boxer_logger, _log_severity_, kUser) << _log_title_ << kBoxerMessageSplit << _log_message_; \
+} while (0)
+
+#  define LOG_DEBUG_MSG_BOX(_log_message_) SHINY_LOG_MSG_BOX(_log_message_, kSevDebug, templog::sev_debug)
+#  define LOG_INFO_MSG_BOX(_log_message_) SHINY_LOG_MSG_BOX(_log_message_, kSevInfo, templog::sev_info)
+#  define LOG_MESSAGE_MSG_BOX(_log_message_) SHINY_LOG_MSG_BOX(_log_message_, kSevMessage, templog::sev_message)
+#  define LOG_WARNING_MSG_BOX(_log_message_) SHINY_LOG_MSG_BOX(_log_message_, kSevWarning, templog::sev_warning)
+#  define LOG_ERROR_MSG_BOX(_log_message_) SHINY_LOG_MSG_BOX(_log_message_, kSevError, templog::sev_error)
 
 // Fatal errors (kill the program, even in release)
 
 #  define LOG_FATAL(_log_message_) \
 do { \
-   LOG(_log_message_, kSevFatal, templog::sev_fatal, SHINY_LOG_AUDIENCE); \
+   SHINY_LOG(_log_message_, kSevFatal, templog::sev_fatal); \
    abort(); \
 } while(0)
 #  define LOG_FATAL_MSG_BOX(_log_message_) \
 do { \
-   LOG(_log_message_, kSevFatal, templog::sev_fatal, kUser); \
+   SHINY_LOG_MSG_BOX(_log_message_, kSevFatal, templog::sev_fatal); \
    abort(); \
 } while(0)
 

@@ -45,7 +45,6 @@ set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # Options
 option(SHINY_LOG_INTERNAL "Enable Shiny internal logging" ON)
-option(SHINY_LOG_TO_FILE "Enable file logging" OFF)
 
 # Generated content
 configure_file (
