@@ -165,7 +165,7 @@ public:
    }
 
    virtual void setOffsetInSamples(int sampleOffset) {
-      source->setOffsetInSeconds(sampleOffset);
+      source->setOffsetInSamples(sampleOffset);
    }
 
    virtual int getOffsetInBytes() const {

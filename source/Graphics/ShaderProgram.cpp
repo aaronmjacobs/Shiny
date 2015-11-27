@@ -164,7 +164,7 @@ void Uniform::setValue(const glm::mat4 &value) {
 
 ShaderProgram::ShaderProgram()
    : id(glCreateProgram()) {
-   for (int i = 0; i < ShaderAttributes::kNames.size(); ++i) {
+   for (size_t i = 0; i < ShaderAttributes::kNames.size(); ++i) {
       bindAttribute(id, i);
    }
 }

@@ -15,13 +15,13 @@ Keyboard::~Keyboard() {
 }
 
 void Keyboard::poll() {
-   for (int i = 0; i < keys.size(); ++i) {
+   for (size_t i = 0; i < keys.size(); ++i) {
       keys[i] = glfwGetKey(window, i) == GLFW_PRESS;
    }
 }
 
 bool Keyboard::pressed(Key::Code key) const {
-   ASSERT(key >= 0 && key < keys.size(), "Invalid key code: %d", key);
+   ASSERT(key >= 0 && static_cast<size_t>(key) < keys.size(), "Invalid key code: %d", key);
 
    return keys[key];
 }

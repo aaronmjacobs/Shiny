@@ -45,13 +45,13 @@ std::string center(std::string input, int width) {
 }
 
 // Format time to a string (hh:mm:ss)
-std::string formatTime(struct tm *tm) {
+std::string formatTime(const tm &tm) {
    std::stringstream ss;
 
    ss << std::setfill('0')
-      << std::setw(2) << tm->tm_hour << ':'
-      << std::setw(2) << tm->tm_min << ':'
-      << std::setw(2) << tm->tm_sec;
+      << std::setw(2) << tm.tm_hour << ':'
+      << std::setw(2) << tm.tm_min << ':'
+      << std::setw(2) << tm.tm_sec;
 
    return ss.str();
 }
@@ -65,8 +65,9 @@ class text_formating_policy : public templog::formating_policy_base<text_formati
 public:
    template< class WritePolicy_, int Sev_, int Aud_, class WriteToken_, class ParamList_ >
    static void write(WriteToken_& token, TEMPLOG_SOURCE_SIGN, const ParamList_& parameters) {
-      auto t = std::time(nullptr);
-      auto tm = std::localtime(&t);
+      time_t now(std::time(nullptr));
+      tm tm;
+      localtime_s(&tm, &now);
 
       write_obj<WritePolicy_>(token, "[");
       write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));

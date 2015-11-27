@@ -25,7 +25,7 @@ bool readTextFile(const std::string &fileName, std::string &data) {
    return true;
 }
 
-UPtr<unsigned char[]> readBinaryFile(const std::string &fileName,  std::streamsize *numBytes) {
+UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, size_t *numBytes) {
    ASSERT(!fileName.empty(), "Trying to read from empty file name");
    std::ifstream in(fileName, std::ifstream::binary);
    if (!in) {
@@ -35,13 +35,14 @@ UPtr<unsigned char[]> readBinaryFile(const std::string &fileName,  std::streamsi
    std::streampos start = in.tellg();
    in.seekg(0, std::ios_base::end);
    std::streamoff size = in.tellg() - start;
+   ASSERT(size >= 0, "Invalid file size");
    in.seekg(0, std::ios_base::beg);
 
-   UPtr<unsigned char[]> data(new unsigned char[size]);
+   UPtr<unsigned char[]> data(new unsigned char[static_cast<size_t>(size)]);
    in.read(reinterpret_cast<char*>(data.get()), size);
 
    if (numBytes) {
-      *numBytes = size;
+      *numBytes = static_cast<size_t>(size);
    }
 
    return std::move(data);
@@ -58,7 +59,7 @@ bool writeTextFile(const std::string &fileName, const std::string &data) {
    return true;
 }
 
-bool writeBinaryFile(const std::string &fileName, unsigned char *data, std::streamsize numBytes) {
+bool writeBinaryFile(const std::string &fileName, unsigned char *data, size_t numBytes) {
    ASSERT(!fileName.empty(), "Trying to write to empty file name");
    std::ofstream out(fileName, std::ofstream::binary);
    if (!out) {

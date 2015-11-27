@@ -27,7 +27,7 @@ SHINYAPI bool readTextFile(const std::string &fileName, std::string &data);
 /**
  * Reads the entire contents of the binary file with the given name, storing the number of bytes in numBytes if set
  */
-SHINYAPI UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, std::streamsize *numBytes = nullptr);
+SHINYAPI UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, size_t *numBytes = nullptr);
 
 /**
  * Writes the contents of the given text to the file with the given name, returning true on success
@@ -37,7 +37,7 @@ SHINYAPI bool writeTextFile(const std::string &fileName, const std::string &data
 /**
  * Writes the contents of the given array to the file with the given name, returning true on success
  */
-SHINYAPI bool writeBinaryFile(const std::string &fileName, unsigned char *data, std::streamsize numBytes);
+SHINYAPI bool writeBinaryFile(const std::string &fileName, unsigned char *data, size_t numBytes);
 
 /**
  * Gets the absolute path of a resource stored in the app data folder given a relative path and application name,

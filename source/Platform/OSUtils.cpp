@@ -161,7 +161,7 @@ bool setWorkingDirectory(const std::string &dir) {
 }
 
 bool createDirectory(const std::string &dir) {
-   return CreateDirectory(dir.c_str(), nullptr);
+   return CreateDirectory(dir.c_str(), nullptr) != 0;
 }
 #endif // _WIN32
 

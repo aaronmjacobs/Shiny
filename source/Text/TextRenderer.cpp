@@ -64,10 +64,10 @@ SPtr<Texture> TextRenderer::renderToTexture(const char *text, int *textureWidth,
    float width, height;
    std::vector<GlyphQuad> quads(atlas->process(text, &width, &height));
    if (textureWidth) {
-      *textureWidth = glm::ceil(width);
+      *textureWidth = static_cast<int>(glm::ceil(width));
    }
    if (textureHeight) {
-      *textureHeight = glm::ceil(height);
+      *textureHeight = static_cast<int>(glm::ceil(height));
    }
 
    const char *uProjMatrix = "uProjMatrix";
@@ -77,7 +77,7 @@ SPtr<Texture> TextRenderer::renderToTexture(const char *text, int *textureWidth,
       model.getProgram()->setUniformValue(uProjMatrix, glm::ortho<float>(0.0f, width, height, 0.0f));
    }
 
-   framebuffer.init(glm::ceil(width), glm::ceil(height));
+   framebuffer.init(static_cast<int>(glm::ceil(width)), static_cast<int>(glm::ceil(height)));
    framebuffer.use();
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
    glClear(GL_COLOR_BUFFER_BIT);

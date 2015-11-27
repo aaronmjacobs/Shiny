@@ -160,7 +160,7 @@ Engine::Result Engine::startUp(int windowWidth, int windowHeight, const char *wi
 
    keyboard = std::make_shared<Keyboard>(window.get());
    mouse = std::make_shared<Mouse>(window.get());
-   for (int i = 0; i < controllers.size(); ++i) {
+   for (size_t i = 0; i < controllers.size(); ++i) {
       controllers[i] = std::make_shared<Controller>(window.get(), i);
    }
    pollInput();
@@ -201,8 +201,8 @@ void Engine::run() {
 
       accumulator += frameTime;
       while (accumulator >= dt) {
-         tick(dt);
-         runningTime += dt;
+         tick(static_cast<float>(dt));
+         runningTime += static_cast<float>(dt);
          accumulator -= dt;
       }
 
@@ -226,7 +226,7 @@ SPtr<const Mouse> Engine::getMouse() const {
 }
 
 SPtr<const Controller> Engine::getController(int which) const {
-   ASSERT(which >= 0 && which < controllers.size(), "Invalid controller number: %d", which);
+   ASSERT(which >= 0 && static_cast<size_t>(which) < controllers.size(), "Invalid controller number: %d", which);
    return controllers[which];
 }
 

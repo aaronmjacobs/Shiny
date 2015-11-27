@@ -41,7 +41,7 @@ bool Stream::fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {
 }
 
 void Stream::setOffsetInBytes(int byteOffset, bool now) {
-   ASSERT(byteOffset >= 0 && byteOffset < dataSource->getSize(), "Invalid byte offset: %d", byteOffset);
+   ASSERT(byteOffset >= 0 && static_cast<size_t>(byteOffset) < dataSource->getSize(), "Invalid byte offset: %d", byteOffset);
 
    if (!now) {
       targetPlayOffset = byteOffset;

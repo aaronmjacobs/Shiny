@@ -19,11 +19,11 @@ class SHINYAPI StreamDataSource {
        */
       virtual bool fill(AudioBuffer *buffer) = 0;
 
-      virtual bool seekTo(int offset) = 0;
+      virtual bool seekTo(size_t offset) = 0;
 
-      virtual int getOffset() const = 0;
+      virtual size_t getOffset() const = 0;
 
-      virtual int getSize() const = 0;
+      virtual size_t getSize() const = 0;
 
       virtual int getNumChannels() const = 0;
 

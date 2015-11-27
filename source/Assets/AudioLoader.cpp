@@ -10,7 +10,14 @@
 
 #include "Shiny/Platform/IOUtils.h"
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#  pragma warning(push)
+#  pragma warning(disable:4996) // suppress warnings about fopen()
+#  include <stb/stb_vorbis.c>
+#  pragma warning(pop)
+#else
 #include <stb/stb_vorbis.c>
+#endif
 
 #include <algorithm>
 #include <array>
@@ -205,11 +212,11 @@ bool WavReader::readHeader(WavInfo *wavInfo) {
 class WavMemReader : public WavReader {
 private:
    const unsigned char *memory;
-   const long memSize;
-   long offset;
+   const size_t memSize;
+   size_t offset;
 
 public:
-   WavMemReader(const unsigned char *memory, const long memSize);
+   WavMemReader(const unsigned char *memory, const size_t memSize);
 
    virtual size_t read(void *dest, size_t numBytes) override;
 
@@ -222,7 +229,7 @@ public:
    }
 };
 
-WavMemReader::WavMemReader(const unsigned char *memory, const long memSize)
+WavMemReader::WavMemReader(const unsigned char *memory, const size_t memSize)
    : memory(memory), memSize(memSize), offset(0) {
 }
 
@@ -275,8 +282,9 @@ WavFileReader::WavFileReader(const std::string &fileName)
 size_t WavFileReader::read(void *dest, size_t numBytes) {
    file.read(reinterpret_cast<char*>(dest), numBytes);
    std::streamsize bytesRead = file.gcount();
+   ASSERT(bytesRead >= 0, "Invalid number of bytes read");
 
-   return bytesRead;
+   return static_cast<size_t>(bytesRead);
 }
 
 bool WavFileReader::skip(size_t numBytes) {
@@ -302,11 +310,11 @@ class NullDataSource : public StreamDataSource {
 public:
    virtual bool fill(AudioBuffer *buffer) override { return false; }
 
-   virtual bool seekTo(int offset) override { return offset == 0; }
+   virtual bool seekTo(size_t offset) override { return offset == 0; }
 
-   virtual int getOffset() const override { return 0; }
+   virtual size_t getOffset() const override { return 0; }
 
-   virtual int getSize() const override { return 1; }
+   virtual size_t getSize() const override { return 1; }
 
    virtual int getNumChannels() const override { return 1; }
 
@@ -331,11 +339,11 @@ public:
 
    virtual bool fill(AudioBuffer *buffer) override;
 
-   virtual bool seekTo(int offset) override;
+   virtual bool seekTo(size_t offset) override;
 
-   virtual int getOffset() const override;
+   virtual size_t getOffset() const override;
 
-   virtual int getSize() const override;
+   virtual size_t getSize() const override;
 
    virtual int getNumChannels() const override;
 
@@ -375,14 +383,14 @@ bool WavFileDataSource::fill(AudioBuffer *buffer) {
    return bytesRead > 0;
 }
 
-bool WavFileDataSource::seekTo(int offset) {
+bool WavFileDataSource::seekTo(size_t offset) {
    ASSERT(initialized, "Trying to seek to offset with an uninitialized WavFileDataSource");
 
    reader.reset();
-   return reader.skip(dataOffset + offset);
+   return reader.skip(static_cast<size_t>(dataOffset) + offset);
 }
 
-int WavFileDataSource::getOffset() const {
+size_t WavFileDataSource::getOffset() const {
    ASSERT(initialized, "Trying to get offset of an uninitialized WavFileDataSource");
 
    int readerPos = static_cast<int>(reader.getCurrentPos());
@@ -392,7 +400,7 @@ int WavFileDataSource::getOffset() const {
    return readerPos == -1 ? getSize() : readerPos - static_cast<int>(dataOffset);
 }
 
-int WavFileDataSource::getSize() const {
+size_t WavFileDataSource::getSize() const {
    ASSERT(initialized, "Trying to get size of an uninitialized WavFileDataSource");
 
    return static_cast<int>(info.dataChunkSize);
@@ -434,11 +442,11 @@ public:
 
    virtual bool fill(AudioBuffer *buffer) override;
 
-   virtual bool seekTo(int offset) override;
+   virtual bool seekTo(size_t offset) override;
 
-   virtual int getOffset() const override;
+   virtual size_t getOffset() const override;
 
-   virtual int getSize() const override;
+   virtual size_t getSize() const override;
 
    virtual int getNumChannels() const override;
 
@@ -484,14 +492,14 @@ bool VorbisFileDataSource::fill(AudioBuffer *buffer) {
    return bytesRead > 0;
 }
 
-bool VorbisFileDataSource::seekTo(int offset) {
+bool VorbisFileDataSource::seekTo(size_t offset) {
    ASSERT(reader, "Trying to seek to offset with an uninitialized VorbisFileDataSource");
 
    int sampleOffset = AudioBuffer::bytesToSamples(offset, info.numChannels, bitsPerSample);
-   return stb_vorbis_seek(reader.get(), sampleOffset);
+   return stb_vorbis_seek(reader.get(), sampleOffset) != 0;
 }
 
-int VorbisFileDataSource::getOffset() const {
+size_t VorbisFileDataSource::getOffset() const {
    ASSERT(reader, "Trying to get offset of an uninitialized VorbisFileDataSource");
 
    int sampleOffset = stb_vorbis_get_sample_offset(reader.get());
@@ -500,7 +508,7 @@ int VorbisFileDataSource::getOffset() const {
    return AudioBuffer::samplesToBytes(sampleOffset == -1 ? 0 : sampleOffset, info.numChannels, bitsPerSample);
 }
 
-int VorbisFileDataSource::getSize() const {
+size_t VorbisFileDataSource::getSize() const {
    ASSERT(reader, "Trying to get size of an uninitialized VorbisFileDataSource");
 
    return AudioBuffer::samplesToBytes(info.numSamples, info.numChannels, bitsPerSample);
@@ -555,7 +563,7 @@ UPtr<StreamDataSource> loadStreamDataSource(const std::string &fileName) {
 
 // Buffer loading
 
-SPtr<AudioBuffer> loadWavBuffer(const AudioSystem &audioSystem, const unsigned char *data, long numBytes) {
+SPtr<AudioBuffer> loadWavBuffer(const AudioSystem &audioSystem, const unsigned char *data, size_t numBytes) {
    WavMemReader reader(data, numBytes);
    WavInfo info;
    if (!reader.readHeader(&info)) {
@@ -576,7 +584,7 @@ UPtr<short[]> loadVorbisFromMemory(const unsigned char *data, long numBytes, Vor
    return UPtr<short[]>(audioData);
 }
 
-SPtr<AudioBuffer> loadVorbisBuffer(const AudioSystem &audioSystem, const unsigned char *data, long numBytes) {
+SPtr<AudioBuffer> loadVorbisBuffer(const AudioSystem &audioSystem, const unsigned char *data, size_t numBytes) {
    VorbisInfo info;
    UPtr<short[]> audioData(loadVorbisFromMemory(data, numBytes, &info));
    if (info.numSamples < 0) {
@@ -595,7 +603,7 @@ SPtr<AudioBuffer> loadBuffer(const AudioSystem &audioSystem, const std::string &
       return nullptr;
    }
 
-   long numBytes = 0;
+   size_t numBytes = 0;
    UPtr<unsigned char[]> fileData(IOUtils::readBinaryFile(fileName, &numBytes));
    if (!fileData) {
       return nullptr;
