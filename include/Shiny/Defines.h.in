@@ -2,7 +2,7 @@
 #define SHINY_DEFINES_H
 
 #cmakedefine SHINY_LOG_INTERNAL
-#cmakedefine SHINY_LOG_TO_FILE
+#cmakedefine SHINY_LOG_MSVC_STYLE
 
 #if defined(SHINY_DLL) && defined(SHINY_BUILD_SHARED_LIB)
    /**

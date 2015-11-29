@@ -69,6 +69,17 @@ public:
       tm tm;
       localtime_s(&tm, &now);
 
+#if defined(SHINY_LOG_MSVC_STYLE)
+      write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_FILE);
+      write_obj<WritePolicy_>(token, "(");
+      write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_LINE);
+      write_obj<WritePolicy_>(token, "): ");
+      write_obj<WritePolicy_>(token, "[");
+      write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
+      write_obj<WritePolicy_>(token, "] <");
+      write_obj<WritePolicy_>(token, formatTime(tm));
+      write_obj<WritePolicy_>(token, "> ");
+#else // defined(SHINY_LOG_MSVC_STYLE)
       write_obj<WritePolicy_>(token, "[");
       write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
       write_obj<WritePolicy_>(token, "] <");
@@ -78,6 +89,8 @@ public:
       write_obj<WritePolicy_>(token, "(");
       write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_LINE);
       write_obj<WritePolicy_>(token, "): ");
+#endif // defined(SHINY_LOG_MSVC_STYLE)
+
       write_params<WritePolicy_>(token, parameters);
    }
 };
