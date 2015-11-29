@@ -45,15 +45,30 @@ std::string center(std::string input, int width) {
 }
 
 // Format time to a string (hh:mm:ss)
-std::string formatTime(const tm &tm) {
+std::string formatTime(const tm &time) {
    std::stringstream ss;
 
    ss << std::setfill('0')
-      << std::setw(2) << tm.tm_hour << ':'
-      << std::setw(2) << tm.tm_min << ':'
-      << std::setw(2) << tm.tm_sec;
+      << std::setw(2) << time.tm_hour << ':'
+      << std::setw(2) << time.tm_min << ':'
+      << std::setw(2) << time.tm_sec;
 
    return ss.str();
+}
+
+tm getCurrentTime() {
+   time_t now(std::time(nullptr));
+   tm time;
+
+#if defined(_POSIX_VERSION)
+   localtime_r(&now, &time);
+#elif defined(_MSC_VER)
+   localtime_s(&time, &now);
+#else
+   time = *localtime(&now);
+#endif
+
+   return time;
 }
 
 // Extract file name from a path
@@ -65,10 +80,6 @@ class text_formating_policy : public templog::formating_policy_base<text_formati
 public:
    template< class WritePolicy_, int Sev_, int Aud_, class WriteToken_, class ParamList_ >
    static void write(WriteToken_& token, TEMPLOG_SOURCE_SIGN, const ParamList_& parameters) {
-      time_t now(std::time(nullptr));
-      tm tm;
-      localtime_s(&tm, &now);
-
 #if defined(SHINY_LOG_MSVC_STYLE)
       write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_FILE);
       write_obj<WritePolicy_>(token, "(");
@@ -77,13 +88,13 @@ public:
       write_obj<WritePolicy_>(token, "[");
       write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
       write_obj<WritePolicy_>(token, "] <");
-      write_obj<WritePolicy_>(token, formatTime(tm));
+      write_obj<WritePolicy_>(token, formatTime(getCurrentTime()));
       write_obj<WritePolicy_>(token, "> ");
 #else // defined(SHINY_LOG_MSVC_STYLE)
       write_obj<WritePolicy_>(token, "[");
       write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
       write_obj<WritePolicy_>(token, "] <");
-      write_obj<WritePolicy_>(token, formatTime(tm));
+      write_obj<WritePolicy_>(token, formatTime(getCurrentTime()));
       write_obj<WritePolicy_>(token, "> ");
       write_obj<WritePolicy_>(token, SHINY_FILENAME(TEMPLOG_SOURCE_FILE));
       write_obj<WritePolicy_>(token, "(");
