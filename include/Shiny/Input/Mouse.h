@@ -13,8 +13,8 @@ namespace Shiny {
 class SHINYAPI Mouse : public InputDevice {
 protected:
    GLFWwindow* const window;
-   double x, y;
-   bool left, middle, right;
+   double x, y, lastX, lastY;
+   bool left, middle, right, lastLeft, lastMiddle, lastRight;
 
 public:
    Mouse(GLFWwindow* const window);
@@ -31,16 +31,24 @@ public:
       return y;
    }
 
-   bool leftButton() const {
-      return left;
+   double xDiff() const {
+      return x - lastX;
    }
 
-   bool middleButton() const {
-      return middle;
+   double yDiff() const {
+      return y - lastY;
    }
 
-   bool rightButton() const {
-      return right;
+   bool leftButton(bool onlyNew = false) const {
+      return onlyNew ? left && !lastLeft : left;
+   }
+
+   bool middleButton(bool onlyNew = false) const {
+      return onlyNew ? middle && !lastMiddle : middle;
+   }
+
+   bool rightButton(bool onlyNew = false) const {
+      return onlyNew ? right && !lastRight : right;
    }
 };
 

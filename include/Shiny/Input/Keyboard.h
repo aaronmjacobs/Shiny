@@ -16,7 +16,7 @@ namespace Shiny {
 class SHINYAPI Keyboard : public InputDevice {
 protected:
    GLFWwindow* const window;
-   std::array<bool, Key::kLast + 1> keys;
+   std::array<bool, Key::kLast + 1> keys, lastKeys;
 
 public:
    Keyboard(GLFWwindow* const window);
@@ -25,7 +25,7 @@ public:
 
    virtual void poll() override;
 
-   bool pressed(Key::Code key) const;
+   bool pressed(Key::Code key, bool onlyNew = false) const;
 };
 
 } // namespace Shiny

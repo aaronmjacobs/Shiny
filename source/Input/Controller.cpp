@@ -63,10 +63,14 @@ bool buttonValue(const unsigned char *buttons, const int buttonCount, const int 
 } // namespace
 
 Controller::Controller(GLFWwindow* const window, const int controllerNum)
-   : window(window), controllerNum(controllerNum), map(ControllerType::none()), inputValues({ 0 }) {
+   : window(window), controllerNum(controllerNum), map(ControllerType::none()), inputValues({ 0 }),
+     lastInputValues({ 0 }), newButtonInputValues({ 0 }) {
    ASSERT(controllerNum >= GLFW_JOYSTICK_1 && controllerNum <= GLFW_JOYSTICK_LAST, "Invalid controller number");
 
-   updateMap();
+   // Set initial state
+   poll();
+   lastInputValues = inputValues;
+   newButtonInputValues = { 0 };
 }
 
 Controller::~Controller() {
@@ -133,8 +137,15 @@ void Controller::handleSpecialCases(const unsigned char *buttons, const float *a
    }
 }
 
-#define SHINY_ASSIGN_AXIS(name) inputValues.name = axisValue(axes, axisCount, map->name, map->deadzone)
-#define SHINY_ASSIGN_BUTTON(name) inputValues.name = buttonValue(buttons, buttonCount, map->name)
+#define SHINY_ASSIGN_AXIS(name) do {\
+inputValues.name = axisValue(axes, axisCount, map->name, map->deadzone);\
+newButtonInputValues.name = inputValues.name;\
+} while (false)
+
+#define SHINY_ASSIGN_BUTTON(name) do {\
+inputValues.name = buttonValue(buttons, buttonCount, map->name);\
+newButtonInputValues.name = inputValues.name && !lastInputValues.name;\
+} while (false)
 
 void Controller::poll() {
    updateMap();
@@ -143,9 +154,12 @@ void Controller::poll() {
    const unsigned char* buttons = glfwGetJoystickButtons(controllerNum, &buttonCount);
    const float* axes = glfwGetJoystickAxes(controllerNum, &axisCount);
 
+   lastInputValues = inputValues;
+
    // If there is no physical controller, set the default values
    if (!buttons || !axes || !map->name) {
       inputValues = { 0 };
+      newButtonInputValues = inputValues;
       return;
    }
 
@@ -189,8 +203,8 @@ bool Controller::connected() const {
    return glfwJoystickPresent(controllerNum) == GL_TRUE;
 }
 
-const ControllerValues& Controller::values() const {
-   return inputValues;
+const ControllerValues& Controller::values(bool onlyNewButtons) const {
+   return onlyNewButtons ? newButtonInputValues : inputValues;
 }
 
 } // namespace Shiny

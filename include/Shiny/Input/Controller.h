@@ -57,7 +57,7 @@ protected:
    GLFWwindow* const window;
    const int controllerNum;
    const ControllerMap *map;
-   ControllerValues inputValues;
+   ControllerValues inputValues, lastInputValues, newButtonInputValues;
 
    void updateMap();
 
@@ -72,7 +72,7 @@ public:
 
    bool connected() const;
 
-   const ControllerValues& values() const;
+   const ControllerValues& values(bool onlyNewButtons = false) const;
 };
 
 } // namespace Shiny
