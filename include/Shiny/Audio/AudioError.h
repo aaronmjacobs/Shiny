@@ -57,7 +57,7 @@ const char* alcErrorString(ALCenum error) {
 #else
 #define SHINY_CHECK_AL_ERROR(location) do{\
 ALenum alError = alGetError();\
-ASSERT(alError == AL_NO_ERROR, "OpenAL error while %s: %s", (location), alErrorString(alError));\
+ASSERT(alError == AL_NO_ERROR, "OpenAL error while %s: %s", (location), Shiny::alErrorString(alError));\
 }while(0)
 #endif
 
@@ -66,7 +66,7 @@ ASSERT(alError == AL_NO_ERROR, "OpenAL error while %s: %s", (location), alErrorS
 #else
 #define SHINY_CHECK_ALC_ERROR(device, location) do{\
 ALCenum alcError = alcGetError(device);\
-ASSERT(alcError == ALC_NO_ERROR, "OpenAL context error while %s: %s", (location), alcErrorString(alcError));\
+ASSERT(alcError == ALC_NO_ERROR, "OpenAL context error while %s: %s", (location), Shiny::alcErrorString(alcError));\
 }while(0)
 #endif
 
