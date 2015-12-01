@@ -1,13 +1,11 @@
 #ifndef SHINY_SHADER_H
 #define SHINY_SHADER_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 
-class SHINYAPI Shader {
+class Shader {
 protected:
    GLuint id;
    const GLenum type;

@@ -1,11 +1,9 @@
 #ifndef SHINY_INPUT_DEVICE_H
 #define SHINY_INPUT_DEVICE_H
 
-#include "Shiny/Defines.h"
-
 namespace Shiny {
 
-class SHINYAPI InputDevice {
+class InputDevice {
 public:
    InputDevice() {}
 

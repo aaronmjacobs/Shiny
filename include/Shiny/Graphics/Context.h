@@ -1,13 +1,11 @@
 #ifndef SHINY_CONTEXT_H
 #define SHINY_CONTEXT_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 
-class SHINYAPI Context {
+class Context {
 protected:
    static Context* currentContext;
 

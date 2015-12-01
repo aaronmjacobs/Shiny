@@ -3,6 +3,10 @@
 cmake_minimum_required(VERSION 3.1)
 project(Shiny)
 
+if(${BUILD_SHARED_LIBS})
+   message(SEND_ERROR "Shiny can not be used as a shared library due to its extensive use of the STL in its public API")
+endif(${BUILD_SHARED_LIBS})
+
 # Save state
 set(SHINY_BUILD_SHARED_LIB ${BUILD_SHARED_LIBS})
 set(SHINY_DEFINITIONS)
@@ -25,14 +29,6 @@ if(WIN32)
       -DNOMINMAX
    )
 endif(WIN32)
-
-# Information importing / exporting
-if(SHINY_BUILD_SHARED_LIB)
-   add_definitions(-DSHINY_BUILD_SHARED_LIB)
-   list(APPEND SHINY_DEFINITIONS
-      -DSHINY_DLL
-   )
-endif(SHINY_BUILD_SHARED_LIB)
 
 # Notify that Shiny is currently being built
 add_definitions(-DSHINY_BUILDING)
@@ -154,12 +150,6 @@ endfunction(copy_headers)
 
 # glad
 set(GLAD_DIR "${DEP_DIR}/glad")
-if(SHINY_BUILD_SHARED_LIB)
-   add_definitions(-DGLAD_GLAPI_EXPORT -DGLAD_GLAPI_EXPORT_BUILD)
-   list(APPEND SHINY_DEFINITIONS
-      -DGLAD_GLAPI_EXPORT
-   )
-endif(SHINY_BUILD_SHARED_LIB)
 attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
 
 # GLM
@@ -178,12 +168,6 @@ file(COPY "${STB_DIR}/stb_vorbis.c" DESTINATION "${BIN_INCLUDE_DIR}/stb")
 
 # templog
 set(TEMPLOG_DIR "${DEP_DIR}/templog")
-if(SHINY_BUILD_SHARED_LIB)
-   add_definitions(-DTEMPLOG_BUILD_DLL)
-   list(APPEND SHINY_DEFINITIONS
-      -DTEMPLOG_DLL
-   )
-endif(SHINY_BUILD_SHARED_LIB)
 copy_headers(${TEMPLOG_DIR} ${BIN_INCLUDE_DIR}/templog false)
 attach_lib("${TEMPLOG_DIR}" "${TEMPLOG_DIR}/imp/logging.cpp" "")
 

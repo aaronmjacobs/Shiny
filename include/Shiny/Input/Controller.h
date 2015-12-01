@@ -1,8 +1,6 @@
 #ifndef SHINY_CONTROLLER_H
 #define SHINY_CONTROLLER_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Input/InputDevice.h"
 
 #include <GLFW/glfw3.h>
@@ -17,7 +15,7 @@ const int kMaxControllers = GLFW_JOYSTICK_LAST + 1;
 
 struct ControllerMap;
 
-struct SHINYAPI ControllerValues {
+struct ControllerValues {
    // Axes
    float leftThumbHorizontal;
    float leftThumbVertical;
@@ -52,7 +50,7 @@ struct SHINYAPI ControllerValues {
    bool rightMenu;
 };
 
-class SHINYAPI Controller : public InputDevice {
+class Controller : public InputDevice {
 protected:
    GLFWwindow* const window;
    const int controllerNum;

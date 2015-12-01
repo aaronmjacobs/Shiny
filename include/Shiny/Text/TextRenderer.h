@@ -1,7 +1,6 @@
 #ifndef SHINY_TEXT_RENDERER_H
 #define SHINY_TEXT_RENDERER_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/Framebuffer.h"
@@ -14,7 +13,7 @@ class ShaderProgram;
 class Texture;
 class TextureMaterial;
 
-class SHINYAPI TextRenderer {
+class TextRenderer {
 protected:
    SPtr<FontAtlas> atlas;
    SPtr<TextureMaterial> textureMaterial;

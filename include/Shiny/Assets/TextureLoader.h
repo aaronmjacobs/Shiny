@@ -1,7 +1,6 @@
 #ifndef SHINY_TEXTURE_LOADER_H
 #define SHINY_TEXTURE_LOADER_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/OpenGL.h"
@@ -16,7 +15,7 @@ class Texture;
 typedef std::unordered_map<std::string, SPtr<Texture>> TextureMap;
 typedef std::unordered_map<std::string, SPtr<Texture>> CubemapMap;
 
-class SHINYAPI TextureLoader {
+class TextureLoader {
 protected:
    TextureMap textureMap;
    CubemapMap cubemapMap;

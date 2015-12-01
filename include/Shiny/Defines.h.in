@@ -4,29 +4,4 @@
 #cmakedefine SHINY_LOG_INTERNAL
 #cmakedefine SHINY_LOG_MSVC_STYLE
 
-#if defined(SHINY_DLL) && defined(SHINY_BUILD_SHARED_LIB)
-   /**
-    * SHINY_DLL must be defined by applications that are linking against the DLL version of the Shiny library.
-    * SHINY_BUILD_SHARED_LIB is defined by the Shiny configuration header when compiling the DLL version of the library.
-    */
-   #error "You may not have both SHINY_DLL and SHINY_BUILD_SHARED_LIB defined"
-#endif
-
-/**
- * SHINYAPI is used to declare public API classes / functions for export from the DLL / shared library / dynamic library
- */
-#if defined(_WIN32) && defined(SHINY_BUILD_SHARED_LIB)
-   // We are building Shiny as a Win32 DLL
-   #define SHINYAPI __declspec(dllexport)
-#elif defined(_WIN32) && defined(SHINY_DLL)
-   // We are calling Shiny as a Win32 DLL
-   #define SHINYAPI __declspec(dllimport)
-#elif defined(__GNUC__) && defined(SHINY_BUILD_SHARED_LIB)
-   // We are building Shiny as a shared / dynamic library
-   #define SHINYAPI __attribute__((visibility("default")))
-#else
-   // We are building or calling Shiny as a static library
-   #define SHINYAPI
-#endif
-
 #endif

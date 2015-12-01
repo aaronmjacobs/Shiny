@@ -1,13 +1,11 @@
 #ifndef SHINY_TEXTURE_H
 #define SHINY_TEXTURE_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 
-class SHINYAPI Texture {
+class Texture {
 protected:
    GLuint textureID;
    GLenum target;

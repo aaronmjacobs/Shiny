@@ -1,13 +1,11 @@
 #ifndef SHINY_MESH_H
 #define SHINY_MESH_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 
-class SHINYAPI Mesh {
+class Mesh {
 public:
    static const unsigned int kDefaultDimensionality = 3;
    static const GLenum kDefaultUsage = GL_STATIC_DRAW;

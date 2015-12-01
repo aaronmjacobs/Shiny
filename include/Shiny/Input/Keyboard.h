@@ -1,8 +1,6 @@
 #ifndef SHINY_KEYBOARD_H
 #define SHINY_KEYBOARD_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Input/InputDevice.h"
 #include "Shiny/Input/Keys.h"
 
@@ -13,7 +11,7 @@ typedef struct GLFWwindow GLFWwindow;
 
 namespace Shiny {
 
-class SHINYAPI Keyboard : public InputDevice {
+class Keyboard : public InputDevice {
 protected:
    GLFWwindow* const window;
    std::array<bool, Key::kLast + 1> keys, lastKeys;

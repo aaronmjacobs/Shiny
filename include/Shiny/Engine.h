@@ -1,7 +1,6 @@
 #ifndef SHINY_ENGINE_H
 #define SHINY_ENGINE_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 #include "Shiny/Shiny.h"
 
@@ -24,9 +23,9 @@ class Mouse;
 
 typedef UPtr<GLFWwindow, std::function<void(GLFWwindow*)>> WindowPtr;
 
-class SHINYAPI Engine {
+class Engine {
 public:
-   enum class SHINYAPI Result {
+   enum class Result {
       kOK,
       kGladLoad,
       kWindowParams,

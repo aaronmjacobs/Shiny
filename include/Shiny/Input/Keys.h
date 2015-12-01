@@ -1,15 +1,13 @@
 #ifndef SHINY_KEYS_H
 #define SHINY_KEYS_H
 
-#include "Shiny/Defines.h"
-
 #include <GLFW/glfw3.h>
 
 namespace Shiny {
 
 namespace Key {
 
-enum SHINYAPI Code {
+enum Code {
    // Unknown key
    kUnknown = GLFW_KEY_UNKNOWN,
 
@@ -138,7 +136,7 @@ enum SHINYAPI Code {
    kMenu = GLFW_KEY_MENU
 };
 
-SHINYAPI const int kLast = kMenu;
+const int kLast = kMenu;
 
 } // namespace Key
 

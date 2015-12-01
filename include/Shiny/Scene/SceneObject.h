@@ -1,7 +1,6 @@
 #ifndef SHINY_SCENE_OBJECT_H
 #define SHINY_SCENE_OBJECT_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/Model.h"
@@ -14,7 +13,7 @@
 
 namespace Shiny {
 
-class SHINYAPI SceneObject : public std::enable_shared_from_this<SceneObject> {
+class SceneObject : public std::enable_shared_from_this<SceneObject> {
 private:
    WPtr<Scene> scene;
    Model model;

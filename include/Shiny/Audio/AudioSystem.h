@@ -1,7 +1,6 @@
 #ifndef SHINY_AUDIO_SYSTEM_H
 #define SHINY_AUDIO_SYSTEM_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include <glm/glm.hpp>
@@ -23,16 +22,16 @@ class Sound;
 class Stream;
 class StreamDataSource;
 
-class SHINYAPI AudioSystem {
+class AudioSystem {
 public:
-   enum class SHINYAPI Result {
+   enum class Result {
       kOK,
       kDevice,
       kContext,
       kContextCurrent
    };
 
-   enum class SHINYAPI DistanceModel {
+   enum class DistanceModel {
       kNone,
       kInverseDistance,
       kInverseDistanceClamped,

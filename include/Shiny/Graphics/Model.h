@@ -1,7 +1,6 @@
 #ifndef SHINY_MODEL_H
 #define SHINY_MODEL_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/RenderData.h"
@@ -16,7 +15,7 @@ class ShaderProgram;
 
 typedef std::vector<SPtr<Material>> MaterialVector;
 
-class SHINYAPI Model {
+class Model {
 private:
    SPtr<Mesh> mesh;
    SPtr<ShaderProgram> program;

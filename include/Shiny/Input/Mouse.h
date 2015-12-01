@@ -1,8 +1,6 @@
 #ifndef SHINY_MOUSE_H
 #define SHINY_MOUSE_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Input/InputDevice.h"
 
 struct GLFWwindow;
@@ -10,7 +8,7 @@ typedef struct GLFWwindow GLFWwindow;
 
 namespace Shiny {
 
-class SHINYAPI Mouse : public InputDevice {
+class Mouse : public InputDevice {
 public:
    enum class Mode {
       kNormal,

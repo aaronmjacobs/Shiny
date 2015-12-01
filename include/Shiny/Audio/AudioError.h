@@ -1,7 +1,6 @@
 #ifndef SHINY_AUDIO_ERROR_H
 #define SHINY_AUDIO_ERROR_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/ShinyAssert.h"
 
 #include <AL/al.h>
@@ -11,7 +10,7 @@ namespace Shiny {
 
 namespace {
 
-const char* SHINYAPI alErrorString(ALenum error) {
+const char* alErrorString(ALenum error) {
    switch (error) {
       case AL_NO_ERROR:
          return "no error";
@@ -30,7 +29,7 @@ const char* SHINYAPI alErrorString(ALenum error) {
    }
 }
 
-const char* SHINYAPI alcErrorString(ALCenum error) {
+const char* alcErrorString(ALCenum error) {
    switch (error) {
       case ALC_NO_ERROR:
          return "no error";

@@ -1,7 +1,6 @@
 #ifndef SHINY_AUDIO_SOURCE_H
 #define SHINY_AUDIO_SOURCE_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Audio/AudioSystem.h"
@@ -21,15 +20,15 @@ namespace Shiny {
 
 class AudioBuffer;
 
-class SHINYAPI AudioSource {
+class AudioSource {
 public:
-   enum class SHINYAPI Type {
+   enum class Type {
       kUndetermined,
       kStatic,
       kStreaming
    };
 
-   enum class SHINYAPI State {
+   enum class State {
       kInitial,
       kPlaying,
       kPaused,

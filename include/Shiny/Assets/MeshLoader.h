@@ -1,7 +1,6 @@
 #ifndef SHINY_MESH_LOADER_H
 #define SHINY_MESH_LOADER_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include <string>
@@ -13,11 +12,11 @@ class Mesh;
 
 typedef std::unordered_map<std::string, SPtr<Mesh>> MeshMap;
 
-enum class SHINYAPI MeshShape {
+enum class MeshShape {
    Cube, XYPlane
 };
 
-class SHINYAPI MeshLoader {
+class MeshLoader {
 protected:
    MeshMap meshMap;
 

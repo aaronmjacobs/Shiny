@@ -1,7 +1,6 @@
 #ifndef SHINY_SOUND_H
 #define SHINY_SOUND_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Audio/AudioBuffer.h"
@@ -15,7 +14,7 @@ namespace Shiny {
 
 class AudioSource;
 
-class SHINYAPI Sound {
+class Sound {
 public:
    enum class FadeAction {
       kNothing,

@@ -1,7 +1,6 @@
 #ifndef SHINY_MATERIAL_H
 #define SHINY_MATERIAL_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 namespace Shiny {
@@ -9,7 +8,7 @@ namespace Shiny {
 class RenderData;
 class ShaderProgram;
 
-class SHINYAPI Material {
+class Material {
 public:
    Material() {}
 

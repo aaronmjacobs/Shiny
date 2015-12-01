@@ -1,7 +1,6 @@
 #ifndef SHINY_AUDIO_BUFFER_H
 #define SHINY_AUDIO_BUFFER_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 #include "Shiny/ShinyAssert.h"
 
@@ -9,9 +8,9 @@
 
 namespace Shiny {
    
-class SHINYAPI AudioBuffer {
+class AudioBuffer {
 public:
-   enum class SHINYAPI Format {
+   enum class Format {
       kMono8,
       kMono16,
       kStereo8,

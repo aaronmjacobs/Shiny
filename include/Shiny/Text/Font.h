@@ -1,14 +1,13 @@
 #ifndef SHINY_FONT_H
 #define SHINY_FONT_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include <string>
 
 namespace Shiny {
 
-class SHINYAPI Font {
+class Font {
 protected:
    UPtr<unsigned char[]> fontData;
 

@@ -1,13 +1,11 @@
 #ifndef SHINY_RENDER_DATA_H
 #define SHINY_RENDER_DATA_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Graphics/OpenGL.h"
 
 namespace Shiny {
 
-class SHINYAPI RenderData {
+class RenderData {
 private:
    static GLint maxTextureUnits();
 

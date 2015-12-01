@@ -1,7 +1,6 @@
 #ifndef SHINY_FONT_ATLAS
 #define SHINY_FONT_ATLAS
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include <string>
@@ -15,7 +14,7 @@ struct FontPackData;
 
 namespace Glyph {
 
-enum SHINYAPI Category {
+enum Category {
    kNone = 0,
    kUpperCase = 1,
    kLowerCase = 2,
@@ -27,18 +26,18 @@ enum SHINYAPI Category {
 
 } // namespace Glyph
 
-struct SHINYAPI GlyphQuad {
+struct GlyphQuad {
    float x0, y0, s0, t0;
    float x1, y1, s1, t1;
 };
 
-struct SHINYAPI FontSpacing {
+struct FontSpacing {
    float ascent;
    float descent;
    float lineGap;
 };
 
-class SHINYAPI FontAtlas {
+class FontAtlas {
 protected:
    SPtr<Font> font;
    SPtr<Texture> texture;

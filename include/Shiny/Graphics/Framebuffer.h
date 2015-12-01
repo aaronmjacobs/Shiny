@@ -1,7 +1,6 @@
 #ifndef SHINY_FRAMEBUFFER_H
 #define SHINY_FRAMEBUFFER_H
 
-#include "Shiny/Defines.h"
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/OpenGL.h"
@@ -11,7 +10,7 @@ namespace Shiny {
 
 class Texture;
 
-class SHINYAPI Framebuffer {
+class Framebuffer {
 protected:
    /**
     * Framebuffer object

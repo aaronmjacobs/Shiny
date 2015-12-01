@@ -1,8 +1,6 @@
 #ifndef SHINY_OS_UTILS_H
 #define SHINY_OS_UTILS_H
 
-#include "Shiny/Defines.h"
-
 #include <string>
 
 namespace Shiny {
@@ -12,37 +10,37 @@ namespace OSUtils {
 /**
  * Gets the path to the running executable, returning true on success
  */
-SHINYAPI bool getExecutablePath(std::string &executablePath);
+bool getExecutablePath(std::string &executablePath);
 
 /**
  * Gets the path to the application's local data / settings / config folder, returning true on success
  */
-SHINYAPI bool getAppDataPath(const std::string &appName, std::string &appDataPath);
+bool getAppDataPath(const std::string &appName, std::string &appDataPath);
 
 /**
  * Extracts the directory from the given path, returning true on success
  */
-SHINYAPI bool getDirectoryFromPath(const std::string &path, std::string &dir);
+bool getDirectoryFromPath(const std::string &path, std::string &dir);
 
 /**
  * Sets the working directory of the application to the given directory, returning true on success
  */
-SHINYAPI bool setWorkingDirectory(const std::string &dir);
+bool setWorkingDirectory(const std::string &dir);
 
 /**
  * Sets the working directory of the application to the directory that the executable is in, returning true on success
  */
-SHINYAPI bool fixWorkingDirectory();
+bool fixWorkingDirectory();
 
 /**
  * Determines if the given directory exists
  */
-SHINYAPI bool directoryExists(const std::string &dir);
+bool directoryExists(const std::string &dir);
 
 /**
  * Creates the given directory, returning true on success
  */
-SHINYAPI bool createDirectory(const std::string &dir);
+bool createDirectory(const std::string &dir);
 
 } // namespace OSUtils
 

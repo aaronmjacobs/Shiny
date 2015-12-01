@@ -1,8 +1,6 @@
 #ifndef SHINY_STREAM_H
 #define SHINY_STREAM_H
 
-#include "Shiny/Defines.h"
-
 #include "Shiny/Audio/Sound.h"
 
 #include <vector>
@@ -11,7 +9,7 @@ namespace Shiny {
 
 class AudioBuffer;
 
-class SHINYAPI StreamDataSource {
+class StreamDataSource {
    public:
       /*!
        * Fills the buffer with audio data. If no more data is available, sets the buffer data to be empty. Returns true
@@ -32,7 +30,7 @@ class SHINYAPI StreamDataSource {
       virtual int getFrequency() const = 0;
    };
 
-class SHINYAPI Stream : public Sound {
+class Stream : public Sound {
 protected:
    UPtr<StreamDataSource> dataSource;
    int targetPlayOffset;

@@ -1,14 +1,12 @@
 #ifndef SHINY_H
 #define SHINY_H
 
-#include "Shiny/Defines.h"
-
 namespace Shiny {
 
 /**
  * Possible results of Shiny functions
  */
-enum class SHINYAPI Result {
+enum class Result {
    kOK,
    kWorkingDirectory,
    kGlfwInit
@@ -17,17 +15,17 @@ enum class SHINYAPI Result {
 /**
  * Returns a string description of an error result
  */
-SHINYAPI const char* errorString(Result result);
+const char* errorString(Result result);
 
 /**
  * Initializes Shiny
  */
-SHINYAPI Result init();
+Result init();
 
 /**
  * Terminates Shiny
  */
-SHINYAPI void terminate();
+void terminate();
 
 } // namespace Shiny
 
