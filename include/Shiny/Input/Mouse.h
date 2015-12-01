@@ -11,6 +11,13 @@ typedef struct GLFWwindow GLFWwindow;
 namespace Shiny {
 
 class SHINYAPI Mouse : public InputDevice {
+public:
+   enum class Mode {
+      kNormal,
+      kHidden,
+      kDisabled
+   };
+
 protected:
    GLFWwindow* const window;
    double x, y, lastX, lastY;
@@ -22,6 +29,10 @@ public:
    virtual ~Mouse();
 
    virtual void poll() override;
+
+   Mode getMode() const;
+
+   void setMode(Mode mode) const;
 
    double xPos() const {
       return x;
