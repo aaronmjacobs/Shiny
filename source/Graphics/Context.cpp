@@ -25,10 +25,6 @@ Context* Context::current() {
    return currentContext;
 }
 
-Context::Context()
-   : currentProgram(0), boundVAO(0) {
-}
-
 Context::~Context() {
    onDestroy(this);
 }

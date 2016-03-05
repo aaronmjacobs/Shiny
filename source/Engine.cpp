@@ -93,9 +93,6 @@ Engine::Engine()
    controllers.fill(nullptr);
 }
 
-Engine::~Engine() {
-}
-
 void Engine::onWindowClose() {
 }
 

@@ -31,12 +31,17 @@ class StreamDataSource {
    };
 
 class Stream : public Sound {
+private:
+   static const int kNoTarget = -1;
+
 protected:
    UPtr<StreamDataSource> dataSource;
-   int targetPlayOffset;
-   bool looping;
+   int targetPlayOffset { kNoTarget };
+   bool looping { false };
 
    Stream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource);
+
+   void move(Stream &&other);
 
    bool fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers);
 
@@ -45,7 +50,11 @@ protected:
 public:
    friend SPtr<Stream> AudioSystem::generateStream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource);
 
-   virtual ~Stream() override;
+   Stream(Stream &&other);
+
+   Stream& operator=(Stream &&other);
+
+   virtual ~Stream() override = default;
 
    virtual void tick(const float dt) override;
 

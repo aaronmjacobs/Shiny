@@ -14,8 +14,6 @@ protected:
 public:
    Font(UPtr<unsigned char[]> data);
 
-   virtual ~Font();
-
    unsigned char* data();
 };
 

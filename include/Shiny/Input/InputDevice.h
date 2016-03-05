@@ -5,9 +5,7 @@ namespace Shiny {
 
 class InputDevice {
 public:
-   InputDevice() {}
-
-   virtual ~InputDevice() {}
+   virtual ~InputDevice() = default;
 
    virtual void poll() = 0;
 };

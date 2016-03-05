@@ -53,8 +53,6 @@ protected:
 public:
    FontAtlas(const SPtr<Font> &font, float fontSize, Glyph::Category glyphCategory);
 
-   virtual ~FontAtlas();
-
    bool generate();
 
    std::vector<GlyphQuad> process(const std::string &text, float *width = nullptr, float *height = nullptr) const;

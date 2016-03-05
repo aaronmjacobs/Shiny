@@ -47,7 +47,7 @@ Mesh::Mesh()
 Mesh::Mesh(const float *vertices, unsigned int numVertices, const float *normals, unsigned int numNormals,
            const float *texCoords, unsigned int numTexCoords, const unsigned int *indices, unsigned int numIndices,
            unsigned int dimensionality, GLenum usage)
-   : vbo(0), nbo(0), tbo(0), ibo(0), vao(0), numIndices(numIndices) {
+   : numIndices(numIndices) {
    glGenVertexArrays(1, &vao);
 
    setVertices(vertices, numVertices, dimensionality, usage);
@@ -56,12 +56,21 @@ Mesh::Mesh(const float *vertices, unsigned int numVertices, const float *normals
    setIndices(indices, numIndices, usage);
 }
 
-Mesh::Mesh(Mesh &&other)
-   : vbo(other.vbo), nbo(other.nbo), tbo(other.tbo), ibo(other.ibo), vao(other.vao), numIndices(other.numIndices) {
-   other.vbo = other.nbo = other.tbo = other.ibo = other.vao = other.numIndices = 0;
+Mesh::Mesh(Mesh &&other) {
+   move(std::move(other));
+}
+
+Mesh& Mesh::operator=(Mesh &&other) {
+   release();
+   move(std::move(other));
+   return *this;
 }
 
 Mesh::~Mesh() {
+   release();
+}
+
+void Mesh::release() {
    glDeleteBuffers(1, &vbo);
    glDeleteBuffers(1, &nbo);
    glDeleteBuffers(1, &tbo);
@@ -69,7 +78,24 @@ Mesh::~Mesh() {
    glDeleteVertexArrays(1, &vao);
 }
 
+void Mesh::move(Mesh &&other) {
+   vbo = other.vbo;
+   nbo = other.nbo;
+   tbo = other.tbo;
+   ibo = other.ibo;
+   vao = other.vao;
+   numIndices = other.numIndices;
+
+   other.vbo = 0;
+   other.nbo = 0;
+   other.tbo = 0;
+   other.ibo = 0;
+   other.vao = 0;
+   other.numIndices = 0;
+}
+
 void Mesh::bindVAO() const {
+   ASSERT(vao > 0, "Trying to bind invalid VAO");
    Context::current()->bindVertexArray(vao);
 }
 

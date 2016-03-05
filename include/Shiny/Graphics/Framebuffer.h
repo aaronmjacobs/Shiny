@@ -15,7 +15,7 @@ protected:
    /**
     * Framebuffer object
     */
-   GLuint framebuffer;
+   GLuint framebuffer { 0 };
 
    /**
     * Color attachment texture
@@ -30,25 +30,31 @@ protected:
    /**
     * Resolution of the textures
     */
-   int width;
-   int height;
+   int width { 0 };
+   int height { 0 };
 
    /**
     * If the framebuffer has been initialized
     */
-   bool initialized;
+   bool initialized { false };
 
    /**
     * The last viewport used before this framebuffer was used
     */
-   Viewport lastViewport;
+   Viewport lastViewport {};
+
+   void release();
+
+   void move(Framebuffer &&other);
 
 public:
    Framebuffer();
 
    Framebuffer(Framebuffer &&other);
 
-   virtual ~Framebuffer();
+   Framebuffer& operator=(Framebuffer &&other);
+
+   ~Framebuffer();
 
    /**
     * Initializes the textures to the given resolution; may be called multiple times

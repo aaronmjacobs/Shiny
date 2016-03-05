@@ -29,7 +29,7 @@ protected:
    CameraVector cameras;
 
 public:
-   virtual ~Scene();
+   virtual ~Scene() = default;
 
    SPtr<SceneObject> createObject();
 

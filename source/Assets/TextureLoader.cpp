@@ -128,12 +128,6 @@ void storeTexture(GLenum target, const ImageInfo &info) {
 
 } // namespace
 
-TextureLoader::TextureLoader() {
-}
-
-TextureLoader::~TextureLoader() {
-}
-
 SPtr<Texture> TextureLoader::loadTexture(const std::string &fileName, GLenum wrap, GLenum minFilter, GLenum magFilter) {
    TextureMap::iterator location(textureMap.find(fileName));
    if (location != textureMap.end()) {

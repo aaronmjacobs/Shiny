@@ -11,13 +11,17 @@ public:
    static const GLenum kDefaultUsage = GL_STATIC_DRAW;
 
 protected:
-   GLuint vbo;
-   GLuint nbo;
-   GLuint tbo;
-   GLuint ibo;
-   GLuint vao;
+   GLuint vbo { 0 };
+   GLuint nbo { 0 };
+   GLuint tbo { 0 };
+   GLuint ibo { 0 };
+   GLuint vao { 0 };
 
-   unsigned int numIndices;
+   unsigned int numIndices { 0 };
+
+   void release();
+
+   void move(Mesh &&other);
 
 public:
    Mesh();
@@ -28,7 +32,9 @@ public:
 
    Mesh(Mesh &&other);
 
-   virtual ~Mesh();
+   Mesh& operator=(Mesh &&other);
+
+   ~Mesh();
 
    void bindVAO() const;
 

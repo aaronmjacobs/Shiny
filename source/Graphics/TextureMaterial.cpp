@@ -11,9 +11,6 @@ TextureMaterial::TextureMaterial(const SPtr<Texture> &texture, const std::string
    : texture(texture), uniformName(uniformName) {
 }
 
-TextureMaterial::~TextureMaterial() {
-}
-
 void TextureMaterial::apply(const SPtr<ShaderProgram> &program, RenderData &renderData) {
    ASSERT(program, "Trying to apply TextureMaterial to null ShaderProgram");
 

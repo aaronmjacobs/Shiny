@@ -48,8 +48,14 @@ protected:
    UPtr<ALCcontext, std::function<void(ALCcontext*)>> context;
    std::vector<WPtr<Sound>> sounds;
 
+   void move(AudioSystem &&other);
+
 public:
-   AudioSystem();
+   AudioSystem() = default;
+
+   AudioSystem(AudioSystem &&other);
+
+   AudioSystem& operator=(AudioSystem &&other);
 
    virtual ~AudioSystem();
 

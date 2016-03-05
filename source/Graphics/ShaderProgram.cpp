@@ -169,13 +169,31 @@ ShaderProgram::ShaderProgram()
    }
 }
 
-ShaderProgram::ShaderProgram(ShaderProgram &&other)
-   : id(other.id), shaders(std::move(other.shaders)), uniforms(std::move(other.uniforms)) {
-   other.id = 0;
+ShaderProgram::ShaderProgram(ShaderProgram &&other) {
+   move(std::move(other));
+}
+
+ShaderProgram& ShaderProgram::operator=(ShaderProgram &&other) {
+   release();
+   move(std::move(other));
+   return *this;
 }
 
 ShaderProgram::~ShaderProgram() {
+   release();
+}
+
+void ShaderProgram::release() {
    glDeleteProgram(id);
+   id = 0;
+}
+
+void ShaderProgram::move(ShaderProgram &&other) {
+   id = other.id;
+   shaders = std::move(other.shaders);
+   uniforms = std::move(other.uniforms);
+
+   other.id = 0;
 }
 
 void ShaderProgram::attach(SPtr<Shader> shader) {

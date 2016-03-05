@@ -23,8 +23,6 @@ protected:
 public:
    TextRenderer(const SPtr<FontAtlas> &atlas, const SPtr<ShaderProgram> &program);
 
-   virtual ~TextRenderer();
-
    SPtr<Texture> renderToTexture(const char *text, int *textureWidth = nullptr, int *textureHeight = nullptr);
 
    void setShaderProgram(const SPtr<ShaderProgram> &program);

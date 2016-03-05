@@ -9,9 +9,6 @@ Font::Font(UPtr<unsigned char[]> data)
    ASSERT(fontData, "Trying to create font with null data");
 }
 
-Font::~Font() {
-}
-
 unsigned char* Font::data() {
    return fontData.get();
 }

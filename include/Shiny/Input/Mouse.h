@@ -24,8 +24,6 @@ protected:
 public:
    Mouse(GLFWwindow* const window);
 
-   virtual ~Mouse();
-
    virtual void poll() override;
 
    Mode getMode() const;

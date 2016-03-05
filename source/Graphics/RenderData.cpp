@@ -15,10 +15,6 @@ GLint RenderData::maxTextureUnits() {
    return maxUnits;
 }
 
-RenderData::RenderData()
-   : nextTextureUnit(0) {
-}
-
 GLint RenderData::aquireTextureUnit() {
    ASSERT(nextTextureUnit < maxTextureUnits(), "Ran out of texture units");
    return nextTextureUnit++;

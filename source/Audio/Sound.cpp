@@ -5,11 +5,22 @@
 namespace Shiny {
    
 Sound::Sound(const SPtr<AudioSource> &source)
-   : source(source), fadeInfo({}) {
+   : source(source) {
    ASSERT(source, "Trying to create sound with null source");
 }
 
-Sound::~Sound() {
+Sound::Sound(Sound &&other) {
+   move(std::move(other));
+}
+
+Sound& Sound::operator=(Sound &&other) {
+   move(std::move(other));
+   return *this;
+}
+
+void Sound::move(Shiny::Sound &&other) {
+   source = std::move(other.source);
+   fadeInfo = std::move(other.fadeInfo);
 }
 
 void Sound::tick(const float dt) {

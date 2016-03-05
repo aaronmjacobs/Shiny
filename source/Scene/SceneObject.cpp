@@ -11,9 +11,6 @@ SceneObject::SceneObject(const SPtr<Scene> &scene)
    : scene(scene) {
 }
 
-SceneObject::~SceneObject() {
-}
-
 void SceneObject::draw(RenderData renderData) {
    const SPtr<ShaderProgram> &program(model.getProgram());
    const char *uModelMatrix = "uModelMatrix";

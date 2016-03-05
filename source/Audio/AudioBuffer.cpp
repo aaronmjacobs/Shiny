@@ -31,15 +31,36 @@ ALenum toAlFormat(AudioBuffer::Format format) {
 
 } // namespace
 
-AudioBuffer::AudioBuffer()
-   : name(0) {
+AudioBuffer::AudioBuffer() {
    alGenBuffers(1, &name);
    SHINY_CHECK_AL_BUFFER_ERROR("generating name");
 }
 
+AudioBuffer::AudioBuffer(AudioBuffer &&other) {
+   move(std::move(other));
+}
+
+AudioBuffer& AudioBuffer::operator=(AudioBuffer &&other) {
+   release();
+   move(std::move(other));
+   return *this;
+}
+
 AudioBuffer::~AudioBuffer() {
-   alDeleteBuffers(1, &name);
-   SHINY_CHECK_AL_BUFFER_ERROR("deleting name");
+   release();
+}
+
+void AudioBuffer::release() {
+   if (name > 0) {
+      alDeleteBuffers(1, &name);
+      SHINY_CHECK_AL_BUFFER_ERROR("deleting name");
+   }
+}
+
+void AudioBuffer::move(AudioBuffer &&other) {
+   name = other.name;
+
+   other.name = 0;
 }
 
 void AudioBuffer::setData(Format format, const void *data, int size, int frequency) {

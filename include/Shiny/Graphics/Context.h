@@ -13,15 +13,19 @@ protected:
 
    static void onDestroy(Context *context);
 
-   GLuint currentProgram;
-   GLuint boundVAO;
+   GLuint currentProgram { 0 };
+   GLuint boundVAO { 0 };
 
 public:
    static Context* current();
 
-   Context();
+   Context() = default;
 
-   virtual ~Context();
+   Context(const Context &other) = delete;
+
+   Context& operator=(const Context &other) = delete;
+
+   ~Context();
 
    void makeCurrent();
 

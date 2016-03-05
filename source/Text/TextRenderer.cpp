@@ -50,9 +50,6 @@ TextRenderer::TextRenderer(const SPtr<FontAtlas> &atlas, const SPtr<ShaderProgra
    model.attachMaterial(textureMaterial);
 }
 
-TextRenderer::~TextRenderer() {
-}
-
 SPtr<Texture> TextRenderer::renderToTexture(const char *text, int *textureWidth, int *textureHeight) {
    if (!atlas->isGenerated()) {
       bool generated = atlas->generate();

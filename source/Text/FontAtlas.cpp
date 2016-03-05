@@ -156,9 +156,6 @@ FontAtlas::FontAtlas(const SPtr<Font> &font, float fontSize, Glyph::Category gly
           glyphCategory);
 }
 
-FontAtlas::~FontAtlas() {
-}
-
 bool FontAtlas::generate() {
    generated = false;
 

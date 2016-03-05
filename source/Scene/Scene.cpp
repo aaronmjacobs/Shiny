@@ -33,9 +33,6 @@ Scene::Scene() {
    cameras.push_back(std::make_shared<Camera>());
 }
 
-Scene::~Scene() {
-}
-
 SPtr<SceneObject> Scene::createObject() {
    SPtr<SceneObject> object(new SceneObject(shared_from_this()));
 

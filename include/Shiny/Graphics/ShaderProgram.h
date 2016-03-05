@@ -94,12 +94,18 @@ protected:
    std::vector<SPtr<Shader>> shaders;
    UniformMap uniforms;
 
+   void release();
+
+   void move(ShaderProgram &&other);
+
    void use() const;
 
 public:
    ShaderProgram();
 
    ShaderProgram(ShaderProgram &&other);
+
+   ShaderProgram& operator=(ShaderProgram &&other);
 
    virtual ~ShaderProgram();
 

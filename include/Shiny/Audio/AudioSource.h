@@ -36,17 +36,25 @@ public:
    };
 
 protected:
-   unsigned int name;
-   ALCdevice* const device;
-   ALCcontext* const context;
+   unsigned int name { 0 };
+   ALCdevice* device { nullptr };
+   ALCcontext* context { nullptr };
    std::list<SPtr<AudioBuffer>> bufferQueue;
 
    AudioSource(ALCdevice* const device, ALCcontext* const context);
 
-public:
-   virtual ~AudioSource();
+   void release();
 
+   void move(AudioSource &&other);
+
+public:
    friend SPtr<AudioSource> AudioSystem::generateSource() const;
+
+   AudioSource(AudioSource &&other);
+
+   AudioSource& operator=(AudioSource &&other);
+
+   ~AudioSource();
 
    void play();
 

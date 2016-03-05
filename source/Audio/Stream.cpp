@@ -6,20 +6,31 @@
 #include "Shiny/Audio/Stream.h"
 
 namespace Shiny {
-
-namespace {
-
-const int kNoTarget = -1;
-
-} // namespace
    
 Stream::Stream(const SPtr<AudioSource> &source, UPtr<StreamDataSource> dataSource)
-   : Sound(source), dataSource(std::move(dataSource)), targetPlayOffset(kNoTarget), looping(false) {
+   : Sound(source), dataSource(std::move(dataSource)) {
    ASSERT(source->getNumBuffersQueued() > 0 || source->getNumBuffersProcessed() > 0,
           "Trying to create stream with audio source that has no buffers");
 }
 
-Stream::~Stream() {
+Stream::Stream(Stream &&other)
+   : Sound(std::move(other)) {
+   move(std::move(other));
+}
+
+Stream& Stream::operator=(Stream &&other) {
+   Sound::operator=(std::move(other));
+   move(std::move(other));
+   return *this;
+}
+
+void Stream::move(Stream &&other) {
+   dataSource = std::move(other.dataSource);
+   targetPlayOffset = other.targetPlayOffset;
+   looping = other.looping;
+
+   other.targetPlayOffset = kNoTarget;
+   other.looping = false;
 }
 
 bool Stream::fillBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {

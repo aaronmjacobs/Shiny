@@ -124,11 +124,24 @@ const char* AudioSystem::errorString(Result result) {
    }
 }
 
-AudioSystem::AudioSystem() {
-}
-
 AudioSystem::~AudioSystem() {
    shutDown();
+}
+
+AudioSystem::AudioSystem(AudioSystem &&other) {
+   move(std::move(other));
+}
+
+AudioSystem& AudioSystem::operator=(AudioSystem &&other) {
+   shutDown();
+   move(std::move(other));
+   return *this;
+}
+
+void AudioSystem::move(AudioSystem &&other) {
+   device = std::move(other.device);
+   context = std::move(other.context);
+   sounds = std::move(other.sounds);
 }
 
 AudioSystem::Result AudioSystem::startUp() {

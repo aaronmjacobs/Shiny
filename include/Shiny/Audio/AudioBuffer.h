@@ -46,14 +46,22 @@ public:
    }
 
 protected:
-   unsigned int name;
+   unsigned int name { 0 };
 
    AudioBuffer();
+
+   void release();
+
+   void move(AudioBuffer &&other);
 
 public:
    friend SPtr<AudioBuffer> AudioSystem::generateBuffer() const;
 
-   virtual ~AudioBuffer();
+   AudioBuffer(AudioBuffer &&other);
+
+   AudioBuffer& operator=(AudioBuffer &&other);
+
+   ~AudioBuffer();
 
    void setData(Format format, const void *data, int size, int frequency);
 

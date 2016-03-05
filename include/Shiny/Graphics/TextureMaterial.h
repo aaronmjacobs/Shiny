@@ -19,8 +19,6 @@ protected:
 public:
    TextureMaterial(const SPtr<Texture> &texture, const std::string &uniformName);
 
-   virtual ~TextureMaterial();
-
    virtual void apply(const SPtr<ShaderProgram> &program, RenderData &renderData) override;
 
    void setTexture(const SPtr<Texture> &texture);

@@ -4,7 +4,7 @@
 
 namespace Shiny {
 
-Shader::Shader(const GLenum type)
+Shader::Shader(GLenum type)
    : id(glCreateShader(type)), type(type) {
    ASSERT(type == GL_VERTEX_SHADER ||
           type == GL_FRAGMENT_SHADER ||
@@ -12,13 +12,29 @@ Shader::Shader(const GLenum type)
           "Invalid shader type: %u", type);
 }
 
-Shader::Shader(Shader &&other)
-   : id(other.id), type(other.type) {
-   other.id = 0;
+Shader::Shader(Shader &&other) {
+   move(std::move(other));
+}
+
+Shader& Shader::operator=(Shader &&other) {
+   release();
+   move(std::move(other));
+   return *this;
 }
 
 Shader::~Shader() {
+   release();
+}
+
+void Shader::release() {
    glDeleteShader(id);
+}
+
+void Shader::move(Shader &&other) {
+   id = other.id;
+   type = other.type;
+
+   other.id = 0;
 }
 
 bool Shader::compile(const char *source) {

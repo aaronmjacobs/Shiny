@@ -5,24 +5,45 @@
 
 namespace Shiny {
 
-Framebuffer::Framebuffer()
-   : framebuffer(0), texture(nullptr), depthTexture(nullptr), width(0), height(0), initialized(false),
-     lastViewport({0}) {
+Framebuffer::Framebuffer() {
    glGenFramebuffers(1, &framebuffer);
 }
 
-Framebuffer::Framebuffer(Framebuffer &&other)
-   : framebuffer(other.framebuffer), texture(other.texture), depthTexture(other.depthTexture), width(other.width),
-     height(other.height), initialized(other.initialized), lastViewport(other.lastViewport) {
-   other.framebuffer = 0;
-   other.texture = other.depthTexture = nullptr;
+Framebuffer::Framebuffer(Framebuffer &&other) {
+   move(std::move(other));
+}
+
+Framebuffer& Framebuffer::operator=(Framebuffer &&other) {
+   release();
+   move(std::move(other));
+   return *this;
 }
 
 Framebuffer::~Framebuffer() {
+   release();
+}
+
+void Framebuffer::release() {
    if (framebuffer) {
       disable();
       glDeleteFramebuffers(1, &framebuffer);
    }
+}
+
+void Framebuffer::move(Framebuffer &&other) {
+   framebuffer = other.framebuffer;
+   texture = std::move(other.texture);
+   depthTexture = std::move(other.depthTexture);
+   width = other.width;
+   height = other.height;
+   initialized = other.initialized;
+   lastViewport = other.lastViewport;
+
+   other.framebuffer = 0;
+   other.width = 0;
+   other.height = 0;
+   other.initialized = false;
+   other.lastViewport = {};
 }
 
 bool Framebuffer::init(int width, int height) {

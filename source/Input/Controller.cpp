@@ -73,9 +73,6 @@ Controller::Controller(GLFWwindow* const window, const int controllerNum)
    newButtonInputValues = { 0 };
 }
 
-Controller::~Controller() {
-}
-
 void Controller::updateMap() {
    if (!connected()) {
       if (map->name) {

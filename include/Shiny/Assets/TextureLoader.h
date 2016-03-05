@@ -21,10 +21,6 @@ protected:
    CubemapMap cubemapMap;
 
 public:
-   TextureLoader();
-
-   virtual ~TextureLoader();
-
    /**
     * Loads the texture with the given filename (and options), using a cached version if possible
     */

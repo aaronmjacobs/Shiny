@@ -10,20 +10,23 @@
 
 namespace Shiny {
 
-Model::Model() {
-}
-
 Model::Model(const SPtr<Mesh> &mesh, const SPtr<ShaderProgram> &program)
    : mesh(mesh), program(program) {
 }
 
-Model::Model(Model &&other)
-   : mesh(other.mesh), program(other.program) {
-   other.mesh = nullptr;
-   other.program = nullptr;
+Model::Model(Model &&other) {
+   move(std::move(other));
 }
 
-Model::~Model() {
+Model& Model::operator=(Model &&other) {
+   move(std::move(other));
+   return *this;
+}
+
+void Model::move(Model &&other) {
+   mesh = std::move(other.mesh);
+   program = std::move(other.program);
+   materials = std::move(other.materials);
 }
 
 void Model::draw(RenderData renderData) {

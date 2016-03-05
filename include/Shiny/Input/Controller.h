@@ -64,8 +64,6 @@ protected:
 public:
    Controller(GLFWwindow* const window, const int controllerNum);
 
-   virtual ~Controller();
-
    virtual void poll() override;
 
    bool connected() const;

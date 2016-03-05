@@ -21,9 +21,6 @@ Keyboard::Keyboard(GLFWwindow* const window)
    }
 }
 
-Keyboard::~Keyboard() {
-}
-
 void Keyboard::poll() {
    for (size_t i = 0; i < keys.size(); ++i) {
       lastKeys[i] = keys[i];

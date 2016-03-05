@@ -75,12 +75,6 @@ SPtr<Mesh> getMeshFromMemory(const char *data) {
 
 } // namespace
 
-MeshLoader::MeshLoader() {
-}
-
-MeshLoader::~MeshLoader() {
-}
-
 SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName) {
    MeshMap::iterator location(meshMap.find(fileName));
    if (location != meshMap.end()) {

@@ -626,12 +626,6 @@ SPtr<AudioBuffer> loadBuffer(const AudioSystem &audioSystem, const std::string &
 
 } // namespace
 
-AudioLoader::AudioLoader() {
-}
-
-AudioLoader::~AudioLoader() {
-}
-
 SPtr<Sound> AudioLoader::loadSound(AudioSystem &audioSystem, const std::string &fileName) {
    SPtr<AudioBuffer> buffer(loadBuffer(audioSystem, fileName));
    if (!buffer) {

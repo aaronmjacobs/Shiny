@@ -75,7 +75,7 @@ protected:
 public:
    Engine();
 
-   virtual ~Engine();
+   virtual ~Engine() = default;
 
    Result startUp(int windowWidth, int windowHeight, const char *windowName);
 

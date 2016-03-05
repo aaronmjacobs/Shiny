@@ -7,15 +7,21 @@ namespace Shiny {
 
 class Texture {
 protected:
-   GLuint textureID;
+   GLuint textureID { 0 };
    GLenum target;
+
+   void release();
+
+   void move(Texture &&other);
 
 public:
    Texture(GLenum target);
 
    Texture(Texture &&other);
 
-   virtual ~Texture();
+   Texture& operator=(Texture &&other);
+
+   ~Texture();
 
    GLuint id() const {
       return textureID;

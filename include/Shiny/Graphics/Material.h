@@ -10,9 +10,7 @@ class ShaderProgram;
 
 class Material {
 public:
-   Material() {}
-
-   virtual ~Material() {}
+   virtual ~Material() = default;
 
    virtual void apply(const SPtr<ShaderProgram> &program, RenderData &renderData) = 0;
 };

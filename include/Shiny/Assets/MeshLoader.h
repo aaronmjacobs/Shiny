@@ -24,10 +24,6 @@ protected:
    SPtr<Mesh> xyPlaneMesh;
 
 public:
-   MeshLoader();
-
-   virtual ~MeshLoader();
-
    /**
     * Loads the mesh with the given file name, using a cached version if possible
     */

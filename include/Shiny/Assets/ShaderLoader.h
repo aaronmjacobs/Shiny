@@ -30,10 +30,6 @@ protected:
    SPtr<ShaderProgram> getDefaultShaderProgram();
 
 public:
-   ShaderLoader();
-
-   virtual ~ShaderLoader();
-
    /**
     * Loads the shader with the given file name and type, using a cached version if possible
     */

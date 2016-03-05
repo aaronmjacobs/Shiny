@@ -13,10 +13,6 @@ class Stream;
 
 class AudioLoader {
 public:
-   AudioLoader();
-
-   virtual ~AudioLoader();
-
    SPtr<Sound> loadSound(AudioSystem &audioSystem, const std::string &fileName);
 
    SPtr<Stream> loadStream(AudioSystem &audioSystem, const std::string &fileName);

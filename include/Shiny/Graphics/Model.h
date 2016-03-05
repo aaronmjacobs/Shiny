@@ -21,14 +21,16 @@ private:
    SPtr<ShaderProgram> program;
    MaterialVector materials;
 
+   void move(Model &&other);
+
 public:
-   Model();
+   Model() = default;
 
    Model(const SPtr<Mesh> &mesh, const SPtr<ShaderProgram> &program);
 
    Model(Model &&other);
 
-   virtual ~Model();
+   Model& operator=(Model &&other);
 
    void draw(RenderData renderData);
 

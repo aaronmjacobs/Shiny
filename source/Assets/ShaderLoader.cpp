@@ -154,12 +154,6 @@ SPtr<ShaderProgram> createDefaultShaderProgram(const SPtr<Shader> &defaultVertex
 
 } // namespace
 
-ShaderLoader::ShaderLoader() {
-}
-
-ShaderLoader::~ShaderLoader() {
-}
-
 SPtr<Shader> ShaderLoader::getDefaultShader(const GLenum type) {
    switch (type) {
       case GL_VERTEX_SHADER:

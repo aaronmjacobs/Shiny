@@ -21,13 +21,29 @@ Texture::Texture(GLenum target)
    glGenTextures(1, &textureID);
 }
 
-Texture::Texture(Texture &&other)
-   : textureID(other.textureID), target(other.target) {
-   other.textureID = 0;
+Texture::Texture(Texture &&other) {
+   move(std::move(other));
+}
+
+Texture& Texture::operator=(Texture &&other) {
+   release();
+   move(std::move(other));
+   return *this;
 }
 
 Texture::~Texture() {
+   release();
+}
+
+void Texture::release() {
    glDeleteTextures(1, &textureID);
+}
+
+void Texture::move(Texture &&other) {
+   textureID = other.textureID;
+   target = other.target;
+
+   other.textureID = 0;
 }
 
 void Texture::bind() {

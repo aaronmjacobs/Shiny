@@ -24,7 +24,7 @@ private:
    friend SPtr<SceneObject> Scene::createObject();
 
 public:
-   virtual ~SceneObject();
+   virtual ~SceneObject() = default;
 
    void draw(RenderData renderData);
 

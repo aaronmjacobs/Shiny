@@ -72,7 +72,7 @@ bool makeContextCurrent(ALCdevice* const device, ALCcontext* const context) {
 } // namespace
 
 AudioSource::AudioSource(ALCdevice* const device, ALCcontext* const context)
-   : name(0), device(device), context(context) {
+   : device(device), context(context) {
    ASSERT(device, "Trying to create audio source with invalid device");
    ASSERT(context, "Trying to create audio source with invalid context");
 
@@ -80,7 +80,25 @@ AudioSource::AudioSource(ALCdevice* const device, ALCcontext* const context)
    SHINY_CHECK_AL_SOURCE_ERROR("generating name");
 }
 
+AudioSource::AudioSource(AudioSource &&other) {
+   move(std::move(other));
+}
+
+AudioSource& AudioSource::operator=(AudioSource &&other) {
+   release();
+   move(std::move(other));
+   return *this;
+}
+
 AudioSource::~AudioSource() {
+   release();
+}
+
+void AudioSource::release() {
+   if (name == 0) {
+      return;
+   }
+
    // Make sure the right context is current
    ALCcontext *currentContext = alcGetCurrentContext();
    if (currentContext != context) {
@@ -97,6 +115,15 @@ AudioSource::~AudioSource() {
    if (currentContext != context) {
       makeContextCurrent(device, currentContext);
    }
+}
+
+void AudioSource::move(AudioSource &&other) {
+   name = other.name;
+   device = other.device;
+   context = other.context;
+   bufferQueue = std::move(other.bufferQueue);
+
+   other.name = 0;
 }
 
 void AudioSource::play() {

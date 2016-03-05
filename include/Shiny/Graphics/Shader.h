@@ -8,14 +8,20 @@ namespace Shiny {
 class Shader {
 protected:
    GLuint id;
-   const GLenum type;
+   GLenum type;
+
+   void release();
+
+   void move(Shader &&other);
 
 public:
-   Shader(const GLenum type);
+   Shader(GLenum type);
 
    Shader(Shader &&other);
 
-   virtual ~Shader();
+   Shader& operator=(Shader &&other);
+
+   ~Shader();
 
    bool compile(const char *source);
 

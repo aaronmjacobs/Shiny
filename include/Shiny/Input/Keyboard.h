@@ -19,8 +19,6 @@ protected:
 public:
    Keyboard(GLFWwindow* const window);
 
-   virtual ~Keyboard();
-
    virtual void poll() override;
 
    bool pressed(Key::Code key, bool onlyNew = false) const;

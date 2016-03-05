@@ -53,9 +53,6 @@ Mouse::Mouse(GLFWwindow* const window)
    lastRight = right;
 }
 
-Mouse::~Mouse() {
-}
-
 void Mouse::poll() {
    lastX = x;
    lastY = y;

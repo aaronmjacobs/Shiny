@@ -9,11 +9,9 @@ class RenderData {
 private:
    static GLint maxTextureUnits();
 
-   GLint nextTextureUnit;
+   GLint nextTextureUnit { 0 };
 
 public:
-   RenderData();
-
    GLint aquireTextureUnit();
 };
 
