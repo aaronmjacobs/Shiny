@@ -24,7 +24,7 @@ Engine::Result loadGL() {
       return Engine::Result::kOK;
    }
 
-   if (!gladLoadGL()) {
+   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
       return Engine::Result::kGladLoad;
    }
 

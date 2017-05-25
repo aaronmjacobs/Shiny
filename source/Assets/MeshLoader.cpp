@@ -19,10 +19,11 @@ class NullMaterialReader : public MaterialReader {
 public:
    NullMaterialReader() {}
    virtual ~NullMaterialReader() {}
-   virtual std::string operator()(const std::string &matId,
-                                  std::vector<material_t> &materials,
-                                  std::map<std::string, int> &matMap) {
-      return std::string("");
+   virtual bool operator()(const std::string &matId,
+                           std::vector<material_t> *materials,
+                           std::map<std::string, int> *matMap,
+                           std::string *err) override {
+      return true;
    }
 };
 
@@ -39,14 +40,16 @@ const char* kCubeMeshSource = "v -0.500000 -0.500000 0.500000\nv 0.500000 -0.500
 const char* kXyPlaneMeshSource = "v -1.000000 -1.000000 -0.000000\nv 1.000000 -1.000000 -0.000000\nv -1.000000 1.000000 0.000000\nv 1.000000 1.000000 0.000000\nvt 1.000000 0.000000\nvt 1.000000 1.000000\nvt 0.000000 1.000000\nvt 0.000000 0.000000\nvn 0.000000 -0.000000 1.000000\ns off\nf 2/1/1 4/2/1 3/3/1\nf 1/4/1 2/1/1 3/3/1\n";
 
 SPtr<Mesh> meshFromStream(std::istream &in) {
+   tinyobj::attrib_t attributes;
    std::vector<tinyobj::shape_t> shapes;
    std::vector<tinyobj::material_t> materials;
    tinyobj::NullMaterialReader reader;
 
-   std::string error = tinyobj::LoadObj(shapes, materials, in, reader);
+   std::string errorMessage;
+   bool success = tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMessage, &in, &reader, true);
 
-   if (!error.empty()) {
-      LOG_WARNING("Unable to load mesh, reverting to empty: " << error);
+   if (!success) {
+      LOG_WARNING("Unable to load mesh, reverting to empty: " << errorMessage);
       return std::make_shared<Mesh>();
    }
 
@@ -58,13 +61,18 @@ SPtr<Mesh> meshFromStream(std::istream &in) {
    const tinyobj::shape_t &shape = shapes.at(0);
    unsigned int dimensionality = 3;
 
-   unsigned int numVertices = shape.mesh.positions.size() / dimensionality;
-   unsigned int numNormals = shape.mesh.normals.size() / dimensionality;
-   unsigned int numTexCoords = shape.mesh.texcoords.size() / 2;
+   unsigned int numVertices = attributes.vertices.size() / dimensionality;
+   unsigned int numNormals = attributes.normals.size() / dimensionality;
+   unsigned int numTexCoords = attributes.texcoords.size() / 2;
    unsigned int numIndices = shape.mesh.indices.size();
 
-   return std::make_shared<Mesh>(shape.mesh.positions.data(), numVertices, shape.mesh.normals.data(), numNormals,
-                                 shape.mesh.texcoords.data(), numTexCoords, shape.mesh.indices.data(), numIndices,
+   std::vector<unsigned int> indices(numIndices);
+   for (std::size_t i = 0; i < numIndices; ++i) {
+      indices[i] = shape.mesh.indices[i].vertex_index;
+   }
+
+   return std::make_shared<Mesh>(attributes.vertices.data(), numVertices, attributes.normals.data(), numNormals,
+                                 attributes.texcoords.data(), numTexCoords, indices.data(), numIndices,
                                  dimensionality);
 }
 

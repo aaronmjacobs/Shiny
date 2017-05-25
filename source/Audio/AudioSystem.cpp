@@ -10,6 +10,7 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>

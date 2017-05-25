@@ -1,7 +1,7 @@
 #ifndef SHINY_ASSERT_H
 #define SHINY_ASSERT_H
 
-#include <pempek/pempek_assert.h>
+#include <ppk/ppk_assert.h>
 
 #define ASSERT                PPK_ASSERT
 #define ASSERT_WARNING        PPK_ASSERT_WARNING

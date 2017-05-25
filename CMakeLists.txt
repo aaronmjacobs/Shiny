@@ -36,7 +36,7 @@ add_definitions(-DSHINY_BUILDING)
 # Directories
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(DEP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # Options
@@ -77,7 +77,7 @@ list(APPEND INCLUDES
 set(LIBS)
 set(COPY_LIBS)
 
-source_group("Dependencies" "${DEP_DIR}/*")
+source_group("Libraries" "${LIB_DIR}/*")
 
 ### Libraries ###
 
@@ -149,30 +149,30 @@ endfunction(copy_headers)
 ## Integrated ##
 
 # glad
-set(GLAD_DIR "${DEP_DIR}/glad")
+set(GLAD_DIR "${LIB_DIR}/glad")
 attach_lib("${GLAD_DIR}/include" "${GLAD_DIR}/src/glad.c" "${CMAKE_DL_LIBS}")
 
 # GLM
-set(GLM_DIR "${DEP_DIR}/glm")
+set(GLM_DIR "${LIB_DIR}/glm")
 copy_headers(${GLM_DIR}/glm ${BIN_INCLUDE_DIR}/glm true)
 
 # Pempek Assert
-set(PEMPEK_DIR "${DEP_DIR}/Assert")
-copy_headers(${PEMPEK_DIR}/src ${BIN_INCLUDE_DIR}/pempek false)
-attach_lib("${PEMPEK_DIR}/src" "${PEMPEK_DIR}/src/pempek_assert.cpp" "")
+set(PEMPEK_DIR "${LIB_DIR}/PPK_ASSERT")
+copy_headers(${PEMPEK_DIR}/src ${BIN_INCLUDE_DIR}/ppk false)
+attach_lib("${PEMPEK_DIR}/src" "${PEMPEK_DIR}/src/ppk_assert.cpp" "")
 
 # stb
-set(STB_DIR "${DEP_DIR}/stb")
+set(STB_DIR "${LIB_DIR}/stb")
 copy_headers(${STB_DIR} ${BIN_INCLUDE_DIR}/stb false)
 file(COPY "${STB_DIR}/stb_vorbis.c" DESTINATION "${BIN_INCLUDE_DIR}/stb")
 
 # templog
-set(TEMPLOG_DIR "${DEP_DIR}/templog")
+set(TEMPLOG_DIR "${LIB_DIR}/templog")
 copy_headers(${TEMPLOG_DIR} ${BIN_INCLUDE_DIR}/templog false)
 attach_lib("${TEMPLOG_DIR}" "${TEMPLOG_DIR}/imp/logging.cpp" "")
 
 # tinyobj
-set(TINYOBJ_DIR "${DEP_DIR}/tinyobjloader")
+set(TINYOBJ_DIR "${LIB_DIR}/tinyobjloader")
 copy_headers(${TINYOBJ_DIR} ${BIN_INCLUDE_DIR}/tinyobj false)
 attach_lib("${TINYOBJ_DIR}" "${TINYOBJ_DIR}/tiny_obj_loader.cc" "")
 
@@ -181,7 +181,7 @@ attach_lib("${TINYOBJ_DIR}" "${TINYOBJ_DIR}/tiny_obj_loader.cc" "")
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 
 # Boxer
-set(BOXER_DIR "${DEP_DIR}/Boxer")
+set(BOXER_DIR "${LIB_DIR}/Boxer")
 add_subdirectory(${BOXER_DIR})
 add_definitions(${BOXER_DEFINITIONS})
 list(APPEND SHINY_DEFINITIONS
@@ -194,7 +194,7 @@ attach_lib("${BOXER_DIR}/include" "" "Boxer")
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
 # GLFW
-set(GLFW_DIR "${DEP_DIR}/glfw")
+set(GLFW_DIR "${LIB_DIR}/glfw")
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
 set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
@@ -214,7 +214,7 @@ endif(BUILD_SHARED_LIBS)
 attach_lib("${GLFW_DIR}/include" "" "glfw")
 
 # OpenAL
-set(OPENAL_DIR "${DEP_DIR}/openal-soft")
+set(OPENAL_DIR "${LIB_DIR}/openal-soft")
 set(ALSOFT_UTILS OFF CACHE INTERNAL "Build and install utility programs")
 set(ALSOFT_NO_CONFIG_UTIL ON CACHE INTERNAL "Disable building the alsoft-config utility")
 set(ALSOFT_EXAMPLES OFF CACHE INTERNAL "Build and install example programs")
