@@ -16,10 +16,10 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # Directories
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
-set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Include")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
-set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/Include")
 
 # Options
 option(SHINY_LOG_INTERNAL "Enable Shiny internal logging" ON)
@@ -43,14 +43,14 @@ configure_header("Defines")
 configure_header("Version")
 
 # Headers
-include(headers.cmake)
+include(Headers.cmake)
 set(HEADERS)
 foreach(HEADER_NAME ${HEADER_NAMES})
    list(APPEND HEADERS "${INCLUDE_DIR}/${PROJECT_NAME}/${HEADER_NAME}")
 endforeach(HEADER_NAME)
 
 # Sources
-include(sources.cmake)
+include(Sources.cmake)
 set(SOURCES)
 foreach(SOURCE_NAME ${SOURCE_NAMES})
    list(APPEND SOURCES "${SRC_DIR}/${SOURCE_NAME}")
