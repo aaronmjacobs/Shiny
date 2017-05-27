@@ -4,7 +4,7 @@
 #include "Shiny/Defines.h"
 
 #include <boxer/boxer.h>
-#include <templog/logging.h>
+#include <logging.h>
 
 #include <cstring>
 #include <ctime>

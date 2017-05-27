@@ -13,10 +13,10 @@
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 #  pragma warning(push)
 #  pragma warning(disable:4996) // suppress warnings about fopen()
-#  include <stb/stb_vorbis.c>
+#  include <stb_vorbis.c>
 #  pragma warning(pop)
 #else
-#include <stb/stb_vorbis.c>
+#include <stb_vorbis.c>
 #endif
 
 #include <algorithm>

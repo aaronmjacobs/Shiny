@@ -8,7 +8,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ASSERT ASSERT
-#include <stb/stb_image.h>
+#include <stb_image.h>
 
 #include <functional>
 

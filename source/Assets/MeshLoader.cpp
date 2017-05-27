@@ -7,7 +7,7 @@
 
 #include "Shiny/Platform/IOUtils.h"
 
-#include <tinyobj/tiny_obj_loader.h>
+#include <tiny_obj_loader.h>
 
 #include <cstring>
 #include <map>

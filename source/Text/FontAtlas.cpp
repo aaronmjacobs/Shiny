@@ -8,12 +8,12 @@
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #define STBRP_ASSERT ASSERT
-#include <stb/stb_rect_pack.h>
+#include <stb_rect_pack.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_STATIC
 #define STBTT_assert ASSERT
-#include <stb/stb_truetype.h>
+#include <stb_truetype.h>
 
 #include <array>
 

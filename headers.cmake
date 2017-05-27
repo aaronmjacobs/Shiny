@@ -1,11 +1,11 @@
 set(HEADER_NAMES
-   Defines.h
+   Defines.h.in
    Engine.h
    Log.h
    Pointers.h
    Shiny.h
    ShinyAssert.h
-   Version.h
+   Version.h.in
    Assets/AudioLoader.h
    Assets/DefaultImageSource.h
    Assets/MeshLoader.h
@@ -45,11 +45,3 @@ set(HEADER_NAMES
    Text/FontAtlas.h
    Text/TextRenderer.h
 )
-source_group("Includes" "(${INCLUDE_DIR}|${BIN_INCLUDE_DIR})/${PROJECT_NAME}/*")
-source_group("Includes\\Assets" "${INCLUDE_DIR}/${PROJECT_NAME}/Assets/*")
-source_group("Includes\\Audio" "${INCLUDE_DIR}/${PROJECT_NAME}/Audio/*")
-source_group("Includes\\Graphics" "${INCLUDE_DIR}/${PROJECT_NAME}/Graphics/*")
-source_group("Includes\\Input" "${INCLUDE_DIR}/${PROJECT_NAME}/Input/*")
-source_group("Includes\\Platform" "${INCLUDE_DIR}/${PROJECT_NAME}/Platform/*")
-source_group("Includes\\Scene" "${INCLUDE_DIR}/${PROJECT_NAME}/Scene/*")
-source_group("Includes\\Text" "${INCLUDE_DIR}/${PROJECT_NAME}/Text/*")

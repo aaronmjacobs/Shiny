@@ -32,11 +32,3 @@ set(SOURCE_NAMES
    Text/FontAtlas.cpp
    Text/TextRenderer.cpp
 )
-source_group("Sources" "${SRC_DIR}/*")
-source_group("Sources\\Assets" "${SRC_DIR}/Assets/*")
-source_group("Sources\\Audio" "${SRC_DIR}/Audio/*")
-source_group("Sources\\Graphics" "${SRC_DIR}/Graphics/*")
-source_group("Sources\\Input" "${SRC_DIR}/Input/*")
-source_group("Sources\\Platform" "${SRC_DIR}/Platform/*")
-source_group("Sources\\Scene" "${SRC_DIR}/Scene/*")
-source_group("Sources\\Text" "${SRC_DIR}/Text/*")
