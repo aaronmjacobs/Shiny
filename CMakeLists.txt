@@ -6,9 +6,9 @@ cmake_minimum_required(VERSION 3.8)
 project(Shiny VERSION 0.0.0 LANGUAGES CXX C)
 
 # Requirements
-if(${BUILD_SHARED_LIBS})
+if(BUILD_SHARED_LIBS)
    message(SEND_ERROR "Shiny can not be used as a shared library due to its extensive use of the STL in its public API")
-endif(${BUILD_SHARED_LIBS})
+endif(BUILD_SHARED_LIBS)
 
 if(NOT CMAKE_BUILD_TYPE)
    message(STATUS "No build type selected, defaulting to Debug")
@@ -96,9 +96,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${GLAD_DIR}/include")
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
 
 # GLM
-set(GLM_DIR "${LIB_DIR}/glm")
-add_subdirectory(${GLM_DIR})
-target_include_directories(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:glm,INTERFACE_INCLUDE_DIRECTORIES>)
+add_subdirectory("${LIB_DIR}/glm")
+target_link_libraries(${PROJECT_NAME} PUBLIC glm)
 
 # PPK_ASSERT
 set(PPK_DIR "${LIB_DIR}/PPK_ASSERT")
@@ -106,8 +105,7 @@ target_sources(${PROJECT_NAME} PRIVATE "${PPK_DIR}/src/ppk_assert.cpp")
 target_include_directories(${PROJECT_NAME} PUBLIC "${PPK_DIR}/src")
 
 # stb
-set(STB_DIR "${LIB_DIR}/stb")
-target_include_directories(${PROJECT_NAME} PUBLIC "${STB_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${LIB_DIR}/stb")
 
 # templog
 set(TEMPLOG_DIR "${LIB_DIR}/templog")
@@ -119,17 +117,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${TEMPLOG_DIR}")
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 
 # Boxer
-set(BOXER_DIR "${LIB_DIR}/Boxer")
-add_subdirectory(${BOXER_DIR})
-target_include_directories(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:Boxer,INTERFACE_INCLUDE_DIRECTORIES>)
-target_link_libraries(${PROJECT_NAME} PUBLIC Boxer $<TARGET_PROPERTY:Boxer,INTERFACE_LINK_LIBRARIES>)
-target_compile_features(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:Boxer,INTERFACE_COMPILE_FEATURES>)
-target_compile_definitions(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:Boxer,INTERFACE_COMPILE_DEFINITIONS>)
+add_subdirectory("${LIB_DIR}/Boxer")
+target_link_libraries(${PROJECT_NAME} PUBLIC Boxer)
 
 # tinyobj
-set(TINYOBJ_DIR "${LIB_DIR}/tinyobjloader")
-add_subdirectory(${TINYOBJ_DIR})
-target_include_directories(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:tinyobjloader,INTERFACE_INCLUDE_DIRECTORIES>)
+add_subdirectory("${LIB_DIR}/tinyobjloader")
 target_link_libraries(${PROJECT_NAME} PUBLIC tinyobjloader)
 
 ## Shared ##
@@ -137,29 +129,26 @@ target_link_libraries(${PROJECT_NAME} PUBLIC tinyobjloader)
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
 # GLFW
-set(GLFW_DIR "${LIB_DIR}/glfw")
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
 set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
 set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
 set(GLFW_USE_CHDIR OFF CACHE INTERNAL "Make glfwInit chdir to Contents/Resources")
-add_subdirectory(${GLFW_DIR})
+add_subdirectory("${LIB_DIR}/glfw")
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_INCLUDE_NONE)
 if(BUILD_SHARED_LIBS)
    target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_DLL)
 endif(BUILD_SHARED_LIBS)
-target_include_directories(${PROJECT_NAME} PUBLIC "${GLFW_DIR}/include")
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 
 # OpenAL
-set(OPENAL_DIR "${LIB_DIR}/openal-soft")
 set(ALSOFT_UTILS OFF CACHE INTERNAL "Build and install utility programs")
 set(ALSOFT_NO_CONFIG_UTIL ON CACHE INTERNAL "Disable building the alsoft-config utility")
 set(ALSOFT_EXAMPLES OFF CACHE INTERNAL "Build and install example programs")
 set(ALSOFT_CONFIG OFF CACHE INTERNAL "Install alsoft.conf sample configuration file")
 set(ALSOFT_HRTF_DEFS OFF CACHE INTERNAL "Install HRTF definition files")
 set(ALSOFT_INSTALL OFF CACHE INTERNAL "Install headers and libraries")
-add_subdirectory(${OPENAL_DIR})
+add_subdirectory("${LIB_DIR}/openal-soft")
 if(WIN32)
    set(OPENAL_LIBRARY OpenAL32)
 else(WIN32)
@@ -168,7 +157,8 @@ endif(WIN32)
 if(NOT BUILD_SHARED_LIBS)
    target_compile_definitions(${PROJECT_NAME} PUBLIC AL_LIBTYPE_STATIC)
 endif(NOT BUILD_SHARED_LIBS)
-target_include_directories(${PROJECT_NAME} PUBLIC "${OPENAL_DIR}/include")
 target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENAL_LIBRARY})
+# openal-soft doesn't populate INTERFACE_INCLUDE_DIRECTORIES, so we need to manually add the includes here
+target_include_directories(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:${OPENAL_LIBRARY},INCLUDE_DIRECTORIES>)
 
 set(BUILD_SHARED_LIBS ${SHINY_BUILD_SHARED_LIB} CACHE INTERNAL "Build shared libraries")
