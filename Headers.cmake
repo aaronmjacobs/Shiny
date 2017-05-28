@@ -28,6 +28,8 @@ set(HEADER_NAMES
    Graphics/ShaderProgram.h
    Graphics/Texture.h
    Graphics/TextureMaterial.h
+   Graphics/Uniform.h
+   Graphics/UniformTypes.h
    Graphics/Viewport.h
    Input/Controller.h
    Input/ControllerMap.h

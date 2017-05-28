@@ -4,6 +4,7 @@
 #include "Shiny/Graphics/Context.h"
 #include "Shiny/Graphics/Shader.h"
 #include "Shiny/Graphics/ShaderProgram.h"
+#include "Shiny/Graphics/UniformTypes.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -13,159 +14,116 @@ namespace Shiny {
 
 namespace {
 
+UPtr<Uniform> createUniform(const std::string& uniformName, const GLint uniformLocation, const GLenum uniformType, const GLuint program) {
+   switch (uniformType) {
+      case GL_FLOAT:
+         return std::make_unique<FloatUniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_INT:
+      case GL_SAMPLER_1D:
+      case GL_SAMPLER_2D:
+      case GL_SAMPLER_3D:
+      case GL_SAMPLER_CUBE:
+      case GL_SAMPLER_1D_SHADOW:
+      case GL_SAMPLER_2D_SHADOW:
+      case GL_SAMPLER_1D_ARRAY:
+      case GL_SAMPLER_2D_ARRAY:
+      case GL_SAMPLER_1D_ARRAY_SHADOW:
+      case GL_SAMPLER_2D_ARRAY_SHADOW:
+      case GL_SAMPLER_2D_MULTISAMPLE:
+      case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:
+      case GL_SAMPLER_CUBE_SHADOW:
+      case GL_SAMPLER_BUFFER:
+      case GL_SAMPLER_2D_RECT:
+      case GL_SAMPLER_2D_RECT_SHADOW:
+      case GL_INT_SAMPLER_1D:
+      case GL_INT_SAMPLER_2D:
+      case GL_INT_SAMPLER_3D:
+      case GL_INT_SAMPLER_CUBE:
+      case GL_INT_SAMPLER_1D_ARRAY:
+      case GL_INT_SAMPLER_2D_ARRAY:
+      case GL_INT_SAMPLER_2D_MULTISAMPLE:
+      case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
+      case GL_INT_SAMPLER_BUFFER:
+      case GL_INT_SAMPLER_2D_RECT:
+      case GL_UNSIGNED_INT_SAMPLER_1D:
+      case GL_UNSIGNED_INT_SAMPLER_2D:
+      case GL_UNSIGNED_INT_SAMPLER_3D:
+      case GL_UNSIGNED_INT_SAMPLER_CUBE:
+      case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:
+      case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
+      case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:
+      case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
+      case GL_UNSIGNED_INT_SAMPLER_BUFFER:
+      case GL_UNSIGNED_INT_SAMPLER_2D_RECT:
+         return std::make_unique<IntUniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_UNSIGNED_INT:
+         return std::make_unique<UintUniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_BOOL:
+         return std::make_unique<BoolUniform>(uniformName, uniformLocation, uniformType, program);
+
+      case GL_FLOAT_VEC2:
+         return std::make_unique<Float2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_VEC3:
+         return std::make_unique<Float3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_VEC4:
+         return std::make_unique<Float4Uniform>(uniformName, uniformLocation, uniformType, program);
+
+      case GL_INT_VEC2:
+         return std::make_unique<Int2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_INT_VEC3:
+         return std::make_unique<Int3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_INT_VEC4:
+         return std::make_unique<Int4Uniform>(uniformName, uniformLocation, uniformType, program);
+
+      case GL_UNSIGNED_INT_VEC2:
+         return std::make_unique<Uint2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_UNSIGNED_INT_VEC3:
+         return std::make_unique<Uint3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_UNSIGNED_INT_VEC4:
+         return std::make_unique<Uint4Uniform>(uniformName, uniformLocation, uniformType, program);
+
+      case GL_BOOL_VEC2:
+         return std::make_unique<Bool2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_BOOL_VEC3:
+         return std::make_unique<Bool3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_BOOL_VEC4:
+         return std::make_unique<Bool4Uniform>(uniformName, uniformLocation, uniformType, program);
+
+      case GL_FLOAT_MAT2:
+         return std::make_unique<Float2x2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT2x3:
+         return std::make_unique<Float2x3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT2x4:
+         return std::make_unique<Float2x4Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT3x2:
+         return std::make_unique<Float3x2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT3:
+         return std::make_unique<Float3x3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT3x4:
+         return std::make_unique<Float3x4Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT4x2:
+         return std::make_unique<Float4x2Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT4x3:
+         return std::make_unique<Float4x3Uniform>(uniformName, uniformLocation, uniformType, program);
+      case GL_FLOAT_MAT4:
+         return std::make_unique<Float4x4Uniform>(uniformName, uniformLocation, uniformType, program);
+
+      default:
+         ASSERT(false, "Invalid uniform type: %u", uniformType);
+         return nullptr;
+   }
+}
+
 void bindAttribute(GLuint id, GLint attribute) {
    glBindAttribLocation(id, attribute, ShaderAttributes::kNames[attribute]);
 }
 
 } // namespace
 
-// Uniform
-
-Uniform::Uniform(const GLint location, const GLenum type, const std::string &name)
-   : data({0}), name(name), location(location), type(type), dirty(false) {
-}
-
-void Uniform::poll(const GLuint program) {
-   switch (type) {
-      case GL_BOOL:
-         int temp;
-         glGetUniformiv(program, location, &temp);
-         data.boolVal = !!temp;
-         break;
-      case GL_INT:
-      case GL_SAMPLER_1D:
-      case GL_SAMPLER_2D:
-      case GL_SAMPLER_3D:
-      case GL_SAMPLER_CUBE:
-      case GL_SAMPLER_1D_SHADOW:
-      case GL_SAMPLER_2D_SHADOW:
-      case GL_SAMPLER_CUBE_SHADOW:
-         glGetUniformiv(program, location, &data.intVal);
-         break;
-      case GL_FLOAT:
-         glGetUniformfv(program, location, &data.floatVal);
-         break;
-      case GL_FLOAT_VEC2:
-         glGetUniformfv(program, location, glm::value_ptr(data.vec2Val));
-         break;
-      case GL_FLOAT_VEC3:
-         glGetUniformfv(program, location, glm::value_ptr(data.vec3Val));
-         break;
-      case GL_FLOAT_VEC4:
-         glGetUniformfv(program, location, glm::value_ptr(data.vec4Val));
-         break;
-      case GL_FLOAT_MAT4:
-         glGetUniformfv(program, location, glm::value_ptr(data.mat4Val));
-         break;
-      default:
-         ASSERT(false, "Invalid uniform type: %d", type);
-         break;
-   }
-
-   dirty = false;
-}
-
-void Uniform::commit() {
-   if (!dirty) {
-      return;
-   }
-
-   switch (type) {
-      case GL_BOOL:
-         glUniform1i(location, data.boolVal);
-         break;
-      case GL_INT:
-      case GL_SAMPLER_1D:
-      case GL_SAMPLER_2D:
-      case GL_SAMPLER_3D:
-      case GL_SAMPLER_CUBE:
-      case GL_SAMPLER_1D_SHADOW:
-      case GL_SAMPLER_2D_SHADOW:
-      case GL_SAMPLER_CUBE_SHADOW:
-         glUniform1i(location, data.intVal);
-         break;
-      case GL_FLOAT:
-         glUniform1f(location, data.floatVal);
-         break;
-      case GL_FLOAT_VEC2:
-         glUniform2fv(location, 1, glm::value_ptr(data.vec2Val));
-         break;
-      case GL_FLOAT_VEC3:
-         glUniform3fv(location, 1, glm::value_ptr(data.vec3Val));
-         break;
-      case GL_FLOAT_VEC4:
-         glUniform4fv(location, 1, glm::value_ptr(data.vec4Val));
-         break;
-      case GL_FLOAT_MAT4:
-         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(data.mat4Val));
-         break;
-      default:
-         ASSERT(false, "Invalid uniform type: %d", type);
-         break;
-   }
-
-   dirty = false;
-}
-
-void Uniform::setValue(bool value) {
-   ASSERT(type == GL_BOOL);
-   dirty = dirty || data.boolVal != value;
-   data.boolVal = value;
-}
-
-void Uniform::setValue(int value) {
-   ASSERT(type == GL_INT ||
-          type == GL_SAMPLER_1D ||
-          type == GL_SAMPLER_2D ||
-          type == GL_SAMPLER_3D ||
-          type == GL_SAMPLER_CUBE ||
-          type == GL_SAMPLER_1D_SHADOW ||
-          type == GL_SAMPLER_2D_SHADOW ||
-          type == GL_SAMPLER_CUBE_SHADOW);
-   dirty = dirty || data.intVal != value;
-   data.intVal = value;
-}
-
-void Uniform::setValue(GLenum value) {
-   setValue((int)value);
-}
-
-void Uniform::setValue(float value) {
-   ASSERT(type == GL_FLOAT);
-   dirty = dirty || data.floatVal != value;
-   data.floatVal = value;
-}
-
-void Uniform::setValue(const glm::vec2 &value) {
-   ASSERT(type == GL_FLOAT_VEC2);
-   dirty = dirty || data.vec2Val != value;
-   data.vec2Val = value;
-}
-
-void Uniform::setValue(const glm::vec3 &value) {
-   ASSERT(type == GL_FLOAT_VEC3);
-   dirty = dirty || data.vec3Val != value;
-   data.vec3Val = value;
-}
-
-void Uniform::setValue(const glm::vec4 &value) {
-   ASSERT(type == GL_FLOAT_VEC4);
-   dirty = dirty || data.vec4Val != value;
-   data.vec4Val = value;
-}
-
-void Uniform::setValue(const glm::mat4 &value) {
-   ASSERT(type == GL_FLOAT_MAT4);
-   dirty = dirty || data.mat4Val != value;
-   data.mat4Val = value;
-}
-
-// ShaderProgram
-
 ShaderProgram::ShaderProgram()
    : id(glCreateProgram()) {
    for (size_t i = 0; i < ShaderAttributes::kNames.size(); ++i) {
-      bindAttribute(id, i);
+      bindAttribute(id, static_cast<GLint>(i));
    }
 }
 
@@ -233,10 +191,8 @@ bool ShaderProgram::link() {
       } else {
          std::string name(nameBuf);
          GLint location = glGetUniformLocation(id, name.c_str());
-         std::pair<UniformMap::iterator, bool> element(uniforms.emplace(name, Uniform(location, type, name)));
-         if (element.second) {
-            element.first->second.poll(id);
-         }
+
+         uniforms.emplace(name, createUniform(name, location, type, id));
       }
    }
 
@@ -254,8 +210,8 @@ bool ShaderProgram::hasUniform(const std::string &name) const {
 void ShaderProgram::commit() {
    use();
 
-   for (UniformMap::iterator itr = uniforms.begin(); itr != uniforms.end(); ++itr) {
-      itr->second.commit();
+   for (const auto& pair : uniforms) {
+      pair.second->commit();
    }
 }
 

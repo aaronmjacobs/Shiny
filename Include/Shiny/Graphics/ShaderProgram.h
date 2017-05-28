@@ -5,6 +5,7 @@
 #include "Shiny/Pointers.h"
 
 #include "Shiny/Graphics/OpenGL.h"
+#include "Shiny/Graphics/Uniform.h"
 
 #include <glm/glm.hpp>
 
@@ -35,64 +36,13 @@ const std::array<const char*, 3> kNames = {{
 
 } // namespace ShaderAttributes
 
-union UniformData {
-   bool boolVal;
-   int intVal;
-   float floatVal;
-   glm::vec2 vec2Val;
-   glm::vec3 vec3Val;
-   glm::vec4 vec4Val;
-   glm::mat4 mat4Val;
-};
-
-class Uniform {
-protected:
-   UniformData data;
-   const std::string name;
-   const GLint location;
-   const GLenum type;
-   bool dirty;
-
-public:
-   Uniform(const GLint location, const GLenum type, const std::string &name);
-
-   void poll(const GLuint program);
-
-   void commit();
-
-   GLenum getType() const {
-      return type;
-   }
-
-   const std::string& getName() const {
-      return name;
-   }
-
-   void setValue(bool value);
-
-   void setValue(int value);
-
-   void setValue(GLenum value);
-
-   void setValue(float value);
-
-   void setValue(const glm::vec2 &value);
-
-   void setValue(const glm::vec3 &value);
-
-   void setValue(const glm::vec4 &value);
-
-   void setValue(const glm::mat4 &value);
-};
-
 class Shader;
-typedef std::unordered_map<std::string, Uniform> UniformMap;
 
 class ShaderProgram {
 protected:
    GLuint id;
    std::vector<SPtr<Shader>> shaders;
-   UniformMap uniforms;
+   std::unordered_map<std::string, UPtr<Uniform>> uniforms;
 
    void release();
 
@@ -122,17 +72,14 @@ public:
    void commit();
 
    template<typename T>
-   void setUniformValue(const std::string &name, const T &value, bool ignoreFailure = false) {
-      UniformMap::iterator itr = uniforms.find(name);
-      if (itr == uniforms.end()) {
-         if (!ignoreFailure) {
-            LOG_WARNING("Uniform with given name doesn't exist: " << name);
-         }
+   void setUniformValue(const std::string &name, const T &value) {
+      auto itr = uniforms.find(name);
 
-         return;
+      if (itr != uniforms.end()) {
+         itr->second->setValue(value);
+      } else {
+         ASSERT(false, "Uniform with given name doesn't exist: %s", name.c_str());
       }
-
-      itr->second.setValue(value);
    }
 };
 
