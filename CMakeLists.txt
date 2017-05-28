@@ -130,6 +130,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:Boxer,INTERF
 set(TINYOBJ_DIR "${LIB_DIR}/tinyobjloader")
 add_subdirectory(${TINYOBJ_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:tinyobjloader,INTERFACE_INCLUDE_DIRECTORIES>)
+target_link_libraries(${PROJECT_NAME} PUBLIC tinyobjloader)
 
 ## Shared ##
 
