@@ -6,8 +6,6 @@
 #include "Shiny/Graphics/ShaderProgram.h"
 #include "Shiny/Graphics/UniformTypes.h"
 
-#include <glm/gtc/type_ptr.hpp>
-
 #include <cstring>
 #include <sstream>
 
@@ -206,7 +204,7 @@ void ShaderProgram::move(ShaderProgram &&other) {
    other.id = 0;
 }
 
-void ShaderProgram::attach(SPtr<Shader> shader) {
+void ShaderProgram::attach(const SPtr<Shader>& shader) {
    ASSERT(shader, "Trying to attach null shader");
 
    glAttachShader(id, shader->getID());
@@ -232,16 +230,8 @@ bool ShaderProgram::link() {
    return true;
 }
 
-void ShaderProgram::use() const {
-   Context::current()->useProgram(id);
-}
-
-bool ShaderProgram::hasUniform(const std::string &name) const {
-   return uniforms.count(name) > 0;
-}
-
 void ShaderProgram::commit() {
-   use();
+   Context::current()->useProgram(id);
 
    for (const auto& pair : uniforms) {
       pair.second->commit();

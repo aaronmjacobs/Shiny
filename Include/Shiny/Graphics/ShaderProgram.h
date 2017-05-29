@@ -1,13 +1,9 @@
 #ifndef SHINY_SHADER_PROGRAM_H
 #define SHINY_SHADER_PROGRAM_H
 
-#include "Shiny/Log.h"
 #include "Shiny/Pointers.h"
-
 #include "Shiny/Graphics/OpenGL.h"
 #include "Shiny/Graphics/Uniform.h"
-
-#include <glm/glm.hpp>
 
 #include <array>
 #include <string>
@@ -40,37 +36,29 @@ class Shader;
 using UniformMap = std::unordered_map<std::string, UPtr<Uniform>>;
 
 class ShaderProgram {
-protected:
-   GLuint id;
-   std::vector<SPtr<Shader>> shaders;
-   UniformMap uniforms;
-
-   void release();
-
-   void move(ShaderProgram &&other);
-
-   void use() const;
-
 public:
    ShaderProgram();
-
+   ShaderProgram(const ShaderProgram& other) = delete;
    ShaderProgram(ShaderProgram &&other);
 
-   ShaderProgram& operator=(ShaderProgram &&other);
+   ~ShaderProgram();
 
-   virtual ~ShaderProgram();
+   ShaderProgram& operator=(const ShaderProgram &other) = delete;
+   ShaderProgram& operator=(ShaderProgram &&other);
 
    GLuint getID() const {
       return id;
    }
 
-   void attach(SPtr<Shader> shader);
+   void attach(const SPtr<Shader>& shader);
 
    bool link();
 
-   bool hasUniform(const std::string &name) const;
-
    void commit();
+
+   bool hasUniform(const std::string &name) const {
+      return uniforms.count(name) > 0;
+   }
 
    template<typename T>
    void setUniformValue(const std::string &name, const T &value) {
@@ -82,6 +70,15 @@ public:
          ASSERT(false, "Uniform with given name doesn't exist: %s", name.c_str());
       }
    }
+
+private:
+   void release();
+
+   void move(ShaderProgram &&other);
+
+   GLuint id;
+   std::vector<SPtr<Shader>> shaders;
+   UniformMap uniforms;
 };
 
 } // namespace Shiny
