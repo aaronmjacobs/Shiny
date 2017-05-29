@@ -603,19 +603,18 @@ SPtr<AudioBuffer> loadBuffer(const AudioSystem &audioSystem, const std::string &
       return nullptr;
    }
 
-   size_t numBytes = 0;
-   UPtr<unsigned char[]> fileData(IOUtils::readBinaryFile(fileName, &numBytes));
-   if (!fileData) {
+   std::vector<uint8_t> fileData = IOUtils::readBinaryFile(fileName);
+   if (fileData.size() == 0) {
       return nullptr;
    }
 
    SPtr<AudioBuffer> buffer;
    switch (fileType) {
       case AudioFileType::kWav:
-         buffer = loadWavBuffer(audioSystem, fileData.get(), numBytes);
+         buffer = loadWavBuffer(audioSystem, fileData.data(), fileData.size());
          break;
       case AudioFileType::kOggVorbis:
-         buffer = loadVorbisBuffer(audioSystem, fileData.get(), numBytes);
+         buffer = loadVorbisBuffer(audioSystem, fileData.data(), fileData.size());
          break;
       default:
          ASSERT(false, "Invalid audio type, shouldn't be able to get here!");

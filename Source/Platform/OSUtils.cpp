@@ -1,5 +1,7 @@
 #include "Shiny/Platform/OSUtils.h"
 
+#include <ctime>
+
 #ifdef __APPLE__
 #include <CoreServices/CoreServices.h>
 #include <mach-o/dyld.h>
@@ -35,7 +37,7 @@ namespace Shiny {
 namespace OSUtils {
 
 #ifdef __APPLE__
-bool getExecutablePath(std::string &executablePath) {
+bool getExecutablePath(std::string& executablePath) {
    uint32_t size = MAXPATHLEN;
    char rawPath[size];
    if (_NSGetExecutablePath(rawPath, &size) != 0) {
@@ -51,30 +53,28 @@ bool getExecutablePath(std::string &executablePath) {
    return true;
 }
 
-bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
+bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
    FSRef ref;
    FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &ref);
 
    char path[PATH_MAX];
    FSRefMakePath(&ref, (UInt8*)&path, PATH_MAX);
 
-   appDataPath = std::string(path);
-   appDataPath += "/" + appName;
-
+   appDataPath = std::string(path) + "/" + appName;
    return true;
 }
 
-bool setWorkingDirectory(const std::string &dir) {
+bool setWorkingDirectory(const std::string& dir) {
    return chdir(dir.c_str()) == 0;
 }
 
-bool createDirectory(const std::string &dir) {
+bool createDirectory(const std::string& dir) {
    return mkdir(dir.c_str(), 0755) == 0;
 }
 #endif // __APPLE__
 
 #ifdef __linux__
-bool getExecutablePath(std::string &executablePath) {
+bool getExecutablePath(std::string& executablePath) {
    char path[PATH_MAX + 1];
 
    ssize_t numBytes = readlink("/proc/self/exe", path, PATH_MAX);
@@ -87,9 +87,9 @@ bool getExecutablePath(std::string &executablePath) {
    return true;
 }
 
-bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
+bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
    // First, check the HOME environment variable
-   char *homePath = secure_getenv("HOME");
+   char* homePath = secure_getenv("HOME");
 
    // If it isn't set, grab the directory from the password entry file
    if (!homePath) {
@@ -100,23 +100,21 @@ bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
       return false;
    }
 
-   appDataPath = std::string(homePath);
-   appDataPath += "/.config/" + appName;
-
+   appDataPath = std::string(homePath) + "/.config/" + appName;
    return true;
 }
 
-bool setWorkingDirectory(const std::string &dir) {
+bool setWorkingDirectory(const std::string& dir) {
    return chdir(dir.c_str()) == 0;
 }
 
-bool createDirectory(const std::string &dir) {
+bool createDirectory(const std::string& dir) {
    return mkdir(dir.c_str(), 0755) == 0;
 }
 #endif // __linux__
 
 #ifdef _WIN32
-bool getExecutablePath(std::string &executablePath) {
+bool getExecutablePath(std::string& executablePath) {
    TCHAR buffer[MAX_PATH + 1];
    DWORD length = GetModuleFileName(NULL, buffer, MAX_PATH);
    buffer[length] = '\0';
@@ -141,7 +139,7 @@ bool getExecutablePath(std::string &executablePath) {
    return true;
 }
 
-bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
+bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
    PWSTR path;
    if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &path) != S_OK) {
       CoTaskMemFree(path);
@@ -156,16 +154,16 @@ bool getAppDataPath(const std::string &appName, std::string &appDataPath) {
    return true;
 }
 
-bool setWorkingDirectory(const std::string &dir) {
+bool setWorkingDirectory(const std::string& dir) {
    return SetCurrentDirectory(dir.c_str()) != 0;
 }
 
-bool createDirectory(const std::string &dir) {
+bool createDirectory(const std::string& dir) {
    return CreateDirectory(dir.c_str(), nullptr) != 0;
 }
 #endif // _WIN32
 
-bool getDirectoryFromPath(const std::string &path, std::string &dir) {
+bool getDirectoryFromPath(const std::string& path, std::string& dir) {
    size_t pos = path.find_last_of("/\\");
    if (pos == std::string::npos) {
       return false;
@@ -189,14 +187,19 @@ bool fixWorkingDirectory() {
    return setWorkingDirectory(executableDir);
 }
 
-bool directoryExists(const std::string &dir) {
+bool directoryExists(const std::string& dir) {
    struct stat info;
 
-   if(stat(dir.c_str(), &info) != 0) {
+   if (stat(dir.c_str(), &info) != 0) {
       return false;
    }
 
    return (info.st_mode & S_IFDIR) != 0;
+}
+
+int64_t getTime() {
+   static_assert(sizeof(std::time_t) <= sizeof(int64_t), "std::time_t will not fit in an int64_t");
+   return static_cast<int64_t>(std::time(nullptr));
 }
 
 } // namespace OSUtils

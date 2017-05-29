@@ -1,5 +1,4 @@
 #include "Shiny/ShinyAssert.h"
-
 #include "Shiny/Platform/IOUtils.h"
 #include "Shiny/Platform/OSUtils.h"
 
@@ -9,12 +8,12 @@ namespace Shiny {
 
 namespace IOUtils {
 
-bool canRead(const std::string &fileName) {
+bool canRead(const std::string& fileName) {
    ASSERT(!fileName.empty(), "Trying to check empty file name");
    return !!std::ifstream(fileName);
 }
 
-bool readTextFile(const std::string &fileName, std::string &data) {
+bool readTextFile(const std::string& fileName, std::string& data) {
    ASSERT(!fileName.empty(), "Trying to read from empty file name");
    std::ifstream in(fileName);
    if (!in) {
@@ -25,11 +24,12 @@ bool readTextFile(const std::string &fileName, std::string &data) {
    return true;
 }
 
-UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, size_t *numBytes) {
+std::vector<uint8_t> readBinaryFile(const std::string& fileName) {
    ASSERT(!fileName.empty(), "Trying to read from empty file name");
+
    std::ifstream in(fileName, std::ifstream::binary);
    if (!in) {
-      return nullptr;
+      return std::vector<uint8_t>();
    }
 
    std::streampos start = in.tellg();
@@ -38,18 +38,19 @@ UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, size_t *numByt
    ASSERT(size >= 0, "Invalid file size");
    in.seekg(0, std::ios_base::beg);
 
-   UPtr<unsigned char[]> data(new unsigned char[static_cast<size_t>(size)]);
-   in.read(reinterpret_cast<char*>(data.get()), size);
+   std::vector<uint8_t> data(static_cast<size_t>(size));
+   in.read(reinterpret_cast<char*>(data.data()), size);
 
-   if (numBytes) {
-      *numBytes = static_cast<size_t>(size);
-   }
-
-   return std::move(data);
+   return data;
 }
 
-bool writeTextFile(const std::string &fileName, const std::string &data) {
+bool writeTextFile(const std::string& fileName, const std::string& data) {
    ASSERT(!fileName.empty(), "Trying to write to empty file name");
+
+   if (!ensurePathToFileExists(fileName)) {
+      return false;
+   }
+
    std::ofstream out(fileName);
    if (!out) {
       return false;
@@ -59,18 +60,23 @@ bool writeTextFile(const std::string &fileName, const std::string &data) {
    return true;
 }
 
-bool writeBinaryFile(const std::string &fileName, unsigned char *data, size_t numBytes) {
+bool writeBinaryFile(const std::string& fileName, const std::vector<uint8_t>& data) {
    ASSERT(!fileName.empty(), "Trying to write to empty file name");
+
+   if (!ensurePathToFileExists(fileName)) {
+      return false;
+   }
+
    std::ofstream out(fileName, std::ofstream::binary);
    if (!out) {
       return false;
    }
 
-   out.write(reinterpret_cast<char*>(data), numBytes);
+   out.write(reinterpret_cast<const char*>(data.data()), data.size());
    return true;
 }
 
-bool appDataPath(const std::string &appName, const std::string &fileName, std::string &path) {
+bool appDataPath(const std::string& appName, const std::string& fileName, std::string& path) {
    std::string appDataFolder;
    if (!OSUtils::getAppDataPath(appName, appDataFolder)) {
       return false;
@@ -78,6 +84,19 @@ bool appDataPath(const std::string &appName, const std::string &fileName, std::s
 
    path = appDataFolder + "/" + fileName;
    return true;
+}
+
+bool ensurePathToFileExists(const std::string& path) {
+   std::string directory;
+   if (!OSUtils::getDirectoryFromPath(path, directory)) {
+      return false;
+   }
+
+   if (OSUtils::directoryExists(directory)) {
+      return true;
+   }
+
+   return OSUtils::createDirectory(directory);
 }
 
 } // namespace IOUtils

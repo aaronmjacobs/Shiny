@@ -3,8 +3,9 @@
 
 #include "Shiny/Pointers.h"
 
-#include <ios>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 namespace Shiny {
 
@@ -16,33 +17,38 @@ namespace IOUtils {
 /**
  * Determines if the file with the given name can be read
  */
-bool canRead(const std::string &fileName);
+bool canRead(const std::string& fileName);
 
 /**
  * Reads the entire contents of the text file with the given name
  */
-bool readTextFile(const std::string &fileName, std::string &data);
+bool readTextFile(const std::string& fileName, std::string& data);
 
 /**
- * Reads the entire contents of the binary file with the given name, storing the number of bytes in numBytes if set
+ * Reads the entire contents of the binary file with the given name
  */
-UPtr<unsigned char[]> readBinaryFile(const std::string &fileName, size_t *numBytes = nullptr);
+std::vector<uint8_t> readBinaryFile(const std::string& fileName);
 
 /**
  * Writes the contents of the given text to the file with the given name, returning true on success
  */
-bool writeTextFile(const std::string &fileName, const std::string &data);
+bool writeTextFile(const std::string& fileName, const std::string& data);
 
 /**
- * Writes the contents of the given array to the file with the given name, returning true on success
+ * Writes the contents of the given vector to the file with the given name, returning true on success
  */
-bool writeBinaryFile(const std::string &fileName, unsigned char *data, size_t numBytes);
+bool writeBinaryFile(const std::string& fileName, const std::vector<uint8_t>& data);
 
 /**
  * Gets the absolute path of a resource stored in the app data folder given a relative path and application name,
  * returning true on success
  */
-bool appDataPath(const std::string &appName, const std::string &fileName, std::string &path);
+bool appDataPath(const std::string& appName, const std::string& fileName, std::string& path);
+
+/**
+ * Ensures the path to the given file exists, returning true on success
+ */
+bool ensurePathToFileExists(const std::string& path);
 
 } // namespace IOUtils
 
