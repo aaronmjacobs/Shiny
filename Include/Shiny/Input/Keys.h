@@ -5,9 +5,7 @@
 
 namespace Shiny {
 
-namespace Key {
-
-enum Code {
+enum class Key {
    // Unknown key
    kUnknown = GLFW_KEY_UNKNOWN,
 
@@ -135,10 +133,6 @@ enum Code {
    kRightSuper = GLFW_KEY_RIGHT_SUPER,
    kMenu = GLFW_KEY_MENU
 };
-
-const int kLast = kMenu;
-
-} // namespace Key
 
 } // namespace Shiny
 

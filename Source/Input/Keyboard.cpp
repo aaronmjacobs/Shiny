@@ -7,31 +7,27 @@
 namespace Shiny {
 
 Keyboard::Keyboard(GLFWwindow* const window)
-   : window(window) {
-   keys.fill(false);
-   lastKeys.fill(false);
-
+   : window(window), keys{}, lastKeys{} {
    // Since we only poll (and don't use callbacks), make sure we don't miss any button presses
    glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 
    // Set initial state
    poll();
-   for (int i = 0; i < keys.size(); ++i) {
-      lastKeys[i] = keys[i];
-   }
+   lastKeys = keys;
 }
 
 void Keyboard::poll() {
-   for (size_t i = 0; i < keys.size(); ++i) {
-      lastKeys[i] = keys[i];
+   lastKeys = keys;
+   for (int i = kFirstKey; i <= kLastKey; ++i) {
       keys[i] = glfwGetKey(window, i) == GLFW_PRESS;
    }
 }
 
-bool Keyboard::pressed(Key::Code key, bool onlyNew) const {
-   ASSERT(key >= 0 && static_cast<size_t>(key) < keys.size(), "Invalid key code: %d", key);
+bool Keyboard::pressed(Key key, bool onlyNew) const {
+   int keyIndex = static_cast<int>(key);
+   ASSERT(keyIndex >= kFirstKey && keyIndex <= kLastKey, "Invalid key code: %d", keyIndex);
 
-   return onlyNew ? keys[key] && !lastKeys[key] : keys[key];
+   return onlyNew ? keys[keyIndex] && !lastKeys[keyIndex] : keys[keyIndex];
 }
 
 } // namespace Shiny

@@ -12,16 +12,19 @@ typedef struct GLFWwindow GLFWwindow;
 namespace Shiny {
 
 class Keyboard : public InputDevice {
-protected:
-   GLFWwindow* const window;
-   std::array<bool, Key::kLast + 1> keys, lastKeys;
-
 public:
    Keyboard(GLFWwindow* const window);
 
    virtual void poll() override;
 
-   bool pressed(Key::Code key, bool onlyNew = false) const;
+   bool pressed(Key key, bool onlyNew = false) const;
+
+private:
+   static constexpr int kFirstKey = static_cast<int>(Key::kSpace);
+   static constexpr int kLastKey = static_cast<int>(Key::kMenu);
+
+   GLFWwindow* const window;
+   std::array<bool, kLastKey + 1> keys, lastKeys;
 };
 
 } // namespace Shiny
