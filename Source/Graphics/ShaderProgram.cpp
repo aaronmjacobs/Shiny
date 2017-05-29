@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <cstring>
+#include <sstream>
 
 namespace Shiny {
 
@@ -114,8 +115,59 @@ UPtr<Uniform> createUniform(const std::string& uniformName, const GLint uniformL
    }
 }
 
-void bindAttribute(GLuint id, GLint attribute) {
-   glBindAttribLocation(id, attribute, ShaderAttributes::kNames[attribute]);
+std::vector<std::string> getUniformNames(const char* nameBuf, GLsizei length, GLint size) {
+   ASSERT(size > 0);
+
+   if (size == 1) {
+      // Not an array, return as is
+      return { nameBuf };
+   }
+
+   ASSERT(length > 3 && nameBuf[length - 3] == '[' && nameBuf[length - 2] == '0' && nameBuf[length - 1] == ']');
+   std::string baseName(nameBuf, length - 3);
+
+   std::vector<std::string> names(size);
+   for (GLint i = 0; i < size; ++i) {
+      std::stringstream ss;
+      ss << baseName << "[" << i << "]";
+      names[i] = ss.str();
+   }
+
+   return names;
+}
+
+void createProgramUniformsAtIndex(UniformMap& uniformMap, GLuint program, GLuint index) {
+   std::array<GLchar, 256> nameBuf;
+   GLsizei length = 0;
+   GLint size = 0;
+   GLenum type = GL_FLOAT;
+   glGetActiveUniform(program, index, static_cast<GLsizei>(nameBuf.size()), &length, &size, &type, nameBuf.data());
+
+   if (length < 1) {
+      LOG_WARNING("Unable to get active uniform " << index << " for program " << program);
+      return;
+   }
+
+   std::vector<std::string> uniformNames = getUniformNames(nameBuf.data(), length, size);
+   for (const std::string& uniformName : uniformNames) {
+      GLint location = glGetUniformLocation(program, uniformName.c_str());
+      ASSERT(location >= 0);
+
+      uniformMap.emplace(uniformName, createUniform(uniformName, location, type, program));
+   }
+}
+
+void createProgramUniforms(UniformMap& uniformMap, GLuint program) {
+   GLint numUniforms = 0;
+   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUniforms);
+
+   for (GLint i = 0; i < numUniforms; ++i) {
+      createProgramUniformsAtIndex(uniformMap, program, i);
+   }
+}
+
+void bindAttribute(GLuint program, GLuint attribute) {
+   glBindAttribLocation(program, attribute, ShaderAttributes::kNames[attribute]);
 }
 
 } // namespace
@@ -123,7 +175,7 @@ void bindAttribute(GLuint id, GLint attribute) {
 ShaderProgram::ShaderProgram()
    : id(glCreateProgram()) {
    for (size_t i = 0; i < ShaderAttributes::kNames.size(); ++i) {
-      bindAttribute(id, static_cast<GLint>(i));
+      bindAttribute(id, static_cast<GLuint>(i));
    }
 }
 
@@ -175,26 +227,7 @@ bool ShaderProgram::link() {
       return false;
    }
 
-   const int nameBufSize = 512;
-   char nameBuf[nameBufSize];
-   GLint numUniforms;
-   glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &numUniforms);
-
-   for (int i = 0; i < numUniforms; ++i) {
-      GLsizei length = 0;
-      GLint size = 0;
-      GLenum type;
-      glGetActiveUniform(id, i, nameBufSize, &length, &size, &type, nameBuf);
-
-      if (length < 1 || size < 1) {
-         LOG_WARNING("Unable to get active uniform: " << i);
-      } else {
-         std::string name(nameBuf);
-         GLint location = glGetUniformLocation(id, name.c_str());
-
-         uniforms.emplace(name, createUniform(name, location, type, id));
-      }
-   }
+   createProgramUniforms(uniforms, id);
 
    return true;
 }

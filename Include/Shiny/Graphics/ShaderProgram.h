@@ -37,12 +37,13 @@ const std::array<const char*, 3> kNames = {{
 } // namespace ShaderAttributes
 
 class Shader;
+using UniformMap = std::unordered_map<std::string, UPtr<Uniform>>;
 
 class ShaderProgram {
 protected:
    GLuint id;
    std::vector<SPtr<Shader>> shaders;
-   std::unordered_map<std::string, UPtr<Uniform>> uniforms;
+   UniformMap uniforms;
 
    void release();
 
