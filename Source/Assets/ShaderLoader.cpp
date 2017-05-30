@@ -11,7 +11,7 @@
 #if defined(GLSL)
 #  undef GLSL
 #endif
-#define GLSL(source) "#version 150 core\n" #source
+#define GLSL(source) "#version 330 core\n" #source
 
 namespace Shiny {
 
