@@ -188,7 +188,7 @@ void AudioSource::setCurrentBuffer(const SPtr<AudioBuffer> &buffer) {
 void AudioSource::queueBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {
    SHINY_CHECK_AUDIO_SOURCE_VALID("queueing audio buffers");
 
-#ifndef NDEBUG
+#if SHINY_DEBUG
    if (!bufferQueue.empty()) {
       const SPtr<AudioBuffer> &frontBuffer = bufferQueue.front();
       int frontFrequency = frontBuffer->getFrequency();
@@ -201,7 +201,7 @@ void AudioSource::queueBuffers(const std::vector<SPtr<AudioBuffer>> &buffers) {
          ASSERT(buffer->getNumChannels() == frontChannels, "New buffer num channels doesn't match existing channels");
       }
    }
-#endif
+#endif // SHINY_DEBUG
 
    std::vector<ALuint> bufferNames;
    for (const SPtr<AudioBuffer> &buffer : buffers) {

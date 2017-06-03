@@ -1,5 +1,4 @@
 set(HEADER_NAMES
-   Defines.h.in
    Engine.h
    Log.h
    Pointers.h

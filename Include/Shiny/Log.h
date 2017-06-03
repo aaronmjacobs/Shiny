@@ -1,8 +1,6 @@
 #ifndef SHINY_LOG_H
 #define SHINY_LOG_H
 
-#include "Shiny/Defines.h"
-
 #include <boxer/boxer.h>
 #include <logging.h>
 
@@ -80,7 +78,7 @@ class text_formating_policy : public templog::formating_policy_base<text_formati
 public:
    template< class WritePolicy_, int Sev_, int Aud_, class WriteToken_, class ParamList_ >
    static void write(WriteToken_& token, TEMPLOG_SOURCE_SIGN, const ParamList_& parameters) {
-#if defined(SHINY_LOG_MSVC_STYLE)
+#if SHINY_LOG_MSVC_STYLE
       write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_FILE);
       write_obj<WritePolicy_>(token, "(");
       write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_LINE);
@@ -90,7 +88,7 @@ public:
       write_obj<WritePolicy_>(token, "] <");
       write_obj<WritePolicy_>(token, formatTime(getCurrentTime()));
       write_obj<WritePolicy_>(token, "> ");
-#else // defined(SHINY_LOG_MSVC_STYLE)
+#else // SHINY_LOG_MSVC_STYLE
       write_obj<WritePolicy_>(token, "[");
       write_obj<WritePolicy_>(token, center(get_name(static_cast<templog::severity>(Sev_)), kSevNameWidth));
       write_obj<WritePolicy_>(token, "] <");
@@ -100,7 +98,7 @@ public:
       write_obj<WritePolicy_>(token, "(");
       write_obj<WritePolicy_>(token, TEMPLOG_SOURCE_LINE);
       write_obj<WritePolicy_>(token, "): ");
-#endif // defined(SHINY_LOG_MSVC_STYLE)
+#endif // SHINY_LOG_MSVC_STYLE
 
       write_params<WritePolicy_>(token, parameters);
    }
@@ -144,13 +142,13 @@ public:
 // Prevent messages boxes lower than error in release builds
 #define SHINY_MSG_BOX_SEV_THRESHOLD templog::sev_error
 
-#if !defined(NDEBUG)
+#if SHINY_DEBUG
 #  undef SHINY_CERR_SEV_THRESHOLD
 #  define SHINY_CERR_SEV_THRESHOLD templog::sev_debug
 
 #  undef SHINY_MSG_BOX_SEV_THRESHOLD
 #  define SHINY_MSG_BOX_SEV_THRESHOLD templog::sev_debug
-#endif // !defined(NDEBUG)
+#endif // SHINY_DEBUG
 
 // Allow internal logging to be disabled
 enum LogAudience {
@@ -159,17 +157,17 @@ enum LogAudience {
    kUser
 };
 
-#if defined(SHINY_LOG_INTERNAL)
+#if SHINY_LOG_INTERNAL
 #  define SHINY_LOGGER_AUDIENCE_LIST kInternal, kExternal, kUser
 #else
 #  define SHINY_LOGGER_AUDIENCE_LIST kExternal, kUser
-#endif // defined(SHINY_LOG_INTERNAL)
+#endif // SHINY_LOG_INTERNAL
 
-#if defined(SHINY_BUILDING)
+#if SHINY_BUILDING
 #  define SHINY_LOG_AUDIENCE kInternal
 #else
 #  define SHINY_LOG_AUDIENCE kExternal
-#endif // defined(SHINY_BUILDING)
+#endif // SHINY_BUILDING
 
 typedef templog::logger<templog::non_filtering_logger<text_formating_policy, templog::std_write_policy>
                       , SHINY_CERR_SEV_THRESHOLD
@@ -204,11 +202,11 @@ do { \
 #define LOG_ERROR(_log_message_) SHINY_LOG(_log_message_, kSevError, templog::sev_error)
 
 // Don't use message boxes or FATAL internally
-#if !defined(SHINY_BUILDING)
+#if !SHINY_BUILDING
 
 // Easy calls to create message boxes
 
-#define SHINY_LOG_MSG_BOX(_log_message_, _log_title_, _log_severity_) \
+#  define SHINY_LOG_MSG_BOX(_log_message_, _log_title_, _log_severity_) \
 do { \
    TEMPLOG_LOG(boxer_logger, _log_severity_, kUser) << _log_title_ << kBoxerMessageSplit << _log_message_; \
 } while (0)
@@ -232,6 +230,6 @@ do { \
    abort(); \
 } while(0)
 
-#endif // !defined(SHINY_BUILDING)
+#endif // !SHINY_BUILDING
 
 #endif

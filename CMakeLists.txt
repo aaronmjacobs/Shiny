@@ -39,7 +39,6 @@ function(configure_header name)
    set(GENERATED_HEADERS ${GENERATED_HEADERS} PARENT_SCOPE)
 endfunction(configure_header)
 
-configure_header("Defines")
 configure_header("Version")
 
 # Headers
@@ -68,13 +67,31 @@ add_library(${PROJECT_NAME} ${GENERATED_HEADERS} ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR} ${BIN_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME} INTERFACE ${PROJECT_NAME})
 
+## Compile Definitions ##
+
+function(compile_definition_01 DEFINITION)
+   if(${DEFINITION})
+      target_compile_definitions(${PROJECT_NAME} PUBLIC ${DEFINITION}=1)
+   else(${DEFINITION})
+      target_compile_definitions(${PROJECT_NAME} PUBLIC ${DEFINITION}=0)
+   endif(${DEFINITION})
+endfunction(compile_definition_01)
+
+# Debug
+target_compile_definitions(${PROJECT_NAME} PUBLIC SHINY_DEBUG=$<BOOL:$<CONFIG:Debug>>)
+
 # Windows quirks
 if(WIN32)
    target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)
 endif(WIN32)
 
-# Notify that Shiny is currently being built
-target_compile_definitions(${PROJECT_NAME} PRIVATE SHINY_BUILDING)
+# Notify whether Shiny is currently being built
+target_compile_definitions(${PROJECT_NAME} PRIVATE SHINY_BUILDING=1)
+target_compile_definitions(${PROJECT_NAME} INTERFACE SHINY_BUILDING=0)
+
+# Options
+compile_definition_01(SHINY_LOG_INTERNAL)
+compile_definition_01(SHINY_LOG_MSVC_STYLE)
 
 # C++ version
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)

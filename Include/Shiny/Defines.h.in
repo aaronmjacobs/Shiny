@@ -1,7 +1,0 @@
-#ifndef SHINY_DEFINES_H
-#define SHINY_DEFINES_H
-
-#cmakedefine SHINY_LOG_INTERNAL
-#cmakedefine SHINY_LOG_MSVC_STYLE
-
-#endif

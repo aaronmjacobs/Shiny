@@ -52,23 +52,23 @@ const char* alcErrorString(ALCenum error) {
 
 } // namespace Shiny
 
-#ifdef NDEBUG
-#define SHINY_CHECK_AL_ERROR(location) do{}while(0)
-#else
-#define SHINY_CHECK_AL_ERROR(location) do{\
+#if SHINY_DEBUG
+#  define SHINY_CHECK_AL_ERROR(location) do{\
 ALenum alError = alGetError();\
 ASSERT(alError == AL_NO_ERROR, "OpenAL error while %s: %s", (location), Shiny::alErrorString(alError));\
 }while(0)
-#endif
+#else // SHINY_DEBUG
+#  define SHINY_CHECK_AL_ERROR(location) do{}while(0)
+#endif // SHINY_DEBUG
 
-#ifdef NDEBUG
-#define SHINY_CHECK_ALC_ERROR(device, location) do{}while(0)
-#else
-#define SHINY_CHECK_ALC_ERROR(device, location) do{\
+#if SHINY_DEBUG
+#  define SHINY_CHECK_ALC_ERROR(device, location) do{\
 ALCenum alcError = alcGetError(device);\
 ASSERT(alcError == ALC_NO_ERROR, "OpenAL context error while %s: %s", (location), Shiny::alcErrorString(alcError));\
 }while(0)
-#endif
+#else // SHINY_DEBUG
+#  define SHINY_CHECK_ALC_ERROR(device, location) do{}while(0)
+#endif // SHINY_DEBUG
 
 #define SHINY_CHECK_AUDIO_VALID(check, what, component) ASSERT((check), "Audio error: %s of invalid %s", (what), (component))
 
