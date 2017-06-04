@@ -127,14 +127,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${TEMPLOG_DIR}")
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 
+# Boxer
+add_subdirectory("${LIB_DIR}/Boxer")
+target_link_libraries(${PROJECT_NAME} PUBLIC Boxer)
+
 # glad
 add_subdirectory("${LIB_DIR}/glad")
 target_link_libraries(${PROJECT_NAME} PUBLIC optimized glad)
 target_link_libraries(${PROJECT_NAME} PUBLIC debug glad-debug)
-
-# Boxer
-add_subdirectory("${LIB_DIR}/Boxer")
-target_link_libraries(${PROJECT_NAME} PUBLIC Boxer)
 
 # tinyobj
 add_subdirectory("${LIB_DIR}/tinyobjloader")
