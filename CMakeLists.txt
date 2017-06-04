@@ -106,12 +106,6 @@ source_group("Libraries" "${LIB_DIR}/*")
 
 ## Integrated / Header Only ##
 
-# glad
-set(GLAD_DIR "${LIB_DIR}/glad")
-target_sources(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/src/glad.c")
-target_include_directories(${PROJECT_NAME} PUBLIC "${GLAD_DIR}/include")
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
-
 # GLM
 add_subdirectory("${LIB_DIR}/glm")
 target_link_libraries(${PROJECT_NAME} PUBLIC glm)
@@ -132,6 +126,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${TEMPLOG_DIR}")
 ## Static ##
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
+
+# glad
+add_subdirectory("${LIB_DIR}/glad")
+target_link_libraries(${PROJECT_NAME} PUBLIC optimized glad)
+target_link_libraries(${PROJECT_NAME} PUBLIC debug glad-debug)
 
 # Boxer
 add_subdirectory("${LIB_DIR}/Boxer")
