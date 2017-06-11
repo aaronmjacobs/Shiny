@@ -11,9 +11,19 @@ namespace Shiny {
 
 namespace {
 
-void errorCallback(int error, const char* description) {
+void glfwErrorCallback(int error, const char* description) {
    ASSERT(false, "GLFW error %d: %s", error, description);
 }
+
+#if SHINY_DEBUG
+void gladPostCallback(const char* name, void* funcptr, int numArgs, ...) {
+   (void)funcptr;
+   (void)numArgs;
+
+   GLenum errorCode = glad_glGetError();
+   ASSERT(errorCode == GL_NO_ERROR, "OpenGL error %d in %s", errorCode, name);
+}
+#endif // SHINY_DEBUG
 
 } // namespace
 
@@ -35,8 +45,7 @@ Result init() {
       return Result::kWorkingDirectory;
    }
 
-   glfwSetErrorCallback(errorCallback);
-
+   glfwSetErrorCallback(glfwErrorCallback);
    if (!glfwInit()) {
       return Result::kGlfwInit;
    }
@@ -45,6 +54,10 @@ Result init() {
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+#if SHINY_DEBUG
+   glad_set_post_callback(gladPostCallback);
+#endif // SHINY_DEBUG
 
    return Result::kOK;
 }
