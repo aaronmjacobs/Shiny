@@ -106,6 +106,10 @@ source_group("Libraries" "${LIB_DIR}/*")
 
 ## Integrated / Header Only ##
 
+# cxxopts
+add_subdirectory("${LIB_DIR}/cxxopts")
+target_link_libraries(${PROJECT_NAME} PRIVATE cxxopts)
+
 # GLM
 add_subdirectory("${LIB_DIR}/glm")
 target_link_libraries(${PROJECT_NAME} PUBLIC glm)

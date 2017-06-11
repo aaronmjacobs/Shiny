@@ -22,3 +22,6 @@
 [submodule "Libraries/tinyobjloader"]
 	path = Libraries/tinyobjloader
 	url = https://github.com/syoyo/tinyobjloader.git
+[submodule "Libraries/cxxopts"]
+	path = Libraries/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
