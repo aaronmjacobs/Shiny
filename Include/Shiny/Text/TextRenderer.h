@@ -3,7 +3,6 @@
 
 #include "Shiny/Pointers.h"
 
-#include "Shiny/Graphics/Framebuffer.h"
 #include "Shiny/Graphics/Model.h"
 
 namespace Shiny {
@@ -17,7 +16,6 @@ class TextRenderer {
 protected:
    SPtr<FontAtlas> atlas;
    SPtr<TextureMaterial> textureMaterial;
-   Framebuffer framebuffer;
    Model model;
 
 public:

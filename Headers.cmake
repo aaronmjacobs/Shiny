@@ -26,6 +26,7 @@ set(HEADER_NAMES
    Graphics/Shader.h
    Graphics/ShaderProgram.h
    Graphics/Texture.h
+   Graphics/TextureInfo.h
    Graphics/TextureMaterial.h
    Graphics/Uniform.h
    Graphics/UniformTypes.h

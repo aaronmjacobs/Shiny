@@ -1,5 +1,6 @@
 #include "Shiny/ShinyAssert.h"
 
+#include "Shiny/Graphics/Framebuffer.h"
 #include "Shiny/Graphics/Mesh.h"
 #include "Shiny/Graphics/RenderData.h"
 #include "Shiny/Graphics/ShaderProgram.h"
@@ -31,9 +32,9 @@ void render(const GlyphQuad &quad, Model &model, float yOffset) {
    std::array<unsigned int, 6> indices = {{ 0, 1, 2,
                                             2, 1, 3 }};
 
-   model.getMesh()->setVertices(vertices.data(), vertices.size() / 3);
-   model.getMesh()->setTexCoords(texCoords.data(), texCoords.size() / 2);
-   model.getMesh()->setIndices(indices.data(), indices.size());
+   model.getMesh()->setVertices(vertices.data(), static_cast<unsigned int>(vertices.size()) / 3);
+   model.getMesh()->setTexCoords(texCoords.data(), static_cast<unsigned int>(texCoords.size()) / 2);
+   model.getMesh()->setIndices(indices.data(), static_cast<unsigned int>(indices.size()));
 
    RenderData renderData;
    model.draw(renderData);
@@ -74,8 +75,8 @@ SPtr<Texture> TextRenderer::renderToTexture(const char *text, int *textureWidth,
       model.getProgram()->setUniformValue(uProjMatrix, glm::ortho<float>(0.0f, width, height, 0.0f));
    }
 
-   framebuffer.init(static_cast<int>(glm::ceil(width)), static_cast<int>(glm::ceil(height)));
-   framebuffer.use();
+   UPtr<Framebuffer> framebuffer = std::make_unique<Framebuffer>(static_cast<GLsizei>(glm::ceil(width)), static_cast<GLsizei>(glm::ceil(height)), false);
+   framebuffer->bind();
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
    glClear(GL_COLOR_BUFFER_BIT);
    glDisable(GL_DEPTH_TEST);
@@ -87,9 +88,9 @@ SPtr<Texture> TextRenderer::renderToTexture(const char *text, int *textureWidth,
    }
 
    glEnable(GL_DEPTH_TEST);
-   framebuffer.disable();
+   Framebuffer::bindDefaultFramebuffer();
 
-   return framebuffer.getTexture();
+   return framebuffer->getColorAttachment(0);
 }
 
 void TextRenderer::setShaderProgram(const SPtr<ShaderProgram> &program) {

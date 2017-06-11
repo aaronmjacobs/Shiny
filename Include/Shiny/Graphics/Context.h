@@ -1,39 +1,66 @@
 #ifndef SHINY_CONTEXT_H
 #define SHINY_CONTEXT_H
 
+#include "Shiny/ShinyAssert.h"
 #include "Shiny/Graphics/OpenGL.h"
+#include "Shiny/Graphics/TextureInfo.h"
+#include "Shiny/Graphics/Viewport.h"
+
+#include <array>
 
 namespace Shiny {
 
 class Context {
-protected:
-   static Context* currentContext;
-
-   static void setCurrent(Context *context);
-
-   static void onDestroy(Context *context);
-
-   GLuint currentProgram { 0 };
-   GLuint boundVAO { 0 };
-
 public:
-   static Context* current();
+   static Context* current() {
+      ASSERT(currentContext, "Current context is null");
+      return currentContext;
+   }
 
-   Context() = default;
+   Context();
+   Context(const Context& other) = delete;
+   Context(Context&& other) = delete;
 
-   Context(const Context &other) = delete;
+   ~Context() {
+      onDestroy(this);
+   }
 
-   Context& operator=(const Context &other) = delete;
+   Context& operator=(const Context& other) = delete;
+   Context& operator=(Context&& other) = delete;
 
-   ~Context();
-
-   void makeCurrent();
+   void makeCurrent() {
+      setCurrent(this);
+   }
 
    void poll();
 
-   void useProgram(GLuint program);
+   void onFramebufferSizeChange(int width, int height);
 
+   void useProgram(GLuint program);
    void bindVertexArray(GLuint vao);
+   void bindTexture(Tex::Target target, GLuint texture);
+   void bindFramebuffer(GLuint fbo);
+
+   void onFramebufferDeleted(GLuint fbo);
+
+   GLint getMaxTextureSize() const {
+      return maxTextureSize;
+   }
+
+private:
+   static void setCurrent(Context *context);
+   static void onDestroy(Context *context);
+
+   static Context* currentContext;
+
+   Viewport viewport;
+   GLuint currentProgram;
+   GLuint boundVAO;
+   GLuint boundDrawFBO;
+   GLuint boundReadFBO;
+   std::array<GLuint, 10> boundTextures;
+
+   GLint maxTextureSize;
 };
 
 } // namespace Shiny

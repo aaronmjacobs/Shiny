@@ -190,17 +190,22 @@ bool FontAtlas::generate() {
    fontSpacing.descent = descent * scale;
    fontSpacing.lineGap = lineGap * scale;
 
-   texture = std::make_shared<Texture>(GL_TEXTURE_2D);
-   texture->bind();
+   Tex::Specification specification = Tex::Specification::create2d();
+   specification.internalFormat = Tex::InternalFormat::kR8;
+   specification.width = textureWidth;
+   specification.height = textureHeight;
+   specification.providedDataFormat = Tex::ProvidedDataFormat::kRed;
+   specification.providedDataType = Tex::ProvidedDataType::kUnsignedByte;
+   specification.providedData = textureData.get();
 
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, textureWidth, textureHeight, 0, GL_RED, GL_UNSIGNED_BYTE, textureData.get());
+   texture = std::make_shared<Texture>(specification);
 
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+   texture->setParam(Tex::IntParam::kWrapS, GL_CLAMP_TO_BORDER);
+   texture->setParam(Tex::IntParam::kWrapT, GL_CLAMP_TO_BORDER);
+   texture->setParam(Tex::IntParam::kWrapR, GL_CLAMP_TO_BORDER);
 
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   texture->setParam(Tex::IntParam::kMinFilter, GL_LINEAR);
+   texture->setParam(Tex::IntParam::kMagFilter, GL_LINEAR);
 
    texture->unbind();
 

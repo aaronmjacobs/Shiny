@@ -100,6 +100,7 @@ void Engine::onWindowSizeChange(int width, int height) {
 }
 
 void Engine::onFramebufferSizeChange(int width, int height) {
+   context.onFramebufferSizeChange(width, height);
 }
 
 void Engine::onWindowMove(int xPos, int yPos) {
@@ -158,7 +159,7 @@ Engine::Result Engine::startUp(int windowWidth, int windowHeight, const char *wi
    keyboard = std::make_shared<Keyboard>(window.get());
    mouse = std::make_shared<Mouse>(window.get());
    for (size_t i = 0; i < controllers.size(); ++i) {
-      controllers[i] = std::make_shared<Controller>(window.get(), i);
+      controllers[i] = std::make_shared<Controller>(window.get(), static_cast<int>(i));
    }
    pollInput();
 

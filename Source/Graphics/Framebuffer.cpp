@@ -1,125 +1,107 @@
 #include "Shiny/ShinyAssert.h"
 
+#include "Shiny/Graphics/Context.h"
 #include "Shiny/Graphics/Framebuffer.h"
 #include "Shiny/Graphics/Texture.h"
 
 namespace Shiny {
 
-Framebuffer::Framebuffer() {
-   glGenFramebuffers(1, &framebuffer);
-}
+Framebuffer::Framebuffer(GLsizei attachmentWidth, GLsizei attachmentHeight, bool withDepthStencil, const std::vector<Tex::InternalFormat>& attachmentFormats)
+   : fbo(0), width(0), height(0) {
+   glGenFramebuffers(1, &fbo);
 
-Framebuffer::Framebuffer(Framebuffer &&other) {
-   move(std::move(other));
-}
-
-Framebuffer& Framebuffer::operator=(Framebuffer &&other) {
-   release();
-   move(std::move(other));
-   return *this;
-}
-
-Framebuffer::~Framebuffer() {
-   release();
+   reset(attachmentWidth, attachmentHeight, withDepthStencil, attachmentFormats);
 }
 
 void Framebuffer::release() {
-   if (framebuffer) {
-      disable();
-      glDeleteFramebuffers(1, &framebuffer);
+   if (fbo) {
+      Context::current()->onFramebufferDeleted(fbo);
+      glDeleteFramebuffers(1, &fbo);
+      fbo = 0;
    }
 }
 
-void Framebuffer::move(Framebuffer &&other) {
-   framebuffer = other.framebuffer;
-   texture = std::move(other.texture);
-   depthTexture = std::move(other.depthTexture);
+void Framebuffer::move(Framebuffer&& other) {
+   fbo = other.fbo;
+   depthStencilAttachment = std::move(other.depthStencilAttachment);
+   colorAttachments = std::move(other.colorAttachments);
    width = other.width;
    height = other.height;
-   initialized = other.initialized;
-   lastViewport = other.lastViewport;
 
-   other.framebuffer = 0;
+   other.fbo = 0;
    other.width = 0;
    other.height = 0;
-   other.initialized = false;
-   other.lastViewport = {};
 }
 
-bool Framebuffer::init(int width, int height) {
-   ASSERT(width > 0 && height > 0, "Trying to use non-positive resolution for framebuffer");
-   this->width = width;
-   this->height = height;
-
-   initialized = true;
-
-   // Create the texture that will be the color attachment
-   texture = std::make_shared<Texture>(GL_TEXTURE_2D);
-   texture->bind();
-
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-   texture->unbind();
-
-   // Create the texture that will be the depth attachment
-   depthTexture = std::make_shared<Texture>(GL_TEXTURE_2D);
-   depthTexture->bind();
-
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-   depthTexture->unbind();
-
-   // Attach the color / depth textures to the framebuffer
-   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->id(), 0);
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture->id(), 0);
-
-   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-   return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
-}
-
-bool Framebuffer::init() {
+void Framebuffer::reset(GLsizei attachmentWidth, GLsizei attachmentHeight, bool withDepthStencil, const std::vector<Tex::InternalFormat>& attachmentFormats) {
    // Determine the texture size from the viewport
    GLint viewport[4];
    glGetIntegerv(GL_VIEWPORT, viewport);
 
-   return init(viewport[2], viewport[3]);
+   width = attachmentWidth <= 0 ? viewport[2] : attachmentWidth;
+   height = attachmentHeight <= 0 ? viewport[3] : attachmentHeight;
+
+   Context::current()->bindFramebuffer(fbo);
+
+   depthStencilAttachment = nullptr;
+   if (withDepthStencil) {
+      Tex::Specification depthStencilSpecification = Tex::Specification::create2d();
+      depthStencilSpecification.internalFormat = Tex::InternalFormat::kDepth24Stencil8;
+      depthStencilSpecification.width = width;
+      depthStencilSpecification.height = height;
+      depthStencilSpecification.providedDataFormat = Tex::ProvidedDataFormat::kDepthStencil;
+      depthStencilSpecification.providedDataType = Tex::ProvidedDataType::kUnsignedInt248;
+
+      depthStencilAttachment = std::make_shared<Texture>(depthStencilSpecification);
+
+      depthStencilAttachment->setParam(Tex::IntParam::kMinFilter, GL_NEAREST);
+      depthStencilAttachment->setParam(Tex::IntParam::kMagFilter, GL_NEAREST);
+      depthStencilAttachment->setParam(Tex::IntParam::kWrapS, GL_CLAMP_TO_EDGE);
+      depthStencilAttachment->setParam(Tex::IntParam::kWrapT, GL_CLAMP_TO_EDGE);
+
+      depthStencilAttachment->unbind();
+
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthStencilAttachment->getId(), 0);
+   }
+
+   Tex::Specification colorSpecification = Tex::Specification::create2d();
+   colorSpecification.width = width;
+   colorSpecification.height = height;
+
+   colorAttachments.clear();
+   colorAttachments.reserve(attachmentFormats.size());
+   for (GLsizei i = 0; i < attachmentFormats.size(); ++i) {
+      colorSpecification.internalFormat = attachmentFormats[i];
+      colorAttachments.push_back(std::make_shared<Texture>(colorSpecification));
+
+      colorAttachments[i]->setParam(Tex::IntParam::kMinFilter, GL_LINEAR);
+      colorAttachments[i]->setParam(Tex::IntParam::kMagFilter, GL_LINEAR);
+      colorAttachments[i]->setParam(Tex::IntParam::kWrapS, GL_CLAMP_TO_BORDER);
+      colorAttachments[i]->setParam(Tex::IntParam::kWrapT, GL_CLAMP_TO_BORDER);
+
+      colorAttachments[i]->unbind();
+
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorAttachments[i]->getId(), 0);
+   }
+
+   ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+   bindDefaultFramebuffer();
 }
 
-void Framebuffer::use() {
-   ASSERT(initialized, "Trying to use uninitialized framebuffer");
+void Framebuffer::setResolution(GLsizei attachmentWidth, GLsizei attachmentHeight) {
+   std::vector<Tex::InternalFormat> internalFormats(colorAttachments.size());
+   for (std::size_t i = 0; i < internalFormats.size(); ++i) {
+      internalFormats[i] = colorAttachments[i]->getSpecification().internalFormat;
+   }
 
-   GLint viewport[4];
-   glGetIntegerv(GL_VIEWPORT, viewport);
-   lastViewport = { viewport[0], viewport[1], viewport[2], viewport[3] };
+   reset(attachmentWidth, attachmentHeight, depthStencilAttachment != nullptr, internalFormats);
+}
 
-   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+void Framebuffer::bind() {
+   Context::current()->bindFramebuffer(fbo);
    glViewport(0, 0, width, height);
-}
 
-void Framebuffer::disable() const {
-   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-   glViewport(lastViewport.x, lastViewport.y, lastViewport.width, lastViewport.height);
-}
-
-SPtr<Texture> Framebuffer::getTexture() const {
-   ASSERT(initialized, "Trying to get texture from uninitialized framebuffer");
-   return texture;
-}
-
-SPtr<Texture> Framebuffer::getDepthTexture() const {
-   ASSERT(initialized, "Trying to get texture from uninitialized framebuffer");
-   return depthTexture;
+   ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
 } // namespace Shiny
