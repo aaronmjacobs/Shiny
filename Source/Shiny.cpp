@@ -10,7 +10,8 @@ namespace Shiny {
 
 namespace {
 
-std::string dataFolderPath = "Data";
+const char* kDefaultDataFolderPath = "Data";
+std::string dataFolderPath = kDefaultDataFolderPath;
 
 void glfwErrorCallback(int error, const char* description) {
    ASSERT(false, "GLFW error %d: %s", error, description);
@@ -42,13 +43,14 @@ const char* errorString(Result result) {
 }
 
 Result init(int argc, char* argv[]) {
+   static const char* kDataPathOption = "data_path";
+
    cxxopts::Options options("Shiny", "Simple game engine");
-   options.add_options()("data_path", "Path to the data folder", cxxopts::value<std::string>());
+   options.add_options()(kDataPathOption, "Path to the data folder", cxxopts::value<std::string>()->default_value(kDefaultDataFolderPath));
    options.parse(argc, argv);
+   dataFolderPath = options[kDataPathOption].as<std::string>();
 
-   if (options["data_path"].has_arg()) {
-      dataFolderPath = options["data_path"].as<std::string>();
-
+   if (dataFolderPath.length() > 1) {
       char lastChar = dataFolderPath[dataFolderPath.length() - 1];
       if (lastChar == '/' || lastChar == '\\') {
          dataFolderPath.pop_back();
