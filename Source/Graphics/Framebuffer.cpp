@@ -68,11 +68,12 @@ void Framebuffer::reset(GLsizei attachmentWidth, GLsizei attachmentHeight, bool 
    colorSpecification.width = width;
    colorSpecification.height = height;
 
-   colorAttachments.clear();
-   colorAttachments.reserve(attachmentFormats.size());
+   colorAttachments.resize(attachmentFormats.size());
+   std::vector<GLenum> drawBuffers(attachmentFormats.size());
    for (GLsizei i = 0; i < attachmentFormats.size(); ++i) {
       colorSpecification.internalFormat = attachmentFormats[i];
-      colorAttachments.push_back(std::make_shared<Texture>(colorSpecification));
+      colorAttachments[i] = std::make_shared<Texture>(colorSpecification);
+      drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
 
       colorAttachments[i]->setParam(Tex::IntParam::kMinFilter, GL_LINEAR);
       colorAttachments[i]->setParam(Tex::IntParam::kMagFilter, GL_LINEAR);
@@ -81,8 +82,9 @@ void Framebuffer::reset(GLsizei attachmentWidth, GLsizei attachmentHeight, bool 
 
       colorAttachments[i]->unbind();
 
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorAttachments[i]->getId(), 0);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, drawBuffers[i], GL_TEXTURE_2D, colorAttachments[i]->getId(), 0);
    }
+   glDrawBuffers(drawBuffers.size(), drawBuffers.data());
 
    ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
    bindDefaultFramebuffer();
