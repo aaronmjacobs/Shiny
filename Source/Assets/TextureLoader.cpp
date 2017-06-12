@@ -123,7 +123,7 @@ SPtr<Texture> createTexture(const ImageInfo &info) {
    specification.width = info.width;
    specification.height = info.height;
    specification.providedDataFormat = determineProvidedDataFormat(info.composition);
-   specification.providedDataType = Tex::ProvidedDataType::kByte;
+   specification.providedDataType = Tex::ProvidedDataType::kUnsignedByte;
    specification.providedData = info.pixels.get();
 
    return std::make_unique<Texture>(specification);
