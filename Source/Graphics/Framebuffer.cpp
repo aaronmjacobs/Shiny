@@ -84,7 +84,7 @@ void Framebuffer::reset(GLsizei attachmentWidth, GLsizei attachmentHeight, bool 
 
       glFramebufferTexture2D(GL_FRAMEBUFFER, drawBuffers[i], GL_TEXTURE_2D, colorAttachments[i]->getId(), 0);
    }
-   glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+   glDrawBuffers(static_cast<GLsizei>(drawBuffers.size()), drawBuffers.data());
 
    ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
    bindDefaultFramebuffer();
