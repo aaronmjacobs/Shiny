@@ -10,6 +10,7 @@ set(SOURCE_NAMES
    Audio/AudioSystem.cpp
    Audio/Sound.cpp
    Audio/Stream.cpp
+   Entity/Component.cpp
    Graphics/Context.cpp
    Graphics/Framebuffer.cpp
    Graphics/Mesh.cpp
