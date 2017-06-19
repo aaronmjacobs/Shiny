@@ -58,8 +58,23 @@ private:
    std::string componentClassName;
 };
 
-#define SHINY_REGISTER_COMPONENT(component_name)\
-static const ComponentRegistrar<component_name> kShiny##component_name##Registrar(#component_name)
+#define SHINY_REFERENCE_COMPONENT(component_name) \
+namespace InitializationHack { \
+namespace component_name { \
+extern const int kDummyInteger; \
+namespace { \
+int referenceDummyInteger() { return kDummyInteger; } \
+} /* namespace */ \
+} /* namespace component_name */ \
+} /* namespace InitializationHack */
+
+#define SHINY_REGISTER_COMPONENT(component_name) \
+namespace InitializationHack { \
+namespace component_name { \
+const int kDummyInteger = 0; \
+} /* namespace component_name */ \
+} /* namespace InitializationHack */\
+static const ComponentRegistrar<component_name> kShiny##component_name##Registrar(#component_name);
 
 class ComponentRegistry {
 public:
