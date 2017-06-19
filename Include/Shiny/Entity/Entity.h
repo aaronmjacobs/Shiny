@@ -11,9 +11,9 @@ namespace Shiny {
 
 class Entity {
 public:
-   template<typename... ComponentTypes>
-   static UPtr<Entity> create() {
-      UPtr<Entity> entity(new Entity);
+   template<typename EntityType, typename... ComponentTypes, typename... ConstructorArgs>
+   static UPtr<EntityType> create(ConstructorArgs&&... constructorArgs) {
+      UPtr<EntityType> entity(new EntityType(std::forward<ConstructorArgs>(constructorArgs)...));
 
       entity->constructComponents<ComponentTypes...>();
       entity->onInitialized();
@@ -21,9 +21,29 @@ public:
       return entity;
    }
 
-   template<typename... ComponentTypes>
-   static SPtr<Entity> createShared() {
-      return SPtr<Entity>(create<ComponentTypes...>().release());
+   template<typename EntityType, typename... ConstructorArgs>
+   static UPtr<EntityType> create(const std::vector<std::string>& componentClassNames, ConstructorArgs&&... constructorArgs) {
+      UPtr<EntityType> entity(new EntityType(std::forward<ConstructorArgs>(constructorArgs)...));
+
+      for (const std::string& className : componentClassNames) {
+         UPtr<Component> newComponent = ComponentRegistry::instance().createComponent(*entity, className);
+         if (newComponent) {
+            entity->components.push_back(std::move(newComponent));
+         }
+      }
+      entity->onInitialized();
+
+      return entity;
+   }
+
+   template<typename EntityType, typename... ComponentTypes, typename... ConstructorArgs>
+   static SPtr<EntityType> createShared(ConstructorArgs&&... constructorArgs) {
+      return SPtr<EntityType>(create<EntityType, ComponentTypes...>(std::forward<ConstructorArgs>(constructorArgs)...).release());
+   }
+
+   template<typename EntityType, typename... ConstructorArgs>
+   static SPtr<EntityType> createShared(const std::vector<std::string>& componentClassNames, ConstructorArgs&&... constructorArgs) {
+      return SPtr<EntityType>(create<EntityType>(componentClassNames, std::forward<ConstructorArgs>(constructorArgs)...).release());
    }
 
    Entity(const Entity& other) = delete;
@@ -76,9 +96,10 @@ public:
       return componentsOfClass;
    }
 
-private:
+protected:
    Entity() = default;
 
+private:
    template<typename First, typename... Rest>
    void constructComponentsHelper() {
       components.push_back(ComponentRegistry::instance().createComponent<First>(*this));
