@@ -12,6 +12,14 @@ public:
    glm::vec3 getUp() const;
    glm::mat4 getViewMatrix() const;
 
+   float getFov() const {
+      return fov;
+   }
+
+   void setFov(float newFov) {
+      fov = newFov;
+   }
+
    void fly(float amount);
    void strafe(float amount);
    void rotate(float pitch, float yaw);
@@ -21,8 +29,11 @@ protected:
    friend class ComponentRegistrar<CameraComponent>;
 
    CameraComponent(Entity& entity)
-      : TransformComponent(entity) {
+      : TransformComponent(entity), fov(70.0f) {
    }
+
+private:
+   float fov;
 };
 
 SHINY_REFERENCE_COMPONENT(CameraComponent)
