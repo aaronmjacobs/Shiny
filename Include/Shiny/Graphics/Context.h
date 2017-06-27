@@ -43,6 +43,10 @@ public:
 
    void onFramebufferDeleted(GLuint fbo);
 
+   Viewport getViewport() const {
+      return viewport;
+   }
+
    GLint getMaxTextureSize() const {
       return maxTextureSize;
    }

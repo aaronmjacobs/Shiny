@@ -35,11 +35,10 @@ void Framebuffer::move(Framebuffer&& other) {
 
 void Framebuffer::reset(GLsizei attachmentWidth, GLsizei attachmentHeight, bool withDepthStencil, const std::vector<Tex::InternalFormat>& attachmentFormats) {
    // Determine the texture size from the viewport
-   GLint viewport[4];
-   glGetIntegerv(GL_VIEWPORT, viewport);
+   Viewport viewport = Context::current()->getViewport();
 
-   width = attachmentWidth <= 0 ? viewport[2] : attachmentWidth;
-   height = attachmentHeight <= 0 ? viewport[3] : attachmentHeight;
+   width = attachmentWidth <= 0 ? viewport.width : attachmentWidth;
+   height = attachmentHeight <= 0 ? viewport.height : attachmentHeight;
 
    Context::current()->bindFramebuffer(fbo);
 

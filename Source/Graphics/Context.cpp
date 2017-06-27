@@ -61,10 +61,7 @@ void Context::poll() {
    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, reinterpret_cast<GLint*>(&boundDrawFBO));
    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, reinterpret_cast<GLint*>(&boundReadFBO));
 
-   std::array<GLint, 4> rawViewport;
-   glGetIntegerv(GL_VIEWPORT, rawViewport.data());
-   viewport = { rawViewport[0], rawViewport[1], rawViewport[2], rawViewport[3] };
-
+   glGetIntegerv(GL_VIEWPORT, viewport.data());
    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 }
 

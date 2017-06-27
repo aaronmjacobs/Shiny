@@ -1,17 +1,23 @@
 #ifndef SHINY_VIEWPORT_H
 #define SHINY_VIEWPORT_H
 
+#include "Shiny/Graphics/OpenGL.h"
+
 namespace Shiny {
 
 struct Viewport {
-   int x { 0 };
-   int y { 0 };
-   int width { 0 };
-   int height { 0 };
+   Viewport(GLint inX = 0, GLint inY = 0, GLint inWidth = 0, GLint inHeight = 0)
+      : x(inX), y(inY), width(inWidth), height(inHeight) {
+   }
 
-   Viewport() = default;
+   GLint* data() {
+      return &x;
+   }
 
-   Viewport(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
+   GLint x;
+   GLint y;
+   GLint width;
+   GLint height;
 };
 
 } // namespace Shiny
