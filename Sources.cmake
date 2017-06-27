@@ -26,9 +26,10 @@ set(SOURCE_NAMES
    Input/Mouse.cpp
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
-   Scene/Camera.cpp
+   Scene/CameraComponent.cpp
+   Scene/ModelComponent.cpp
    Scene/Scene.cpp
-   Scene/SceneObject.cpp
+   Scene/TransformComponent.cpp
    Text/Font.cpp
    Text/FontAtlas.cpp
    Text/TextRenderer.cpp

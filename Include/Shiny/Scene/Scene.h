@@ -2,51 +2,47 @@
 #define SHINY_SCENE_H
 
 #include "Shiny/Pointers.h"
+#include "Shiny/Entity/Entity.h"
 
-#include <map>
+#include <string>
 #include <vector>
 
 namespace Shiny {
 
-class Camera;
-class SceneObject;
-class ShaderProgram;
+class CameraComponent;
 
-typedef std::vector<SPtr<SceneObject>> SceneObjectVector;
-typedef std::map<SPtr<ShaderProgram>, SceneObjectVector> SceneObjectProgramMap;
-typedef std::vector<SPtr<Camera>> CameraVector;
-
-class Scene : public std::enable_shared_from_this<Scene> {
+class Scene {
 public:
-   static SPtr<Scene> create();
+   Scene()
+      : activeCamera(nullptr) {
+   }
+
+   template<typename... ComponentTypes>
+   Entity* createEntity() {
+      entities.push_back(Entity::create<ComponentTypes...>(*this));
+      return entities.back().get();
+   }
+
+   Entity* createEntity(const std::vector<std::string>& componentClassNames) {
+      entities.push_back(Entity::create(componentClassNames, *this));
+      return entities.back().get();
+   }
+
+   const std::vector<UPtr<Entity>>& getEntities() const {
+      return entities;
+   }
+
+   void setActiveCamera(CameraComponent* newCamera) {
+      activeCamera = newCamera;
+   }
+
+   CameraComponent* getActiveCamera() const {
+      return activeCamera;
+   }
 
 private:
-   Scene();
-
-protected:
-   SceneObjectVector objects;
-   SceneObjectProgramMap objectsByProgram;
-   CameraVector cameras;
-
-public:
-   virtual ~Scene() = default;
-
-   SPtr<SceneObject> createObject();
-
-   void removeObject(const SPtr<SceneObject> &object);
-
-   void shaderProgramChange(const SPtr<SceneObject> &object, const SPtr<ShaderProgram> &oldProgram,
-                            const SPtr<ShaderProgram> &newProgram);
-
-   SPtr<Camera> createCamera();
-
-   void removeCamera(const SPtr<Camera> &camera);
-
-   const SceneObjectVector& getObjects() const;
-
-   const SceneObjectProgramMap& getObjectsByProgram() const;
-
-   const SPtr<Camera>& getDefaultCamera();
+   std::vector<UPtr<Entity>> entities;
+   CameraComponent* activeCamera;
 };
 
 } // namespace Shiny

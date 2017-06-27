@@ -9,43 +9,10 @@
 
 namespace Shiny {
 
+class Scene;
+
 class Entity {
 public:
-   template<typename EntityType, typename... ComponentTypes, typename... ConstructorArgs>
-   static UPtr<EntityType> create(ConstructorArgs&&... constructorArgs) {
-      UPtr<EntityType> entity(new EntityType(std::forward<ConstructorArgs>(constructorArgs)...));
-
-      entity->constructComponents<ComponentTypes...>();
-      entity->onInitialized();
-
-      return entity;
-   }
-
-   template<typename EntityType, typename... ConstructorArgs>
-   static UPtr<EntityType> create(const std::vector<std::string>& componentClassNames, ConstructorArgs&&... constructorArgs) {
-      UPtr<EntityType> entity(new EntityType(std::forward<ConstructorArgs>(constructorArgs)...));
-
-      for (const std::string& className : componentClassNames) {
-         UPtr<Component> newComponent = ComponentRegistry::instance().createComponent(*entity, className);
-         if (newComponent) {
-            entity->components.push_back(std::move(newComponent));
-         }
-      }
-      entity->onInitialized();
-
-      return entity;
-   }
-
-   template<typename EntityType, typename... ComponentTypes, typename... ConstructorArgs>
-   static SPtr<EntityType> createShared(ConstructorArgs&&... constructorArgs) {
-      return SPtr<EntityType>(create<EntityType, ComponentTypes...>(std::forward<ConstructorArgs>(constructorArgs)...).release());
-   }
-
-   template<typename EntityType, typename... ConstructorArgs>
-   static SPtr<EntityType> createShared(const std::vector<std::string>& componentClassNames, ConstructorArgs&&... constructorArgs) {
-      return SPtr<EntityType>(create<EntityType>(componentClassNames, std::forward<ConstructorArgs>(constructorArgs)...).release());
-   }
-
    Entity(const Entity& other) = delete;
    Entity(Entity&& other) = delete;
    Entity& operator=(const Entity& other) = delete;
@@ -84,6 +51,17 @@ public:
    }
 
    template<typename T>
+   const T* getComponentByClass() const {
+      for (const UPtr<Component>& component : components) {
+         if (const T* castedComponent = dynamic_cast<const T*>(component.get())) {
+            return castedComponent;
+         }
+      }
+
+      return nullptr;
+   }
+
+   template<typename T>
    std::vector<T*> getComponentsByClass() {
       std::vector<T*> componentsOfClass;
 
@@ -96,10 +74,58 @@ public:
       return componentsOfClass;
    }
 
-protected:
-   Entity() = default;
+   template<typename T>
+   std::vector<const T*> getComponentsByClass() const {
+      std::vector<const T*> componentsOfClass;
+
+      for (const UPtr<Component>& component : components) {
+         if (const T* castedComponent = dynamic_cast<const T*>(component.get())) {
+            componentsOfClass.push_back(castedComponent);
+         }
+      }
+
+      return componentsOfClass;
+   }
+
+   Scene& getScene() {
+      return scene;
+   }
+
+   const Scene& getScene() const {
+      return scene;
+   }
 
 private:
+   friend class Scene;
+
+   template<typename... ComponentTypes>
+   static UPtr<Entity> create(Scene& scene) {
+      UPtr<Entity> entity(new Entity(scene));
+
+      entity->constructComponents<ComponentTypes...>();
+      entity->onInitialized();
+
+      return entity;
+   }
+
+   static UPtr<Entity> create(const std::vector<std::string>& componentClassNames, Scene& scene) {
+      UPtr<Entity> entity(new Entity(scene));
+
+      for (const std::string& className : componentClassNames) {
+         UPtr<Component> newComponent = ComponentRegistry::instance().createComponent(*entity, className);
+         if (newComponent) {
+            entity->components.push_back(std::move(newComponent));
+         }
+      }
+      entity->onInitialized();
+
+      return entity;
+   }
+
+   Entity(Scene& inScene)
+      : scene(inScene) {
+   }
+
    template<typename First, typename... Rest>
    void constructComponentsHelper() {
       components.push_back(ComponentRegistry::instance().createComponent<First>(*this));
@@ -128,6 +154,7 @@ private:
    }
 
    std::vector<UPtr<Component>> components;
+   Scene& scene;
 };
 
 } // namespace Shiny

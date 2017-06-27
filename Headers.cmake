@@ -39,12 +39,14 @@ set(HEADER_NAMES
    Input/Keyboard.h
    Input/Keys.h
    Input/Mouse.h
+   Math/MathUtils.h
+   Math/Transform.h
    Platform/IOUtils.h
    Platform/OSUtils.h
-   Scene/Camera.h
    Scene/Scene.h
-   Scene/SceneObject.h
-   Scene/Transform.h
+   Scene/CameraComponent.h
+   Scene/ModelComponent.h
+   Scene/TransformComponent.h
    Text/Font.h
    Text/FontAtlas.h
    Text/TextRenderer.h
