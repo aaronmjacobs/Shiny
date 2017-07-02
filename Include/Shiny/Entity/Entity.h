@@ -165,10 +165,6 @@ private:
       constructComponentsHelper<ComponentTypes...>();
    }
 
-   template<>
-   void constructComponents() {
-   }
-
    void onInitialized() {
       for (const UPtr<Component>& component : components) {
          component->onOwnerInitialized();
@@ -194,6 +190,10 @@ private:
    Scene& scene;
    OnDestroyDelegate onDestroy;
 };
+
+template<>
+void Entity::constructComponents() {
+}
 
 } // namespace Shiny
 
