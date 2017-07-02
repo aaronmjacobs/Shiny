@@ -2,8 +2,11 @@
 #define SHINY_ENTITY_H
 
 #include "Shiny/Pointers.h"
+#include "Shiny/ShinyAssert.h"
 #include "Shiny/Entity/Component.h"
+#include "Shiny/Entity/Delegate.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -13,8 +16,15 @@ class Scene;
 
 class Entity {
 public:
+   using OnDestroyDelegate = Delegate<void, Entity*>;
+
    Entity(const Entity& other) = delete;
    Entity(Entity&& other) = delete;
+
+   ~Entity() {
+      ASSERT(components.empty(), "Components vector not empty, was destroy() not called?");
+   }
+
    Entity& operator=(const Entity& other) = delete;
    Entity& operator=(Entity&& other) = delete;
 
@@ -87,6 +97,24 @@ public:
       return componentsOfClass;
    }
 
+   void destroy();
+
+   OnDestroyDelegate::Handle bindOnDestroy(const OnDestroyDelegate::FuncType& function) {
+      return onDestroy.bind(function);
+   }
+
+   bool destroyComponent(Component* componentToDestroy) {
+      auto itr = std::find_if(components.begin(), components.end(), [componentToDestroy](const UPtr<Component>& component) { return component.get() == componentToDestroy; });
+
+      if (itr != components.end()) {
+         (*itr)->executeDestroy();
+         components.erase(itr);
+         return true;
+      }
+
+      return false;
+   }
+
    Scene& getScene() {
       return scene;
    }
@@ -153,8 +181,18 @@ private:
       }
    }
 
+   void executeDestroy() {
+      for (const auto& component : components) {
+         component->executeDestroy();
+      }
+      components.clear();
+
+      onDestroy.execute(this);
+   }
+
    std::vector<UPtr<Component>> components;
    Scene& scene;
+   OnDestroyDelegate onDestroy;
 };
 
 } // namespace Shiny

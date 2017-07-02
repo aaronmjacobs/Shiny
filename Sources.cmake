@@ -11,6 +11,7 @@ set(SOURCE_NAMES
    Audio/Sound.cpp
    Audio/Stream.cpp
    Entity/Component.cpp
+   Entity/Entity.cpp
    Graphics/Context.cpp
    Graphics/Framebuffer.cpp
    Graphics/Mesh.cpp
@@ -28,7 +29,6 @@ set(SOURCE_NAMES
    Platform/OSUtils.cpp
    Scene/CameraComponent.cpp
    Scene/ModelComponent.cpp
-   Scene/Scene.cpp
    Scene/TransformComponent.cpp
    Text/Font.cpp
    Text/FontAtlas.cpp

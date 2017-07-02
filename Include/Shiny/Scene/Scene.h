@@ -4,6 +4,7 @@
 #include "Shiny/Pointers.h"
 #include "Shiny/Entity/Entity.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,13 @@ class Scene {
 public:
    Scene()
       : activeCamera(nullptr) {
+   }
+
+   ~Scene() {
+      for (const auto& entity : entities) {
+         entity->executeDestroy();
+      }
+      entities.clear();
    }
 
    template<typename... ComponentTypes>
@@ -30,6 +38,18 @@ public:
 
    const std::vector<UPtr<Entity>>& getEntities() const {
       return entities;
+   }
+
+   bool destroyEntity(Entity* entityToDestroy) {
+      auto itr = std::find_if(entities.begin(), entities.end(), [entityToDestroy](const UPtr<Entity>& entity) { return entity.get() == entityToDestroy; });
+
+      if (itr != entities.end()) {
+         (*itr)->executeDestroy();
+         entities.erase(itr);
+         return true;
+      }
+
+      return false;
    }
 
    void setActiveCamera(CameraComponent* newCamera) {

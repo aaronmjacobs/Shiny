@@ -3,6 +3,7 @@
 
 #include "Shiny/Pointers.h"
 #include "Shiny/ShinyAssert.h"
+#include "Shiny/Entity/Delegate.h"
 
 #include <string>
 #include <unordered_map>
@@ -13,12 +14,20 @@ class Entity;
 
 class Component {
 public:
+   using OnDestroyDelegate = Delegate<void, Component*>;
+
    virtual ~Component() = default;
 
    virtual void onOwnerInitialized() {
    }
 
    virtual void onComponentAddedToOwner(Component* component) {
+   }
+
+   void destroy();
+
+   OnDestroyDelegate::Handle bindOnDestroy(const OnDestroyDelegate::FuncType& function) {
+      return onDestroy.bind(function);
    }
 
    Entity& getOwner() {
@@ -35,7 +44,14 @@ protected:
    }
 
 private:
+   friend class Entity;
+
+   void executeDestroy() {
+      onDestroy.execute(this);
+   }
+
    Entity& owner;
+   OnDestroyDelegate onDestroy;
 };
 
 template<typename T>
