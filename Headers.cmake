@@ -17,6 +17,7 @@ set(HEADER_NAMES
    Audio/Sound.h
    Audio/Stream.h
    Entity/Component.h
+   Entity/Delegate.h
    Entity/Entity.h
    Graphics/Context.h
    Graphics/Framebuffer.h
