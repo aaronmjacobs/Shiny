@@ -25,9 +25,6 @@ namespace Shiny {
 
 namespace {
 
-const glm::vec3 kFront(0.0f, 0.0f, -1.0f);
-const glm::vec3 kUp(0.0f, 1.0f, 0.0f);
-
 AudioSource::Type getSourceType(ALint alType) {
    switch (alType) {
       case AL_UNDETERMINED:
