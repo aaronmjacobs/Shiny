@@ -5,6 +5,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
 
 namespace Shiny {
 
@@ -23,6 +25,10 @@ struct Transform {
       glm::vec3 inversePosition = inverseOrientation * (inverseScale * -position);
 
       return Transform(inverseOrientation, inversePosition, inverseScale);
+   }
+
+   glm::mat4 toMatrix() const {
+      return glm::translate(position) * glm::toMat4(orientation) * glm::scale(scale);
    }
 
    Transform operator*(const Transform& other) const {
