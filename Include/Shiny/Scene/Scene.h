@@ -3,14 +3,17 @@
 
 #include "Shiny/Pointers.h"
 #include "Shiny/Entity/Entity.h"
+#include "Shiny/Scene/ModelComponent.h"
 
 #include <algorithm>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Shiny {
 
 class CameraComponent;
+class ShaderProgram;
 
 class Scene {
 public:
@@ -41,7 +44,9 @@ public:
    }
 
    bool destroyEntity(Entity* entityToDestroy) {
-      auto itr = std::find_if(entities.begin(), entities.end(), [entityToDestroy](const UPtr<Entity>& entity) { return entity.get() == entityToDestroy; });
+      auto itr = std::find_if(entities.begin(), entities.end(), [entityToDestroy](const UPtr<Entity>& entity) {
+         return entity.get() == entityToDestroy;
+      });
 
       if (itr != entities.end()) {
          (*itr)->executeDestroy();
@@ -60,8 +65,21 @@ public:
       return activeCamera;
    }
 
+   void registerModelComponent(ModelComponent* modelComponent);
+
+   const std::unordered_map<ShaderProgram*, std::vector<ModelComponent*>>& getModelComponentsByShaderProgram() const {
+      return modelComponentsByShaderProgram;
+   }
+
 private:
+   struct ModelComponentHandles {
+      Component::OnDestroyDelegate::Handle onDestroyHandle;
+      ModelComponent::OnShaderProgramChangeDelegate::Handle onShaderProgramChangeHandle;
+   };
+
    std::vector<UPtr<Entity>> entities;
+   std::unordered_map<ShaderProgram*, std::vector<ModelComponent*>> modelComponentsByShaderProgram;
+   std::unordered_map<ModelComponent*, ModelComponentHandles> modelComponentHandles;
    CameraComponent* activeCamera;
 };
 

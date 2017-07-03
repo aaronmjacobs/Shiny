@@ -29,6 +29,7 @@ set(SOURCE_NAMES
    Platform/OSUtils.cpp
    Scene/CameraComponent.cpp
    Scene/ModelComponent.cpp
+   Scene/Scene.cpp
    Scene/TransformComponent.cpp
    Text/Font.cpp
    Text/FontAtlas.cpp

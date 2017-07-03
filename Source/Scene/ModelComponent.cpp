@@ -1,5 +1,6 @@
 #include "Shiny/Graphics/ShaderProgram.h"
 #include "Shiny/Scene/ModelComponent.h"
+#include "Shiny/Scene/Scene.h"
 
 #include <glm/gtx/transform.hpp>
 
@@ -12,8 +13,13 @@ const char* kNormalMatrix = "uNormalMatrix";
 
 } // namespace
 
+ModelComponent::ModelComponent(Entity& entity)
+   : TransformComponent(entity) {
+   getOwner().getScene().registerModelComponent(this);
+}
+
 void ModelComponent::render(RenderData renderData) {
-   const SPtr<ShaderProgram>& program = model.getProgram();
+   const SPtr<ShaderProgram>& program = model.getShaderProgram();
 
    if (program && program->hasUniform(kModelMatrix)) {
       Transform absoluteTransform = getAbsoluteTransform();

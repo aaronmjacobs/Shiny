@@ -69,10 +69,10 @@ SPtr<Texture> TextRenderer::renderToTexture(const char *text, int *textureWidth,
    }
 
    const char *uProjMatrix = "uProjMatrix";
-   if (model.getProgram()->hasUniform(uProjMatrix)) {
+   if (model.getShaderProgram()->hasUniform(uProjMatrix)) {
       // stb_truetype generates the bitmap top-down, but we need it to be bottom-up,
       // so just flip the y values using the projection matrix
-      model.getProgram()->setUniformValue(uProjMatrix, glm::ortho<float>(0.0f, width, height, 0.0f));
+      model.getShaderProgram()->setUniformValue(uProjMatrix, glm::ortho<float>(0.0f, width, height, 0.0f));
    }
 
    UPtr<Framebuffer> framebuffer = std::make_unique<Framebuffer>(static_cast<GLsizei>(glm::ceil(width)), static_cast<GLsizei>(glm::ceil(height)), false);
