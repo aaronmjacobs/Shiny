@@ -22,7 +22,6 @@ struct ImageInfo {
    int width;
    int height;
    int composition;
-   GLint format;
    PixelPtr pixels;
 };
 
@@ -36,8 +35,7 @@ PixelPtr createPixelPtr(unsigned char *pixels) {
 bool infoMatches(const ImageInfo& first, const ImageInfo& second) {
    return first.width == second.width
       && first.height == second.height
-      && first.composition == second.composition
-      && first.format == second.format;
+      && first.composition == second.composition;
 }
 
 ImageInfo getDefaultImageInfo() {
