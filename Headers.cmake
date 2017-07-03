@@ -48,6 +48,9 @@ set(HEADER_NAMES
    Scene/CameraComponent.h
    Scene/ModelComponent.h
    Scene/TransformComponent.h
+   Scene/DeferredRenderer.h
+   Scene/ForwardRenderer.h
+   Scene/Renderer.h
    Text/Font.h
    Text/FontAtlas.h
    Text/TextRenderer.h

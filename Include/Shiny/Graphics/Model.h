@@ -38,7 +38,7 @@ public:
       return mesh;
    }
 
-   const SPtr<ShaderProgram>& getProgram() const {
+   const SPtr<ShaderProgram>& getShaderProgram() const {
       return program;
    }
 

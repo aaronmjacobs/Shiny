@@ -28,6 +28,9 @@ set(SOURCE_NAMES
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
    Scene/CameraComponent.cpp
+   Scene/DeferredRenderer.cpp
+   Scene/ForwardRenderer.cpp
+   Scene/Scene.cpp
    Scene/ModelComponent.cpp
    Scene/TransformComponent.cpp
    Text/Font.cpp

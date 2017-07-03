@@ -20,10 +20,12 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Include")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 set(BIN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/Include")
+set(TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Test")
 
 # Options
 option(SHINY_LOG_INTERNAL "Enable Shiny internal logging" ON)
 option(SHINY_LOG_MSVC_STYLE "Format logs for MSVC" ${MSVC})
+option(SHINY_BUILD_TESTS "Build Shiny tests" OFF)
 
 ### Source Content ###
 
@@ -176,3 +178,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENAL_LIBRARY})
 target_include_directories(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:${OPENAL_LIBRARY},INCLUDE_DIRECTORIES>)
 
 set(BUILD_SHARED_LIBS ${SHINY_BUILD_SHARED_LIB} CACHE INTERNAL "Build shared libraries")
+
+### Testing ###
+
+if(SHINY_BUILD_TESTS)
+   add_subdirectory("${TEST_DIR}")
+endif(SHINY_BUILD_TESTS)

@@ -3,14 +3,17 @@
 
 #include "Shiny/Pointers.h"
 #include "Shiny/Entity/Entity.h"
+#include "Shiny/Scene/ModelComponent.h"
 
 #include <algorithm>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Shiny {
 
 class CameraComponent;
+class ShaderProgram;
 
 class Scene {
 public:
@@ -60,8 +63,17 @@ public:
       return activeCamera;
    }
 
+   void registerModelComponent(ModelComponent* modelComponent);
+
+   const std::unordered_map<ShaderProgram*, std::vector<ModelComponent*>>& getModelComponentsByShaderProgram() const {
+      return modelComponentsByShaderProgram;
+   }
+
 private:
    std::vector<UPtr<Entity>> entities;
+   std::unordered_map<ShaderProgram*, std::vector<ModelComponent*>> modelComponentsByShaderProgram;
+   std::vector<Component::OnDestroyDelegate::Handle> modelDestroyHandles;
+   std::vector<ModelComponent::OnShaderProgramChangedDelegate::Handle> shaderProgramChangedHandles;
    CameraComponent* activeCamera;
 };
 
