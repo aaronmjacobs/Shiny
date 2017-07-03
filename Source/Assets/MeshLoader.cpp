@@ -1,12 +1,11 @@
 #include "Shiny/Log.h"
 #include "Shiny/ShinyAssert.h"
-
 #include "Shiny/Assets/MeshLoader.h"
-
 #include "Shiny/Graphics/Mesh.h"
-
 #include "Shiny/Platform/IOUtils.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <tiny_obj_loader.h>
 
 #include <cstring>
@@ -39,7 +38,37 @@ const char* kCubeMeshSource = "v -0.500000 -0.500000 0.500000\nv 0.500000 -0.500
 
 const char* kXyPlaneMeshSource = "v -1.000000 -1.000000 -0.000000\nv 1.000000 -1.000000 -0.000000\nv -1.000000 1.000000 0.000000\nv 1.000000 1.000000 0.000000\nvt 0.000000 0.000000\nvt 1.000000 0.000000\nvt 0.000000 1.000000\nvt 1.000000 1.000000\nvn 0.000000 -0.000000 1.000000\ns off\nf 2/2/1 4/4/1 3/3/1\nf 1/1/1 2/2/1 3/3/1\n";
 
-SPtr<Mesh> meshFromStream(std::istream &in) {
+std::vector<glm::vec3> generateNormals(const float *vertices, unsigned int numVertices, const unsigned int *indices, unsigned int numIndices) {
+   std::vector<glm::vec3> calcedNormals(numVertices);
+
+   for (std::size_t i = 0; i < numIndices / 3; ++i) {
+      unsigned int index1 = indices[i * 3];
+      unsigned int index2 = indices[i * 3 + 1];
+      unsigned int index3 = indices[i * 3 + 2];
+
+      glm::vec3 vertex1(vertices[index1 * 3], vertices[index1 * 3 + 1], vertices[index1 * 3 + 2]);
+      glm::vec3 vertex2(vertices[index2 * 3], vertices[index2 * 3 + 1], vertices[index2 * 3 + 2]);
+      glm::vec3 vertex3(vertices[index3 * 3], vertices[index3 * 3 + 1], vertices[index3 * 3 + 2]);
+
+      glm::vec3 side1 = vertex2 - vertex1;
+      glm::vec3 side2 = vertex3 - vertex1;
+
+      glm::vec3 normal = glm::normalize(glm::cross(side1, side2));
+      calcedNormals[index1] += normal;
+      calcedNormals[index2] += normal;
+      calcedNormals[index3] += normal;
+   }
+
+   for (glm::vec3& calcedNormal : calcedNormals) {
+      if (glm::length(calcedNormal) > 0.0f) {
+         calcedNormal = glm::normalize(calcedNormal);
+      }
+   }
+
+   return calcedNormals;
+}
+
+SPtr<Mesh> meshFromStream(std::istream &in, bool generateNormalsIfMissing) {
    tinyobj::attrib_t attributes;
    std::vector<tinyobj::shape_t> shapes;
    std::vector<tinyobj::material_t> materials;
@@ -61,29 +90,37 @@ SPtr<Mesh> meshFromStream(std::istream &in) {
    const tinyobj::shape_t &shape = shapes.at(0);
    unsigned int dimensionality = 3;
 
-   unsigned int numVertices = attributes.vertices.size() / dimensionality;
-   unsigned int numNormals = attributes.normals.size() / dimensionality;
-   unsigned int numTexCoords = attributes.texcoords.size() / 2;
-   unsigned int numIndices = shape.mesh.indices.size();
+   unsigned int numVertices = static_cast<unsigned int>(attributes.vertices.size() / dimensionality);
+   unsigned int numNormals = static_cast<unsigned int>(attributes.normals.size() / dimensionality);
+   unsigned int numTexCoords = static_cast<unsigned int>(attributes.texcoords.size() / 2);
+   unsigned int numIndices = static_cast<unsigned int>(shape.mesh.indices.size());
 
    std::vector<unsigned int> indices(numIndices);
    for (std::size_t i = 0; i < numIndices; ++i) {
       indices[i] = shape.mesh.indices[i].vertex_index;
    }
 
-   return std::make_shared<Mesh>(attributes.vertices.data(), numVertices, attributes.normals.data(), numNormals,
+   const float* normals = attributes.normals.data();
+   std::vector<glm::vec3> generatedNormals;
+   if (numNormals == 0 && generateNormalsIfMissing) {
+      generatedNormals = generateNormals(attributes.vertices.data(), numVertices, indices.data(), numIndices);
+      normals = glm::value_ptr(*generatedNormals.data());
+      numNormals = static_cast<unsigned int>(generatedNormals.size());
+   }
+
+   return std::make_shared<Mesh>(attributes.vertices.data(), numVertices, normals, numNormals,
                                  attributes.texcoords.data(), numTexCoords, indices.data(), numIndices,
                                  dimensionality);
 }
 
 SPtr<Mesh> getMeshFromMemory(const char *data) {
    std::stringstream ss(data);
-   return meshFromStream(ss);
+   return meshFromStream(ss, true);
 }
 
 } // namespace
 
-SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName) {
+SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName, bool generateNormalsIfMissing) {
    MeshMap::iterator location(meshMap.find(fileName));
    if (location != meshMap.end()) {
       return location->second;
@@ -97,7 +134,7 @@ SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName) {
    }
 
    std::ifstream in(fileName);
-   mesh = meshFromStream(in);
+   mesh = meshFromStream(in, generateNormalsIfMissing);
 
    if (!mesh) {
       LOG_WARNING("Unable to import mesh \"" << fileName << "\", reverting to default");

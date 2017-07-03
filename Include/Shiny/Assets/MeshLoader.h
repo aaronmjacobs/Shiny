@@ -27,7 +27,7 @@ public:
    /**
     * Loads the mesh with the given file name, using a cached version if possible
     */
-   SPtr<Mesh> loadMesh(const std::string &fileName);
+   SPtr<Mesh> loadMesh(const std::string &fileName, bool generateNormalsIfMissing = true);
 
    /**
     * Gets a mesh with the given shape
