@@ -192,7 +192,7 @@ private:
 };
 
 template<>
-void Entity::constructComponents() {
+inline void Entity::constructComponents() {
 }
 
 } // namespace Shiny
