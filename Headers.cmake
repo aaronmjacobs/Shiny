@@ -44,9 +44,13 @@ set(HEADER_NAMES
    Math/Transform.h
    Platform/IOUtils.h
    Platform/OSUtils.h
-   Scene/Scene.h
    Scene/CameraComponent.h
+   Scene/DirectionalLightComponent.h
+   Scene/LightComponent.h
    Scene/ModelComponent.h
+   Scene/PointLightComponent.h
+   Scene/Scene.h
+   Scene/SpotLightComponent.h
    Scene/TransformComponent.h
    Text/Font.h
    Text/FontAtlas.h

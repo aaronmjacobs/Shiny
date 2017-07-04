@@ -28,8 +28,12 @@ set(SOURCE_NAMES
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
    Scene/CameraComponent.cpp
+   Scene/DirectionalLightComponent.cpp
+   Scene/LightComponent.cpp
    Scene/ModelComponent.cpp
+   Scene/PointLightComponent.cpp
    Scene/Scene.cpp
+   Scene/SpotLightComponent.cpp
    Scene/TransformComponent.cpp
    Text/Font.cpp
    Text/FontAtlas.cpp
