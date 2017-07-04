@@ -6,6 +6,10 @@ namespace Shiny {
 void PointLightComponent::apply(ShaderProgram& program, RenderData& renderData) {
    LightComponent::apply(program, renderData);
 
+   if (program.hasUniform("uLight.position")) {
+      program.setUniformValue("uLight.position", getAbsoluteTransform().position);
+   }
+
    if (program.hasUniform("uLight.squareFalloff")) {
       program.setUniformValue("uLight.squareFalloff", squareFalloff);
    }
