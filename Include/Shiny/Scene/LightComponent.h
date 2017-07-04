@@ -25,9 +25,7 @@ public:
 protected:
    friend class ComponentRegistrar<LightComponent>;
 
-   LightComponent(Entity& entity)
-      : TransformComponent(entity), color(1.0f) {
-   }
+   LightComponent(Entity& entity);
 
 private:
    glm::vec3 color;

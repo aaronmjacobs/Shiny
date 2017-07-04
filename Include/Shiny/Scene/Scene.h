@@ -13,6 +13,7 @@
 namespace Shiny {
 
 class CameraComponent;
+class LightComponent;
 class ShaderProgram;
 
 class Scene {
@@ -71,6 +72,12 @@ public:
       return modelComponentsByShaderProgram;
    }
 
+   void registerLightComponent(LightComponent* lightComponent);
+
+   const std::vector<LightComponent*> getLightComponents() const {
+      return lightComponents;
+   }
+
 private:
    struct ModelComponentHandles {
       Component::OnDestroyDelegate::Handle onDestroyHandle;
@@ -78,8 +85,13 @@ private:
    };
 
    std::vector<UPtr<Entity>> entities;
+
    std::unordered_map<ShaderProgram*, std::vector<ModelComponent*>> modelComponentsByShaderProgram;
    std::unordered_map<ModelComponent*, ModelComponentHandles> modelComponentHandles;
+
+   std::vector<LightComponent*> lightComponents;
+   std::unordered_map<LightComponent*, Component::OnDestroyDelegate::Handle> lightComponentDestroyHandles;
+
    CameraComponent* activeCamera;
 };
 

@@ -1,3 +1,4 @@
+#include "Shiny/Scene/LightComponent.h"
 #include "Shiny/Scene/ModelComponent.h"
 #include "Shiny/Scene/Scene.h"
 
@@ -38,6 +39,23 @@ void Scene::registerModelComponent(ModelComponent* modelComponent) {
 
    modelComponentHandles[modelComponent] = std::move(handles);
    addToMap(modelComponent, modelComponent->getShaderProgram().get());
+}
+
+void Scene::registerLightComponent(LightComponent* lightComponent) {
+   lightComponents.push_back(lightComponent);
+
+   lightComponentDestroyHandles[lightComponent] = lightComponent->bindOnDestroy([this](Component* component) {
+      LightComponent* lightComponent = static_cast<LightComponent*>(component);
+
+      auto vecItr = std::find(lightComponents.begin(), lightComponents.end(), lightComponent);
+      ASSERT(vecItr != lightComponents.end());
+
+      auto mapItr = lightComponentDestroyHandles.find(lightComponent);
+      ASSERT(mapItr != lightComponentDestroyHandles.end());
+
+      lightComponents.erase(vecItr);
+      lightComponentDestroyHandles.erase(mapItr);
+   });
 }
 
 } // namespace Shiny
