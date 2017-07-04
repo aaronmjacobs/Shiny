@@ -33,8 +33,8 @@ void Model::draw(RenderData renderData) {
    if (mesh && program) {
       mesh->bindVAO();
 
-      for (const SPtr<Material> &material : materials) {
-         material->apply(program, renderData);
+      for (const SPtr<Material>& material : materials) {
+         material->apply(*program, renderData);
       }
 
       program->commit();

@@ -12,7 +12,7 @@ class Material {
 public:
    virtual ~Material() = default;
 
-   virtual void apply(const SPtr<ShaderProgram> &program, RenderData &renderData) = 0;
+   virtual void apply(ShaderProgram& program, RenderData& renderData) = 0;
 };
 
 } // namespace Shiny
