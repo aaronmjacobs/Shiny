@@ -19,7 +19,7 @@ ModelComponent::ModelComponent(Entity& entity)
 }
 
 void ModelComponent::render(RenderData renderData) {
-   const SPtr<ShaderProgram>& program = model.getShaderProgram();
+   ShaderProgram* program = renderData.getOverrideProgram() ? renderData.getOverrideProgram() : model.getShaderProgram().get();
 
    if (program && program->hasUniform(kModelMatrix)) {
       Transform absoluteTransform = getAbsoluteTransform();

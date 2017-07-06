@@ -15,9 +15,4 @@ GLint RenderData::maxTextureUnits() {
    return maxUnits;
 }
 
-GLint RenderData::aquireTextureUnit() {
-   ASSERT(nextTextureUnit < maxTextureUnits(), "Ran out of texture units");
-   return nextTextureUnit++;
-}
-
 } // namespace Shiny
