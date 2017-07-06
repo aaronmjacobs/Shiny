@@ -30,13 +30,16 @@ void Model::move(Model &&other) {
 }
 
 void Model::draw(RenderData renderData) {
-   ShaderProgram* activeProgram = renderData.getOverrideProgram() ? renderData.getOverrideProgram() : program.get();
+   ShaderProgram* overrideProgram = renderData.getOverrideProgram();
+   ShaderProgram* activeProgram = overrideProgram ? overrideProgram : program.get();
 
    if (mesh && activeProgram) {
       mesh->bindVAO();
 
-      for (const SPtr<Material>& material : materials) {
-         material->apply(*activeProgram, renderData);
+      if (!overrideProgram) {
+         for (const SPtr<Material>& material : materials) {
+            material->apply(*activeProgram, renderData);
+         }
       }
 
       activeProgram->commit();
