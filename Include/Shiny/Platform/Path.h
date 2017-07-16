@@ -77,7 +77,7 @@ private:
 
 inline bool operator==(const Path& first, const Path& second) {
 #ifdef _WIN32
-   return std::equal(first.toString().begin(), first.toString().end(), second.toString().begin(), [](unsigned char first, unsigned char second) {
+   return std::equal(first.toString().begin(), first.toString().end(), second.toString().begin(), second.toString().end(), [](unsigned char first, unsigned char second) {
       return std::tolower(first) == std::tolower(second);
    });
 #else
