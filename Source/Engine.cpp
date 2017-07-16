@@ -199,6 +199,10 @@ void Engine::run() {
 
       accumulator += frameTime;
       while (accumulator >= dt) {
+         // Always use the most up-to-date user input
+         glfwPollEvents();
+         pollInput();
+
          tick(static_cast<float>(dt));
          runningTime += static_cast<float>(dt);
          accumulator -= dt;
@@ -207,9 +211,6 @@ void Engine::run() {
       render();
 
       glfwSwapBuffers(window.get());
-      glfwPollEvents();
-
-      pollInput();
    }
 
    running = false;
