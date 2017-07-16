@@ -2,6 +2,7 @@
 #include "Shiny/ShinyAssert.h"
 #include "Shiny/Graphics/OpenGL.h"
 #include "Shiny/Platform/OSUtils.h"
+#include "Shiny/Platform/Path.h"
 
 #include <cxxopts.hpp>
 #include <GLFW/glfw3.h>
@@ -9,9 +10,6 @@
 namespace Shiny {
 
 namespace {
-
-const char* kDefaultDataFolderPath = "Data";
-std::string dataFolderPath = kDefaultDataFolderPath;
 
 void glfwErrorCallback(int error, const char* description) {
    ASSERT(false, "GLFW error %d: %s", error, description);
@@ -46,16 +44,10 @@ Result init(int argc, char* argv[]) {
    static const char* kDataPathOption = "data_path";
 
    cxxopts::Options options("Shiny", "Simple game engine");
-   options.add_options()(kDataPathOption, "Path to the data folder", cxxopts::value<std::string>()->default_value(kDefaultDataFolderPath));
+   options.add_options()(kDataPathOption, "Path to the data folder", cxxopts::value<std::string>());
    options.parse(argc, argv);
-   dataFolderPath = options[kDataPathOption].as<std::string>();
-
-   if (dataFolderPath.length() > 1) {
-      char lastChar = dataFolderPath[dataFolderPath.length() - 1];
-      if (lastChar == '/' || lastChar == '\\') {
-         dataFolderPath.pop_back();
-      }
-   }
+   std::string dataPathStr = options[kDataPathOption].as<std::string>();
+   Path::init(dataPathStr);
 
    if (!OSUtils::fixWorkingDirectory()) {
       return Result::kWorkingDirectory;
@@ -80,10 +72,6 @@ Result init(int argc, char* argv[]) {
 
 void terminate() {
    glfwTerminate();
-}
-
-const std::string& dataPath() {
-   return dataFolderPath;
 }
 
 } // namespace Shiny

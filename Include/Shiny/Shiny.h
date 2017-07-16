@@ -29,11 +29,6 @@ Result init(int argc, char* argv[]);
  */
 void terminate();
 
-/**
- * Returns the path to the data folder
- */
-const std::string& dataPath();
-
 } // namespace Shiny
 
 #endif

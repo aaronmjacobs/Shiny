@@ -27,6 +27,7 @@ set(SOURCE_NAMES
    Input/Mouse.cpp
    Platform/IOUtils.cpp
    Platform/OSUtils.cpp
+   Platform/Path.cpp
    Scene/CameraComponent.cpp
    Scene/DirectionalLightComponent.cpp
    Scene/LightComponent.cpp

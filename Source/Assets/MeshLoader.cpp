@@ -38,7 +38,7 @@ const char* kCubeMeshSource = "v -0.500000 -0.500000 0.500000\nv 0.500000 -0.500
 
 const char* kXyPlaneMeshSource = "v -1.000000 -1.000000 -0.000000\nv 1.000000 -1.000000 -0.000000\nv -1.000000 1.000000 0.000000\nv 1.000000 1.000000 0.000000\nvt 0.000000 0.000000\nvt 1.000000 0.000000\nvt 0.000000 1.000000\nvt 1.000000 1.000000\nvn 0.000000 -0.000000 1.000000\ns off\nf 2/2/1 4/4/1 3/3/1\nf 1/1/1 2/2/1 3/3/1\n";
 
-std::vector<glm::vec3> generateNormals(const float *vertices, unsigned int numVertices, const unsigned int *indices, unsigned int numIndices) {
+std::vector<glm::vec3> generateNormals(const float* vertices, unsigned int numVertices, const unsigned int* indices, unsigned int numIndices) {
    std::vector<glm::vec3> calcedNormals(numVertices);
 
    for (std::size_t i = 0; i < numIndices / 3; ++i) {
@@ -68,7 +68,7 @@ std::vector<glm::vec3> generateNormals(const float *vertices, unsigned int numVe
    return calcedNormals;
 }
 
-SPtr<Mesh> meshFromStream(std::istream &in, bool generateNormalsIfMissing) {
+SPtr<Mesh> meshFromStream(std::istream& in, bool generateNormalsIfMissing) {
    tinyobj::attrib_t attributes;
    std::vector<tinyobj::shape_t> shapes;
    std::vector<tinyobj::material_t> materials;
@@ -113,35 +113,35 @@ SPtr<Mesh> meshFromStream(std::istream &in, bool generateNormalsIfMissing) {
                                  dimensionality);
 }
 
-SPtr<Mesh> getMeshFromMemory(const char *data) {
+SPtr<Mesh> getMeshFromMemory(const char* data) {
    std::stringstream ss(data);
    return meshFromStream(ss, true);
 }
 
 } // namespace
 
-SPtr<Mesh> MeshLoader::loadMesh(const std::string &fileName, bool generateNormalsIfMissing) {
-   MeshMap::iterator location(meshMap.find(fileName));
+SPtr<Mesh> MeshLoader::loadMesh(const Path& filePath, bool generateNormalsIfMissing) {
+   auto location = meshMap.find(filePath);
    if (location != meshMap.end()) {
       return location->second;
    }
 
    SPtr<Mesh> mesh;
 
-   if (!IOUtils::canRead(fileName)) {
-      LOG_WARNING("Unable to load mesh from file \"" << fileName << "\", reverting to default");
+   if (!IOUtils::canRead(filePath)) {
+      LOG_WARNING("Unable to load mesh from file \"" << filePath << "\", reverting to default");
       mesh = getMeshForShape(MeshShape::Cube);
    }
 
-   std::ifstream in(fileName);
+   std::ifstream in(filePath.toString());
    mesh = meshFromStream(in, generateNormalsIfMissing);
 
    if (!mesh) {
-      LOG_WARNING("Unable to import mesh \"" << fileName << "\", reverting to default");
+      LOG_WARNING("Unable to import mesh \"" << filePath << "\", reverting to default");
       mesh = getMeshForShape(MeshShape::Cube);
    }
 
-   meshMap.insert({ fileName, mesh });
+   meshMap.insert({ filePath, mesh });
    return mesh;
 }
 

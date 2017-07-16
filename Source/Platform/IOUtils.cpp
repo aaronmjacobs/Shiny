@@ -8,14 +8,12 @@ namespace Shiny {
 
 namespace IOUtils {
 
-bool canRead(const std::string& fileName) {
-   ASSERT(!fileName.empty(), "Trying to check empty file name");
-   return !!std::ifstream(fileName);
+bool canRead(const Path& path) {
+   return !!std::ifstream(path.toString());
 }
 
-bool readTextFile(const std::string& fileName, std::string& data) {
-   ASSERT(!fileName.empty(), "Trying to read from empty file name");
-   std::ifstream in(fileName);
+bool readTextFile(const Path& path, std::string& data) {
+   std::ifstream in(path.toString());
    if (!in) {
       return false;
    }
@@ -24,10 +22,8 @@ bool readTextFile(const std::string& fileName, std::string& data) {
    return true;
 }
 
-std::vector<uint8_t> readBinaryFile(const std::string& fileName) {
-   ASSERT(!fileName.empty(), "Trying to read from empty file name");
-
-   std::ifstream in(fileName, std::ifstream::binary);
+std::vector<uint8_t> readBinaryFile(const Path& path) {
+   std::ifstream in(path.toString(), std::ifstream::binary);
    if (!in) {
       return std::vector<uint8_t>();
    }
@@ -44,14 +40,12 @@ std::vector<uint8_t> readBinaryFile(const std::string& fileName) {
    return data;
 }
 
-bool writeTextFile(const std::string& fileName, const std::string& data) {
-   ASSERT(!fileName.empty(), "Trying to write to empty file name");
-
-   if (!ensurePathToFileExists(fileName)) {
+bool writeTextFile(const Path& path, const std::string& data) {
+   if (!ensurePathToFileExists(path)) {
       return false;
    }
 
-   std::ofstream out(fileName);
+   std::ofstream out(path.toString());
    if (!out) {
       return false;
    }
@@ -60,14 +54,12 @@ bool writeTextFile(const std::string& fileName, const std::string& data) {
    return true;
 }
 
-bool writeBinaryFile(const std::string& fileName, const std::vector<uint8_t>& data) {
-   ASSERT(!fileName.empty(), "Trying to write to empty file name");
-
-   if (!ensurePathToFileExists(fileName)) {
+bool writeBinaryFile(const Path& path, const std::vector<uint8_t>& data) {
+   if (!ensurePathToFileExists(path)) {
       return false;
    }
 
-   std::ofstream out(fileName, std::ofstream::binary);
+   std::ofstream out(path.toString(), std::ofstream::binary);
    if (!out) {
       return false;
    }
@@ -76,21 +68,18 @@ bool writeBinaryFile(const std::string& fileName, const std::vector<uint8_t>& da
    return true;
 }
 
-bool appDataPath(const std::string& appName, const std::string& fileName, std::string& path) {
-   std::string appDataFolder;
-   if (!OSUtils::getAppDataPath(appName, appDataFolder)) {
+bool appDataPath(const std::string& appName, const std::string& fileName, Path& path) {
+   Path appDataDirectory;
+   if (!OSUtils::getAppDataPath(appName, appDataDirectory)) {
       return false;
    }
 
-   path = appDataFolder + "/" + fileName;
+   path = appDataDirectory / fileName;
    return true;
 }
 
-bool ensurePathToFileExists(const std::string& path) {
-   std::string directory;
-   if (!OSUtils::getDirectoryFromPath(path, directory)) {
-      return false;
-   }
+bool ensurePathToFileExists(const Path& path) {
+   Path directory = path.getDirectory();
 
    if (OSUtils::directoryExists(directory)) {
       return true;

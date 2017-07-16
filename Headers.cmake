@@ -44,6 +44,7 @@ set(HEADER_NAMES
    Math/Transform.h
    Platform/IOUtils.h
    Platform/OSUtils.h
+   Platform/Path.h
    Scene/CameraComponent.h
    Scene/DirectionalLightComponent.h
    Scene/LightComponent.h

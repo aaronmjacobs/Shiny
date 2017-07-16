@@ -37,7 +37,7 @@ namespace Shiny {
 namespace OSUtils {
 
 #ifdef __APPLE__
-bool getExecutablePath(std::string& executablePath) {
+bool getExecutablePathString(std::string& executablePathStr) {
    uint32_t size = MAXPATHLEN;
    char rawPath[size];
    if (_NSGetExecutablePath(rawPath, &size) != 0) {
@@ -49,32 +49,32 @@ bool getExecutablePath(std::string& executablePath) {
       return false;
    }
 
-   executablePath = std::string(realPath);
+   executablePathStr = std::string(realPath);
    return true;
 }
 
-bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
+bool getAppDataPath(const std::string& appName, Path& appDataPath) {
    FSRef ref;
    FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &ref);
 
    char path[PATH_MAX];
    FSRefMakePath(&ref, (UInt8*)&path, PATH_MAX);
 
-   appDataPath = std::string(path) + "/" + appName;
+   appDataPath = Path(std::string(path)) / appName;
    return true;
 }
 
-bool setWorkingDirectory(const std::string& dir) {
-   return chdir(dir.c_str()) == 0;
+bool setWorkingDirectory(const Path& dir) {
+   return chdir(dir.toString().c_str()) == 0;
 }
 
-bool createDirectory(const std::string& dir) {
-   return mkdir(dir.c_str(), 0755) == 0;
+bool createDirectory(const Path& dir) {
+   return mkdir(dir.toString().c_str(), 0755) == 0;
 }
 #endif // __APPLE__
 
 #ifdef __linux__
-bool getExecutablePath(std::string& executablePath) {
+bool getExecutablePathString(std::string& executablePathStr) {
    char path[PATH_MAX + 1];
 
    ssize_t numBytes = readlink("/proc/self/exe", path, PATH_MAX);
@@ -83,11 +83,11 @@ bool getExecutablePath(std::string& executablePath) {
    }
    path[numBytes] = '\0';
 
-   executablePath = std::string(path);
+   executablePathStr = std::string(path);
    return true;
 }
 
-bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
+bool getAppDataPath(const std::string& appName, Path& appDataPath) {
    // First, check the HOME environment variable
    char* homePath = secure_getenv("HOME");
 
@@ -100,21 +100,21 @@ bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
       return false;
    }
 
-   appDataPath = std::string(homePath) + "/.config/" + appName;
+   appDataPath = Path(std::string(homePath)) / (".config/" + appName);
    return true;
 }
 
-bool setWorkingDirectory(const std::string& dir) {
-   return chdir(dir.c_str()) == 0;
+bool setWorkingDirectory(const Path& dir) {
+   return chdir(dir.toString().c_str()) == 0;
 }
 
-bool createDirectory(const std::string& dir) {
-   return mkdir(dir.c_str(), 0755) == 0;
+bool createDirectory(const Path& dir) {
+   return mkdir(dir.toString().c_str(), 0755) == 0;
 }
 #endif // __linux__
 
 #ifdef _WIN32
-bool getExecutablePath(std::string& executablePath) {
+bool getExecutablePathString(std::string& executablePathStr) {
    TCHAR buffer[MAX_PATH + 1];
    DWORD length = GetModuleFileName(NULL, buffer, MAX_PATH);
    buffer[length] = '\0';
@@ -131,15 +131,15 @@ bool getExecutablePath(std::string& executablePath) {
          return false;
       }
 
-      executablePath = std::string(unreasonablyLargeBuffer);
+      executablePathStr = std::string(unreasonablyLargeBuffer);
    } else {
-      executablePath = std::string(buffer);
+      executablePathStr = std::string(buffer);
    }
 
    return true;
 }
 
-bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
+bool getAppDataPath(const std::string& appName, Path& appDataPath) {
    PWSTR path;
    if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &path) != S_OK) {
       CoTaskMemFree(path);
@@ -150,16 +150,16 @@ bool getAppDataPath(const std::string& appName, std::string& appDataPath) {
    CoTaskMemFree(path);
 
    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-   appDataPath = converter.to_bytes(widePathStr) + "/" + appName;
+   appDataPath = Path(converter.to_bytes(widePathStr)) / appName;
    return true;
 }
 
-bool setWorkingDirectory(const std::string& dir) {
-   return SetCurrentDirectory(dir.c_str()) != 0;
+bool setWorkingDirectory(const Path& dir) {
+   return SetCurrentDirectory(dir.toString().c_str()) != 0;
 }
 
-bool createDirectory(const std::string& dir) {
-   return CreateDirectory(dir.c_str(), nullptr) != 0;
+bool createDirectory(const Path& dir) {
+   return CreateDirectory(dir.toString().c_str(), nullptr) != 0;
 }
 #endif // _WIN32
 
@@ -174,23 +174,18 @@ bool getDirectoryFromPath(const std::string& path, std::string& dir) {
 }
 
 bool fixWorkingDirectory() {
-   std::string executablePath;
-   if (!getExecutablePath(executablePath)) {
+   std::string executablePathStr;
+   if (!getExecutablePathString(executablePathStr)) {
       return false;
    }
 
-   std::string executableDir;
-   if (!getDirectoryFromPath(executablePath, executableDir)) {
-      return false;
-   }
-
-   return setWorkingDirectory(executableDir);
+   return setWorkingDirectory(Path(executablePathStr).getDirectory());
 }
 
-bool directoryExists(const std::string& dir) {
+bool directoryExists(const Path& dir) {
    struct stat info;
 
-   if (stat(dir.c_str(), &info) != 0) {
+   if (stat(dir.toString().c_str(), &info) != 0) {
       return false;
    }
 
