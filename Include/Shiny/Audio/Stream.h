@@ -10,25 +10,27 @@ namespace Shiny {
 class AudioBuffer;
 
 class StreamDataSource {
-   public:
-      /*!
-       * Fills the buffer with audio data. If no more data is available, sets the buffer data to be empty. Returns true
-       * if more than zero bytes are placed in the buffer, false otherwise.
-       */
-      virtual bool fill(AudioBuffer *buffer) = 0;
+public:
+   virtual ~StreamDataSource() = default;
 
-      virtual bool seekTo(size_t offset) = 0;
+   /*!
+    * Fills the buffer with audio data. If no more data is available, sets the buffer data to be empty. Returns true
+    * if more than zero bytes are placed in the buffer, false otherwise.
+    */
+   virtual bool fill(AudioBuffer* buffer) = 0;
 
-      virtual size_t getOffset() const = 0;
+   virtual bool seekTo(std::size_t offset) = 0;
 
-      virtual size_t getSize() const = 0;
+   virtual std::size_t getOffset() const = 0;
 
-      virtual int getNumChannels() const = 0;
+   virtual std::size_t getSize() const = 0;
 
-      virtual int getBitsPerSample() const = 0;
+   virtual int getNumChannels() const = 0;
 
-      virtual int getFrequency() const = 0;
-   };
+   virtual int getBitsPerSample() const = 0;
+
+   virtual int getFrequency() const = 0;
+};
 
 class Stream : public Sound {
 private:

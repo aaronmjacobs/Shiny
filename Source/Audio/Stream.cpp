@@ -142,10 +142,10 @@ int Stream::getOffsetInBytes() const {
       activeSize += buffer->getSize();
    }
 
-   int offset = (dataSource->getOffset() - activeSize) + Sound::getOffsetInBytes();
+   int offset = (static_cast<int>(dataSource->getOffset()) - activeSize) + Sound::getOffsetInBytes();
    // Offset can be less than zero when looping (due to data source seeking to beginnig while stream is playing)
    if (offset < 0) {
-      int dataSize = dataSource->getSize();
+      int dataSize = static_cast<int>(dataSource->getSize());
       ASSERT(dataSize != 0, "Data size is zero, but offset is not: %d", offset);
 
       int numDataSteps = 1 + ((-offset - 1) / dataSize);
@@ -173,7 +173,7 @@ int Stream::getSizeInSamples() const {
 }
 
 int Stream::getSizeInBytes() const {
-   return dataSource->getSize();
+   return static_cast<int>(dataSource->getSize());
 }
 
 } // namespace Shiny
